@@ -1,0 +1,9 @@
+# アカウントID
+accountId:
+  type: string
+  pattern: ^P\d{7}$
+  minLength: 8
+  maxLength: 8
+  description: 社員番号
+  example: P0673822
+

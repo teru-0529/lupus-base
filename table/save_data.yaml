@@ -1,0 +1,7 @@
+data_type: define_tables
+version: 3.2.4
+create_at: 2024-03-09T19:13:05+09:00
+schema:
+  name_jp: 在庫管理
+  name_en: inventries
+tables: []
