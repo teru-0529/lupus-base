@@ -1,0 +1,16 @@
+data_type: define_elements
+version: 3.0.22
+create_at: 2024-03-09T19:10:59+09:00
+elements:
+  - name_jp: アカウントID
+    name_en: accountId
+    domain: NOKEY
+    reg_ex: ^P\d{7}$
+    min_digits: 8
+    max_digits: 8
+    min_value: null
+    max_value: null
+    example: P0673822
+    description: 社員番号
+delive_elements: []
+segments: []

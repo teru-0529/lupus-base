@@ -1,0 +1,5 @@
+sources:
+  - schema: inventories
+    sourceType: local
+    gitRepository: null
+    gitTag: null
