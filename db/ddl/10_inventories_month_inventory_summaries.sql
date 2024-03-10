@@ -15,7 +15,7 @@ CREATE TABLE inventories.month_inventory_summaries (
   wearhousing_amount numeric NOT NULL DEFAULT 0.00 check (wearhousing_amount >= 0),
   shipping_amount numeric NOT NULL DEFAULT 0.00 check (shipping_amount >= 0),
   present_amount numeric NOT NULL DEFAULT 0.00 check (present_amount >= 0),
-  cost_price numeric NOT NULL DEFAULT 0.00 check (cost_price >= 0),
+  cost_price numeric check (cost_price >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),

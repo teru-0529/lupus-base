@@ -8,7 +8,7 @@ CREATE TABLE inventories.current_inventory_summaries (
   product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
   present_quantity integer NOT NULL DEFAULT 0 check (present_quantity >= 0),
   present_amount numeric NOT NULL DEFAULT 0.00 check (present_amount >= 0),
-  cost_price numeric NOT NULL DEFAULT 0.00 check (cost_price >= 0),
+  cost_price numeric check (cost_price >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
