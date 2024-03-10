@@ -1,4 +1,4 @@
--- 月次在庫サマリ＿倉庫別:登録後処理
+-- 月次在庫サマリ＿倉庫別:登録「前」処理
 --  導出属性の算出(在庫数量)
 
 -- Create Function
@@ -18,7 +18,7 @@ CREATE TRIGGER post_process
 EXECUTE PROCEDURE inventories.month_summaries_es_registration_post_process();
 
 
--- 月次在庫サマリ:登録後処理
+-- 月次在庫サマリ:登録「前」処理
 --  導出属性の算出(在庫数量/在庫金額/原価)
 --  有効桁数調整(月初金額/入庫金額/出庫金額)
 
@@ -51,7 +51,7 @@ CREATE TRIGGER post_process
 EXECUTE PROCEDURE inventories.month_summaries_registration_post_process();
 
 
--- 現在在庫サマリ:登録後処理
+-- 現在在庫サマリ:登録「前」処理
 --  導出属性の算出(原価)
 --  有効桁数調整(在庫金額)
 
