@@ -2,7 +2,7 @@
 --  導出属性の算出(在庫数量)
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.month_summaries_es_registration_post_process() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION inventories.month_summaries_es_pre_process() RETURNS TRIGGER AS $$
 BEGIN
   -- 導出属性の算出(在庫数量)
   NEW.present_quantity = NEW.init_quantity + NEW.wearhousing_quantity - NEW.shipping_quantity;
@@ -11,11 +11,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create Trigger
-CREATE TRIGGER post_process
+CREATE TRIGGER pre_process
   BEFORE INSERT OR UPDATE
   ON inventories.month_inventory_summaries_every_site
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.month_summaries_es_registration_post_process();
+EXECUTE PROCEDURE inventories.month_summaries_es_pre_process();
 
 
 -- 月次在庫サマリ:登録「前」処理
@@ -23,7 +23,7 @@ EXECUTE PROCEDURE inventories.month_summaries_es_registration_post_process();
 --  有効桁数調整(月初金額/入庫金額/出庫金額)
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.month_summaries_registration_post_process() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION inventories.month_summaries_pre_process() RETURNS TRIGGER AS $$
 BEGIN
   -- 有効桁数調整(月初金額/入庫金額/出庫金額)
   NEW.init_amount = ROUND(NEW.init_amount, 2);
@@ -44,11 +44,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create Trigger
-CREATE TRIGGER post_process
+CREATE TRIGGER pre_process
   BEFORE INSERT OR UPDATE
   ON inventories.month_inventory_summaries
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.month_summaries_registration_post_process();
+EXECUTE PROCEDURE inventories.month_summaries_pre_process();
 
 
 -- 現在在庫サマリ:登録「前」処理
@@ -56,7 +56,7 @@ EXECUTE PROCEDURE inventories.month_summaries_registration_post_process();
 --  有効桁数調整(在庫金額)
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.current_summaries_registration_post_process() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION inventories.current_summaries_pre_process() RETURNS TRIGGER AS $$
 BEGIN
 --  有効桁数調整(在庫金額)
   NEW.present_amount = ROUND(NEW.present_amount, 2);
@@ -71,11 +71,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create Trigger
-CREATE TRIGGER post_process
+CREATE TRIGGER pre_process
   BEFORE INSERT OR UPDATE
   ON inventories.current_inventory_summaries
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.current_summaries_registration_post_process();
+EXECUTE PROCEDURE inventories.current_summaries_pre_process();
 
 
 -- 在庫変動履歴:チェック制約
@@ -120,7 +120,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create Trigger
-CREATE TRIGGER post_process
+CREATE TRIGGER pre_process
   BEFORE INSERT
   ON inventories.inventory_histories
   FOR EACH ROW
