@@ -1,4 +1,4 @@
-DROP FUNCTION IF EXISTS inventories.products_registration_post_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.products_pre_process() CASCADE;
 
 ALTER TABLE inventories.suppliers DROP CONSTRAINT IF EXISTS suppliers_order_policy_check;
 
