@@ -107,6 +107,25 @@ ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_t
 );
 
 
+-- 在庫変動履歴:登録「前」処理
+--  有効桁数調整(変動金額)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.inventory_histories_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+--  有効桁数調整(変動金額)
+  NEW.variable_amount = ROUND(NEW.variable_amount, 2);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.inventory_histories
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.inventory_histories_pre_process();
+
 -- -- 在庫変動履歴:登録後処理
 -- --  導出属性の算出(原価)
 -- --  有効桁数調整(在庫金額)
