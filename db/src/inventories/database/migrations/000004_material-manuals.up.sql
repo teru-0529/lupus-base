@@ -75,27 +75,26 @@ ALTER TABLE inventories.suppliers ADD CONSTRAINT suppliers_exist_bank_check CHEC
   END
 );
 
--- -- Create Constraint
--- ALTER TABLE inventories.suppliers DROP CONSTRAINT IF EXISTS suppliers_order_policy_check;
--- ALTER TABLE inventories.suppliers ADD CONSTRAINT suppliers_order_policy_check CHECK (
---   -- 発注方法が「定期発注」の場合、発注曜日が「必須」
---   -- 発注方法が「随時発注」の場合、発注曜日が存在してはいけない
---   CASE
---     WHEN order_policy='PERIODICALLY' AND order_week_num IS NULL THEN FALSE
---     WHEN order_policy='AS_NEEDED' AND order_week_num IS NOT NULL THEN FALSE
---     ELSE TRUE
---   END
--- );
+-- ビューテーブル(送付先)
+--  企業・企業送付先を統合
 
-
--- Create Constraint
--- ALTER TABLE inventories.suppliers DROP CONSTRAINT IF EXISTS suppliers_order_policy_check;
--- ALTER TABLE inventories.suppliers ADD CONSTRAINT suppliers_order_policy_check CHECK (
---   -- 発注方法が「定期発注」の場合、発注曜日が「必須」
---   -- 発注方法が「随時発注」の場合、発注曜日が存在してはいけない
---   CASE
---     WHEN order_policy='PERIODICALLY' AND order_week_num IS NULL THEN FALSE
---     WHEN order_policy='AS_NEEDED' AND order_week_num IS NOT NULL THEN FALSE
---     ELSE TRUE
---   END
--- );
+-- Create View
+CREATE OR REPLACE VIEW inventories.view_company_destinations AS
+  SELECT
+    company_id,
+    0 AS seq_no,
+    postal_code,
+    address,
+    phone_no,
+    fax_no
+  FROM inventories.companies
+  UNION
+  SELECT
+    costomer_id AS company_id,
+    ROW_NUMBER() OVER(PARTITION BY 'company_id' ORDER BY 'destination_no') AS seq_no,
+    postal_code,
+    address,
+    phone_no,
+    fax_no
+  FROM inventories.company_destinations
+  ORDER BY company_id, seq_no
