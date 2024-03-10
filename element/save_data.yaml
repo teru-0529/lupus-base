@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-10T19:55:32+09:00
+create_at: 2024-03-10T23:35:56+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -499,28 +499,28 @@ segments:
   - key: 在庫変動種類
     value: MOVE_WEARHOUSEMENT
     name: 倉庫間移動入庫
-    description: 倉庫間移動入庫
+    description: 倉庫間移動
   - key: 在庫変動種類
     value: PURCHASE
     name: 仕入入庫
-    description: 仕入入庫
+    description: 仕入
   - key: 在庫変動種類
     value: SALES_RETURN
-    name: 売上返品
+    name: 売上返品入庫
     description: 売上返品
   - key: 在庫変動種類
     value: MOVE_SHIPPMENT
     name: 倉庫間移動出庫
-    description: 倉庫間移動出庫
+    description: 倉庫間移動
   - key: 在庫変動種類
     value: SELES
     name: 売上出庫
-    description: 売上出庫
+    description: 売上
   - key: 在庫変動種類
     value: ORDER_RETURN
-    name: 仕入返品
+    name: 仕入返品出庫
     description: 仕入返品
   - key: 在庫変動種類
     value: OTHER
-    name: その他
+    name: その他雑入出庫
     description: その他
