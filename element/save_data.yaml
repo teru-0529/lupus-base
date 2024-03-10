@@ -1,16 +1,334 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-09T19:10:59+09:00
+create_at: 2024-03-10T10:21:10+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
     domain: NOKEY
-    reg_ex: ^P\d{7}$
+    reg_ex: ^P[0-9]{7}$
     min_digits: 8
     max_digits: 8
     min_value: null
     max_value: null
     example: P0673822
     description: 社員番号
-delive_elements: []
-segments: []
+  - name_jp: 企業ID
+    name_en: companyId
+    domain: NOKEY
+    reg_ex: null
+    min_digits: 6
+    max_digits: 6
+    min_value: null
+    max_value: null
+    example: A01234
+    description: 企業ID
+  - name_jp: 名称
+    name_en: name
+    domain: 文字列
+    reg_ex: null
+    min_digits: null
+    max_digits: 30
+    min_value: null
+    max_value: null
+    example: 田中
+    description: 名称
+  - name_jp: 郵便番号
+    name_en: postalCode
+    domain: 文字列
+    reg_ex: ^[0-9]{3}-[0-9]{4}$
+    min_digits: 8
+    max_digits: 8
+    min_value: null
+    max_value: null
+    example: 100-0005
+    description: 郵便番号
+  - name_jp: 住所
+    name_en: address
+    domain: テキスト
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 東京都千代田区丸の内１丁目
+    description: 住所
+  - name_jp: 電話番号
+    name_en: phoneNo
+    domain: 文字列
+    reg_ex: ^[0-9]{9,10}$
+    min_digits: 9
+    max_digits: 11
+    min_value: null
+    max_value: null
+    example: "05036447177"
+    description: 電話番号
+  - name_jp: 取引状況
+    name_en: dealingStatus
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: ACTIVE
+    description: 取引の状況
+  - name_jp: 銀行コード
+    name_en: bankCode
+    domain: 文字列
+    reg_ex: ^[0-9]{4}$
+    min_digits: 4
+    max_digits: 4
+    min_value: null
+    max_value: null
+    example: "0001"
+    description: 金融機関コード
+  - name_jp: 支店コード
+    name_en: bankBranchCode
+    domain: 文字列
+    reg_ex: ^[0-9]{3}$
+    min_digits: 3
+    max_digits: 3
+    min_value: null
+    max_value: null
+    example: "234"
+    description: 銀行支店コード
+  - name_jp: 口座番号
+    name_en: bankAccountNo
+    domain: 文字列
+    reg_ex: null
+    min_digits: null
+    max_digits: 50
+    min_value: null
+    max_value: null
+    example: 00000-00000-11111
+    description: 口座番号
+  - name_jp: 備考
+    name_en: note
+    domain: テキスト
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 備考
+    description: 備考
+  - name_jp: 日付
+    name_en: day
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 1
+    max_value: 99
+    example: 5
+    description: 日付（月末を示す場合は99）
+  - name_jp: 猶予月数
+    name_en: monthOfTerm
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 1
+    max_value: null
+    example: 1
+    description: 締日計算時の猶予月数
+  - name_jp: 相手先担当者
+    name_en: contactPerson
+    domain: 文字列
+    reg_ex: null
+    min_digits: null
+    max_digits: 20
+    min_value: null
+    max_value: null
+    example: 織田信長
+    description: 相手先担当者名
+  - name_jp: 発注方針
+    name_en: orderPolicy
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: PERIODICALLY
+    description: 発注方針（定期/随時）
+  - name_jp: 発注曜日
+    name_en: orderWeekNum
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 1
+    max_value: 7
+    example: 4
+    description: 発注曜日（日曜が0）
+  - name_jp: 標準入荷日数
+    name_en: daysToArrive
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 1
+    max_value: null
+    example: 5
+    description: 発注後入荷までにかかる日数
+  - name_jp: 送付先No
+    name_en: destinationNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 1
+    description: 送付先用のサロゲートキー
+  - name_jp: 商品ID
+    name_en: productId
+    domain: NOKEY
+    reg_ex: null
+    min_digits: 9
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: ABC001001
+    description: 社内で商品を一意に特定するID
+  - name_jp: 仕入れ先商品コード
+    name_en: productCode
+    domain: 文字列
+    reg_ex: null
+    min_digits: null
+    max_digits: 30
+    min_value: null
+    max_value: null
+    example: 001001ABC-SSL-02
+    description: 仕入れ先側の商品特定ID
+  - name_jp: 価格
+    name_en: price
+    domain: 実数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 0
+    max_value: null
+    example: 32000.53
+    description: 価格
+  - name_jp: 利益率
+    name_en: profitRate
+    domain: 実数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 0
+    max_value: null
+    example: 0.35
+    description: 利益率
+  - name_jp: 倉庫ID
+    name_en: siteId
+    domain: NOKEY
+    reg_ex: null
+    min_digits: 1
+    max_digits: 30
+    min_value: null
+    max_value: null
+    example: DAMAGED_PRODUCTS_SITE
+    description: 在庫を管理する倉庫のID
+  - name_jp: 引当可能
+    name_en: allocatable
+    domain: 可否/フラグ
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: true
+    description: 利用することが可能な在庫であるかどうか
+delive_elements:
+  - origin: 名称
+    name_jp: 企業名称
+    name_en: companyName
+    description: 企業名称
+  - origin: 電話番号
+    name_jp: FAX番号
+    name_en: faxNo
+    description: FAX番号
+  - origin: 名称
+    name_jp: 銀行名称
+    name_en: bankName
+    description: 銀行名称
+  - origin: 日付
+    name_jp: 締日付
+    name_en: cutOffDay
+    description: 締め日
+  - origin: 日付
+    name_jp: 入金期限日付
+    name_en: depositDay
+    description: 入金期限日
+  - origin: 日付
+    name_jp: 支払期限日付
+    name_en: paymentDay
+    description: 支払期限日
+  - origin: アカウントID
+    name_jp: 営業担当者ID
+    name_en: salesPIC
+    description: 得意先の営業担当アカウントID
+  - origin: アカウントID
+    name_jp: 仕入担当者ID
+    name_en: purchasePIC
+    description: 仕入先の仕入担当アカウントID
+  - origin: 猶予月数
+    name_jp: 入金猶予月数
+    name_en: monthOfDepositTerm
+    description: 翌月入金の場合1
+  - origin: 猶予月数
+    name_jp: 支払猶予月数
+    name_en: monthOfPaymentTerm
+    description: 翌月支払の場合1
+  - origin: 名称
+    name_jp: 商品名称
+    name_en: productName
+    description: 商品名称
+  - origin: 価格
+    name_jp: 売価
+    name_en: sellingPrice
+    description: 売価
+  - origin: 価格
+    name_jp: 原価
+    name_en: costPrice
+    description: 原価
+  - origin: 企業ID
+    name_jp: 得意先ID
+    name_en: costomerId
+    description: 得意先ID
+  - origin: 企業ID
+    name_jp: 仕入先ID
+    name_en: supplierId
+    description: 仕入先ID
+  - origin: 利益率
+    name_jp: 標準利益率
+    name_en: standardProfitRate
+    description: 標準利益率
+  - origin: アカウントID
+    name_jp: 管理担当者ID
+    name_en: managePIC
+    description: 管理担当アカウントID
+segments:
+  - key: 取引状況
+    value: READY
+    name: 準備中
+    description: 取引開始前の状態
+  - key: 取引状況
+    value: ACTIVE
+    name: 取引中
+    description: 取引可能な状態
+  - key: 取引状況
+    value: STOP_DEALING
+    name: 取引中止
+    description: 取引を中断している状態
+  - key: 発注方針
+    value: PERIODICALLY
+    name: 定期発注
+    description: 曜日を指定して定期的に発注する
+  - key: 発注方針
+    value: AS_NEEDED
+    name: 随時発注
+    description: 必要な際に随時発注する

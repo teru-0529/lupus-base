@@ -1,9 +1,184 @@
 # アカウントID
 accountId:
   type: string
-  pattern: ^P\d{7}$
+  pattern: ^P[0-9]{7}$
   minLength: 8
   maxLength: 8
   description: 社員番号
   example: P0673822
+
+# 企業ID
+companyId:
+  type: string
+  minLength: 6
+  maxLength: 6
+  description: 企業ID
+  example: A01234
+
+# 名称
+name:
+  type: string
+  maxLength: 30
+  description: 名称
+  example: 田中
+
+# 郵便番号
+postalCode:
+  type: string
+  pattern: ^[0-9]{3}-[0-9]{4}$
+  minLength: 8
+  maxLength: 8
+  description: 郵便番号
+  example: 100-0005
+
+# 住所
+address:
+  type: string
+  description: 住所
+  example: 東京都千代田区丸の内１丁目
+
+# 電話番号
+phoneNo:
+  type: string
+  pattern: ^[0-9]{9,10}$
+  minLength: 9
+  maxLength: 11
+  description: 電話番号
+  example: "05036447177"
+
+# 取引状況
+dealingStatus:
+  type: string
+  enum:
+    - READY
+    - ACTIVE
+    - STOP_DEALING
+  description: 取引の状況
+  example: ACTIVE
+
+# 銀行コード
+bankCode:
+  type: string
+  pattern: ^[0-9]{4}$
+  minLength: 4
+  maxLength: 4
+  description: 金融機関コード
+  example: "0001"
+
+# 支店コード
+bankBranchCode:
+  type: string
+  pattern: ^[0-9]{3}$
+  minLength: 3
+  maxLength: 3
+  description: 銀行支店コード
+  example: "234"
+
+# 口座番号
+bankAccountNo:
+  type: string
+  maxLength: 50
+  description: 口座番号
+  example: 00000-00000-11111
+
+# 備考
+note:
+  type: string
+  description: 備考
+  example: 備考
+
+# 日付
+day:
+  type: integer
+  minimum: 1
+  maximum: 99
+  description: 日付（月末を示す場合は99）
+  example: 5
+
+# 猶予月数
+monthOfTerm:
+  type: integer
+  minimum: 1
+  description: 締日計算時の猶予月数
+  example: 1
+
+# 相手先担当者
+contactPerson:
+  type: string
+  maxLength: 20
+  description: 相手先担当者名
+  example: 織田信長
+
+# 発注方針
+orderPolicy:
+  type: string
+  enum:
+    - PERIODICALLY
+    - AS_NEEDED
+  description: 発注方針（定期/随時）
+  example: PERIODICALLY
+
+# 発注曜日
+orderWeekNum:
+  type: integer
+  minimum: 1
+  maximum: 7
+  description: 発注曜日（日曜が0）
+  example: 4
+
+# 標準入荷日数
+daysToArrive:
+  type: integer
+  minimum: 1
+  description: 発注後入荷までにかかる日数
+  example: 5
+
+# 送付先No
+destinationNo:
+  type: integer
+  description: 送付先用のサロゲートキー
+  example: 1
+
+# 商品ID
+productId:
+  type: string
+  minLength: 9
+  maxLength: 10
+  description: 社内で商品を一意に特定するID
+  example: ABC001001
+
+# 仕入れ先商品コード
+productCode:
+  type: string
+  maxLength: 30
+  description: 仕入れ先側の商品特定ID
+  example: 001001ABC-SSL-02
+
+# 価格
+price:
+  type: number
+  minimum: 0
+  description: 価格
+  example: 32000.53
+
+# 利益率
+profitRate:
+  type: number
+  minimum: 0
+  description: 利益率
+  example: 0.35
+
+# 倉庫ID
+siteId:
+  type: string
+  minLength: 1
+  maxLength: 30
+  description: 在庫を管理する倉庫のID
+  example: DAMAGED_PRODUCTS_SITE
+
+# 引当可能
+allocatable:
+  type: boolean
+  description: 利用することが可能な在庫であるかどうか
+  example: true
 

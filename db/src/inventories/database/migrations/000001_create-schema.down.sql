@@ -1,1 +1,1 @@
-DROP SCHEMA IF EXISTS inventories;
+DROP SCHEMA IF EXISTS inventories CASCADE;
