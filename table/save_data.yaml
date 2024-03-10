@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.4
-create_at: 2024-03-10T09:26:55+09:00
+create_at: 2024-03-10T10:21:37+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories

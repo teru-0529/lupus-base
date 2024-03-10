@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS inventories.companies CASCADE;
 CREATE TABLE inventories.companies (
   company_id varchar(6) NOT NULL check (LENGTH(company_id) = 6),
   company_name varchar(30),
-  postalcode varchar(8) check (postalcode ~* '^[0-9]{3}-[0-9]{4}$'),
+  postal_code varchar(8) check (postal_code ~* '^[0-9]{3}-[0-9]{4}$'),
   address text,
   phone_no varchar(11) check (phone_no ~* '^[0-9]{9,10}$'),
   fax_no varchar(11) check (fax_no ~* '^[0-9]{9,10}$'),
@@ -24,7 +24,7 @@ COMMENT ON TABLE inventories.companies IS '企業';
 -- Set Column Comment
 COMMENT ON COLUMN inventories.companies.company_id IS '企業ID';
 COMMENT ON COLUMN inventories.companies.company_name IS '企業名称';
-COMMENT ON COLUMN inventories.companies.postalcode IS '郵便番号';
+COMMENT ON COLUMN inventories.companies.postal_code IS '郵便番号';
 COMMENT ON COLUMN inventories.companies.address IS '住所';
 COMMENT ON COLUMN inventories.companies.phone_no IS '電話番号';
 COMMENT ON COLUMN inventories.companies.fax_no IS 'FAX番号';

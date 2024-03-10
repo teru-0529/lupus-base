@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-10T09:19:38+09:00
+create_at: 2024-03-10T10:21:10+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -33,7 +33,7 @@ elements:
     example: 田中
     description: 名称
   - name_jp: 郵便番号
-    name_en: postalcode
+    name_en: postalCode
     domain: 文字列
     reg_ex: ^[0-9]{3}-[0-9]{4}$
     min_digits: 8
