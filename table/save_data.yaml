@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.4
-create_at: 2024-03-09T23:46:47+09:00
+create_at: 2024-03-10T09:26:55+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -248,4 +248,23 @@ tables:
           fields:
             - this: 仕入先ID
               ref: 仕入先ID
+    indexes: []
+  - name_jp: 倉庫
+    name_en: inventory_sites
+    is_master: true
+    fields:
+      - name: 倉庫ID
+        nullable: false
+        default: null
+      - name: 管理担当者ID
+        nullable: true
+        default: null
+      - name: 引当可能
+        nullable: false
+        default: "True"
+    constraint:
+      primary_key:
+        - 倉庫ID
+      uniques: []
+      foreign_keys: []
     indexes: []

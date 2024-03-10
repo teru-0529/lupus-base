@@ -168,3 +168,17 @@ profitRate:
   description: 利益率
   example: 0.35
 
+# 倉庫ID
+siteId:
+  type: string
+  minLength: 1
+  maxLength: 30
+  description: 在庫を管理する倉庫のID
+  example: DAMAGED_PRODUCTS_SITE
+
+# 引当可能
+allocatable:
+  type: boolean
+  description: 利用することが可能な在庫であるかどうか
+  example: true
+

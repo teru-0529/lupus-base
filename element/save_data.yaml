@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-09T21:03:46+09:00
+create_at: 2024-03-10T09:19:38+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -222,6 +222,26 @@ elements:
     max_value: null
     example: 0.35
     description: 利益率
+  - name_jp: 倉庫ID
+    name_en: siteId
+    domain: NOKEY
+    reg_ex: null
+    min_digits: 1
+    max_digits: 30
+    min_value: null
+    max_value: null
+    example: DAMAGED_PRODUCTS_SITE
+    description: 在庫を管理する倉庫のID
+  - name_jp: 引当可能
+    name_en: allocatable
+    domain: 可否/フラグ
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: true
+    description: 利用することが可能な在庫であるかどうか
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -287,6 +307,10 @@ delive_elements:
     name_jp: 標準利益率
     name_en: standardProfitRate
     description: 標準利益率
+  - origin: アカウントID
+    name_jp: 管理担当者ID
+    name_en: managePIC
+    description: 管理担当アカウントID
 segments:
   - key: 取引状況
     value: READY
