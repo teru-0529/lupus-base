@@ -234,7 +234,7 @@ amount:
 taransactionType:
   type: string
   enum:
-    - MOVE_WEARHOUSEMENT
+    - MOVE_WAREHOUSEMENT
     - PURCHASE
     - SALES_RETURN
     - MOVE_SHIPPMENT

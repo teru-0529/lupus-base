@@ -9,7 +9,7 @@ CREATE TABLE inventories.month_inventory_summaries_every_site (
   year_month varchar(6) NOT NULL check (year_month ~* '^[12][0-9]{3}(0[1-9]|1[0-2])$'),
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   init_quantity integer NOT NULL DEFAULT 0 check (init_quantity >= 0),
-  wearhousing_quantity integer NOT NULL DEFAULT 0 check (wearhousing_quantity >= 0),
+  warehousing_quantity integer NOT NULL DEFAULT 0 check (warehousing_quantity >= 0),
   shipping_quantity integer NOT NULL DEFAULT 0 check (shipping_quantity >= 0),
   present_quantity integer NOT NULL DEFAULT 0 check (present_quantity >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -26,7 +26,7 @@ COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.product_id IS
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.year_month IS '年月';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.init_quantity IS '月初数量';
-COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.wearhousing_quantity IS '入庫数量';
+COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.warehousing_quantity IS '入庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.shipping_quantity IS '出庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.present_quantity IS '在庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.created_at IS '作成日時';

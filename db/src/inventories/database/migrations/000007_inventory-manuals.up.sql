@@ -5,7 +5,7 @@
 CREATE OR REPLACE FUNCTION inventories.month_summaries_es_pre_process() RETURNS TRIGGER AS $$
 BEGIN
   -- 導出属性の算出(在庫数量)
-  NEW.present_quantity = NEW.init_quantity + NEW.wearhousing_quantity - NEW.shipping_quantity;
+  NEW.present_quantity = NEW.init_quantity + NEW.warehousing_quantity - NEW.shipping_quantity;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -27,12 +27,12 @@ CREATE OR REPLACE FUNCTION inventories.month_summaries_pre_process() RETURNS TRI
 BEGIN
   -- 有効桁数調整(月初金額/入庫金額/出庫金額)
   NEW.init_amount = ROUND(NEW.init_amount, 2);
-  NEW.wearhousing_amount = ROUND(NEW.wearhousing_amount, 2);
+  NEW.warehousing_amount = ROUND(NEW.warehousing_amount, 2);
   NEW.shipping_amount = ROUND(NEW.shipping_amount, 2);
   -- 導出属性の算出(在庫数量)
-  NEW.present_quantity = NEW.init_quantity + NEW.wearhousing_quantity - NEW.shipping_quantity;
+  NEW.present_quantity = NEW.init_quantity + NEW.warehousing_quantity - NEW.shipping_quantity;
   -- 導出属性の算出(在庫金額)
-  NEW.present_amount = ROUND(NEW.init_amount + NEW.wearhousing_amount - NEW.shipping_amount, 2);
+  NEW.present_amount = ROUND(NEW.init_amount + NEW.warehousing_amount - NEW.shipping_amount, 2);
   -- 導出属性の算出(原価)
   IF (NEW.present_quantity = 0) THEN
     NEW.cost_price = null;
@@ -86,7 +86,7 @@ ALTER TABLE inventories.inventory_histories DROP CONSTRAINT IF EXISTS inventory_
 ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_taransaction_type_check CHECK (
   CASE
     -- 在庫変動種類が「倉庫間移動入庫」「仕入入庫」「売上返品入庫」の場合、変動数量が1以上であること
-    WHEN taransaction_type='MOVE_WEARHOUSEMENT' AND variable_quantity <= 0 THEN FALSE
+    WHEN taransaction_type='MOVE_WAREHOUSEMENT' AND variable_quantity <= 0 THEN FALSE
     WHEN taransaction_type='PURCHASE' AND variable_quantity <= 0 THEN FALSE
     WHEN taransaction_type='SALES_RETURN' AND variable_quantity <= 0 THEN FALSE
     -- 在庫変動種類が「倉庫間移動出庫」「売上出庫」「仕入返品出庫」の場合、変動数量が-1以下であること
@@ -94,7 +94,7 @@ ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_t
     WHEN taransaction_type='SELES' AND variable_quantity >= 0 THEN FALSE
     WHEN taransaction_type='ORDER_RETURN' AND variable_quantity >= 0 THEN FALSE
     -- 在庫変動種類が「倉庫間移動入庫」「倉庫間移動出庫」の場合、変動金額が0であること
-    WHEN taransaction_type='MOVE_WEARHOUSEMENT' AND variable_amount != 0.00 THEN FALSE
+    WHEN taransaction_type='MOVE_WAREHOUSEMENT' AND variable_amount != 0.00 THEN FALSE
     WHEN taransaction_type='MOVE_SHIPPMENT' AND variable_amount != 0.00 THEN FALSE
     -- 在庫変動種類が「仕入入庫」「売上返品入庫」の場合、変動金額が0より大きい値であること
     WHEN taransaction_type='PURCHASE' AND variable_amount <= 0.00 THEN FALSE
@@ -126,28 +126,96 @@ CREATE TRIGGER pre_process
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.inventory_histories_pre_process();
 
--- -- 在庫変動履歴:登録後処理
--- --  導出属性の算出(原価)
--- --  有効桁数調整(在庫金額)
 
--- -- Create Function
--- CREATE OR REPLACE FUNCTION inventories.current_summaries_registration_post_process() RETURNS TRIGGER AS $$
--- BEGIN
--- --  有効桁数調整(在庫金額)
---   NEW.present_amount = ROUND(NEW.present_amount, 2);
---   -- 導出属性の算出(原価)
---   IF (NEW.present_quantity = 0) THEN
---     NEW.cost_price = null;
---   ELSE
---     NEW.cost_price = ROUND(NEW.present_amount / NEW.present_quantity, 2);
---   END IF;
---   RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
+-- 在庫変動履歴:登録「後」処理
+--  別テーブル登録/更新(月次在庫サマリ＿倉庫別/月次在庫サマリ/現在在庫サマリ＿倉庫別/現在在庫サマリ)
 
--- -- Create Trigger
--- CREATE TRIGGER post_process
---   BEFORE INSERT OR UPDATE
---   ON inventories.current_inventory_summaries
---   FOR EACH ROW
--- EXECUTE PROCEDURE inventories.current_summaries_registration_post_process();
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.upsert_inventory_summaries() RETURNS TRIGGER AS $$
+DECLARE
+  yyyymm text:=to_char(NEW.business_date, 'YYYYMM');
+
+  t_init_quantity integer;
+  t_warehousing_quantity integer;
+  t_shipping_quantity integer;
+  t_init_amount numeric;
+  t_warehousing_amount numeric;
+  t_shipping_amount numeric;
+
+  recent_rec RECORD; --検索結果レコード(現在年月)
+  last_rec RECORD;--検索結果レコード(過去最新年月)
+BEGIN
+--  1.月次在庫サマリ＿倉庫別 INFO:
+
+  -- 1.1.現在年月データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.month_inventory_summaries_every_site
+    WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month = yyyymm
+    FOR UPDATE;
+
+  -- 1.2.月初数量/入庫数量/出庫数量の算出
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    -- 過去最新年月データの取得
+    SELECT * INTO last_rec
+      FROM inventories.month_inventory_summaries_every_site
+      WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month < yyyymm
+      ORDER BY year_month DESC
+      LIMIT 1;
+
+    IF last_rec IS NULL THEN
+      t_init_quantity:=0;
+    ELSE
+      t_init_quantity:=last_rec.present_quantity;
+    END IF;
+    t_warehousing_quantity:=0;
+    t_shipping_quantity:=0;
+  ELSE
+    -- 現在年月データが存在するケース
+    t_init_quantity:=recent_rec.init_quantity;
+    t_warehousing_quantity:=recent_rec.warehousing_quantity;
+    t_shipping_quantity:=recent_rec.shipping_quantity;
+  END IF;
+
+  -- 1.3.取引数量の計上(変動数量の符号により判断)
+  IF NEW.variable_quantity > 0 THEN
+    t_warehousing_quantity:=t_warehousing_quantity + NEW.variable_quantity;
+  ELSE
+    t_shipping_quantity:=t_shipping_quantity - NEW.variable_quantity;
+  END IF;
+
+  -- 1.4.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    INSERT INTO inventories.month_inventory_summaries_every_site VALUES (
+      NEW.product_id,
+      yyyymm,
+      NEW.site_id,
+      t_init_quantity,
+      t_warehousing_quantity,
+      t_shipping_quantity,
+      default,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 現在年月データが存在するケース
+    UPDATE inventories.month_inventory_summaries_every_site
+    SET warehousing_quantity = t_warehousing_quantity,
+        shipping_quantity = t_shipping_quantity
+    WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month = yyyymm;
+  END IF;
+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.inventory_histories
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.upsert_inventory_summaries();

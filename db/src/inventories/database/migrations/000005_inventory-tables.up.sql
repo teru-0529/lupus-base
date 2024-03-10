@@ -3,7 +3,7 @@
 -- 在庫変動種類
 DROP TYPE IF EXISTS taransaction_type;
 CREATE TYPE taransaction_type AS enum (
-  'MOVE_WEARHOUSEMENT',
+  'MOVE_WAREHOUSEMENT',
   'PURCHASE',
   'SALES_RETURN',
   'MOVE_SHIPPMENT',
@@ -23,7 +23,7 @@ CREATE TABLE inventories.month_inventory_summaries_every_site (
   year_month varchar(6) NOT NULL check (year_month ~* '^[12][0-9]{3}(0[1-9]|1[0-2])$'),
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   init_quantity integer NOT NULL DEFAULT 0 check (init_quantity >= 0),
-  wearhousing_quantity integer NOT NULL DEFAULT 0 check (wearhousing_quantity >= 0),
+  warehousing_quantity integer NOT NULL DEFAULT 0 check (warehousing_quantity >= 0),
   shipping_quantity integer NOT NULL DEFAULT 0 check (shipping_quantity >= 0),
   present_quantity integer NOT NULL DEFAULT 0 check (present_quantity >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -40,7 +40,7 @@ COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.product_id IS
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.year_month IS '年月';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.init_quantity IS '月初数量';
-COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.wearhousing_quantity IS '入庫数量';
+COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.warehousing_quantity IS '入庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.shipping_quantity IS '出庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.present_quantity IS '在庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries_every_site.created_at IS '作成日時';
@@ -95,11 +95,11 @@ CREATE TABLE inventories.month_inventory_summaries (
   product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
   year_month varchar(6) NOT NULL check (year_month ~* '^[12][0-9]{3}(0[1-9]|1[0-2])$'),
   init_quantity integer NOT NULL DEFAULT 0 check (init_quantity >= 0),
-  wearhousing_quantity integer NOT NULL DEFAULT 0 check (wearhousing_quantity >= 0),
-  shipping_quantity integer NOT NULL DEFAULT 0 check (shipping_quantity >= 0),
+  warehousing_quantity integer NOT NULL DEFAULT 0 check (warehousing_quantity >= 0),
+    shipping_quantity integer NOT NULL DEFAULT 0 check (shipping_quantity >= 0),
   present_quantity integer NOT NULL DEFAULT 0 check (present_quantity >= 0),
   init_amount numeric NOT NULL DEFAULT 0.00 check (init_amount >= 0),
-  wearhousing_amount numeric NOT NULL DEFAULT 0.00 check (wearhousing_amount >= 0),
+  warehousing_amount numeric NOT NULL DEFAULT 0.00 check (warehousing_amount >= 0),
   shipping_amount numeric NOT NULL DEFAULT 0.00 check (shipping_amount >= 0),
   present_amount numeric NOT NULL DEFAULT 0.00 check (present_amount >= 0),
   cost_price numeric check (cost_price >= 0),
@@ -116,11 +116,11 @@ COMMENT ON TABLE inventories.month_inventory_summaries IS '月次在庫サマリ
 COMMENT ON COLUMN inventories.month_inventory_summaries.product_id IS '商品ID';
 COMMENT ON COLUMN inventories.month_inventory_summaries.year_month IS '年月';
 COMMENT ON COLUMN inventories.month_inventory_summaries.init_quantity IS '月初数量';
-COMMENT ON COLUMN inventories.month_inventory_summaries.wearhousing_quantity IS '入庫数量';
+COMMENT ON COLUMN inventories.month_inventory_summaries.warehousing_quantity IS '入庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries.shipping_quantity IS '出庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries.present_quantity IS '在庫数量';
 COMMENT ON COLUMN inventories.month_inventory_summaries.init_amount IS '月初金額';
-COMMENT ON COLUMN inventories.month_inventory_summaries.wearhousing_amount IS '入庫金額';
+COMMENT ON COLUMN inventories.month_inventory_summaries.warehousing_amount IS '入庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.shipping_amount IS '出庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.present_amount IS '在庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.cost_price IS '原価';

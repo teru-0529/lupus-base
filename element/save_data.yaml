@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-10T23:35:56+09:00
+create_at: 2024-03-11T08:37:51+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -417,7 +417,7 @@ delive_elements:
     description: 月初数量
   - origin: 数量
     name_jp: 入庫数量
-    name_en: wearhousingQuantity
+    name_en: warehousingQuantity
     description: 入庫数量
   - origin: 数量
     name_jp: 出庫数量
@@ -433,7 +433,7 @@ delive_elements:
     description: 月初金額
   - origin: 金額
     name_jp: 入庫金額
-    name_en: wearhousingAmount
+    name_en: warehousingAmount
     description: 入庫金額
   - origin: 金額
     name_jp: 出庫金額
@@ -497,7 +497,7 @@ segments:
     name: 随時発注
     description: 必要な際に随時発注する
   - key: 在庫変動種類
-    value: MOVE_WEARHOUSEMENT
+    value: MOVE_WAREHOUSEMENT
     name: 倉庫間移動入庫
     description: 倉庫間移動
   - key: 在庫変動種類
