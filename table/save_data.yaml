@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.4
-create_at: 2024-03-10T10:21:37+09:00
+create_at: 2024-03-10T11:56:47+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -78,13 +78,13 @@ tables:
       - name: 取引状況
         nullable: false
         default: READY
-      - name: 締日付
+      - name: 締日
         nullable: false
         default: "99"
       - name: 入金猶予月数
         nullable: false
         default: "1"
-      - name: 入金期限日付
+      - name: 入金期限日
         nullable: false
         default: "99"
       - name: 営業担当者ID
@@ -119,13 +119,13 @@ tables:
       - name: 取引状況
         nullable: false
         default: READY
-      - name: 締日付
+      - name: 締日
         nullable: false
         default: "99"
       - name: 支払猶予月数
         nullable: false
         default: "1"
-      - name: 支払期限日付
+      - name: 支払期限日
         nullable: false
         default: "99"
       - name: 仕入担当者ID

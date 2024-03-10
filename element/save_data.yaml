@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-10T10:21:10+09:00
+create_at: 2024-03-10T11:55:52+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -112,7 +112,7 @@ elements:
     max_value: null
     example: 備考
     description: 備考
-  - name_jp: 日付
+  - name_jp: 日
     name_en: day
     domain: 整数
     reg_ex: null
@@ -202,7 +202,7 @@ elements:
     max_value: null
     example: 001001ABC-SSL-02
     description: 仕入れ先側の商品特定ID
-  - name_jp: 価格
+  - name_jp: 金額
     name_en: price
     domain: 実数
     reg_ex: null
@@ -242,6 +242,36 @@ elements:
     max_value: null
     example: true
     description: 利用することが可能な在庫であるかどうか
+  - name_jp: 年月
+    name_en: yearMonth
+    domain: 文字列
+    reg_ex: ^[12][0-9]{3}(0[1-9]|1[0-2])$
+    min_digits: 6
+    max_digits: 6
+    min_value: null
+    max_value: null
+    example: "202403"
+    description: 年月
+  - name_jp: 数量
+    name_en: quantity
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 0
+    max_value: null
+    example: 10
+    description: 数量
+  - name_jp: 在庫変動No
+    name_en: inventoryNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 20
+    description: 在庫変動履歴のサロゲートキー
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -255,16 +285,16 @@ delive_elements:
     name_jp: 銀行名称
     name_en: bankName
     description: 銀行名称
-  - origin: 日付
-    name_jp: 締日付
+  - origin: 日
+    name_jp: 締日
     name_en: cutOffDay
     description: 締め日
-  - origin: 日付
-    name_jp: 入金期限日付
+  - origin: 日
+    name_jp: 入金期限日
     name_en: depositDay
     description: 入金期限日
-  - origin: 日付
-    name_jp: 支払期限日付
+  - origin: 日
+    name_jp: 支払期限日
     name_en: paymentDay
     description: 支払期限日
   - origin: アカウントID
@@ -287,11 +317,11 @@ delive_elements:
     name_jp: 商品名称
     name_en: productName
     description: 商品名称
-  - origin: 価格
+  - origin: 金額
     name_jp: 売価
     name_en: sellingPrice
     description: 売価
-  - origin: 価格
+  - origin: 金額
     name_jp: 原価
     name_en: costPrice
     description: 原価
@@ -311,6 +341,38 @@ delive_elements:
     name_jp: 管理担当者ID
     name_en: managePIC
     description: 管理担当アカウントID
+  - origin: 数量
+    name_jp: 月初数量
+    name_en: initQuantity
+    description: 月初数量
+  - origin: 数量
+    name_jp: 入庫数量
+    name_en: wearhousingQuantity
+    description: 入庫数量
+  - origin: 数量
+    name_jp: 出庫数量
+    name_en: shippingQuantity
+    description: 出庫数量
+  - origin: 数量
+    name_jp: 在庫数量
+    name_en: presentQuantity
+    description: 現在在庫数量
+  - origin: 金額
+    name_jp: 月初金額
+    name_en: initAmount
+    description: 月初金額
+  - origin: 金額
+    name_jp: 入庫金額
+    name_en: wearhousingAmount
+    description: 入庫金額
+  - origin: 金額
+    name_jp: 出庫金額
+    name_en: shippingAmount
+    description: 出庫金額
+  - origin: 金額
+    name_jp: 在庫金額
+    name_en: presentAmount
+    description: 現在在庫金額
 segments:
   - key: 取引状況
     value: READY

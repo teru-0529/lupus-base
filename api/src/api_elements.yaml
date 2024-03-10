@@ -87,7 +87,7 @@ note:
   description: 備考
   example: 備考
 
-# 日付
+# 日
 day:
   type: integer
   minimum: 1
@@ -154,7 +154,7 @@ productCode:
   description: 仕入れ先側の商品特定ID
   example: 001001ABC-SSL-02
 
-# 価格
+# 金額
 price:
   type: number
   minimum: 0
@@ -181,4 +181,26 @@ allocatable:
   type: boolean
   description: 利用することが可能な在庫であるかどうか
   example: true
+
+# 年月
+yearMonth:
+  type: string
+  pattern: ^[12][0-9]{3}(0[1-9]|1[0-2])$
+  minLength: 6
+  maxLength: 6
+  description: 年月
+  example: "202403"
+
+# 数量
+quantity:
+  type: integer
+  minimum: 0
+  description: 数量
+  example: 10
+
+# 在庫変動No
+inventoryNo:
+  type: integer
+  description: 在庫変動履歴のサロゲートキー
+  example: 20
 
