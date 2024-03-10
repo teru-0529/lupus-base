@@ -46,10 +46,10 @@ ALTER TABLE inventories.suppliers ADD CONSTRAINT suppliers_order_policy_check CH
 
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.exist_dealing_bank(i_company_id text) RETURNS boolean AS $$
-  BEGIN
+BEGIN
   -- 取引銀行のPK検索し存在する場合にTrue
-    RETURN(SELECT COUNT(1) > 0 FROM inventories.dealing_banks WHERE company_id = i_company_id);
-  END;
+  RETURN(SELECT COUNT(1) > 0 FROM inventories.dealing_banks WHERE company_id = i_company_id);
+END;
 $$ LANGUAGE plpgsql;
 
 -- Create Constraint
