@@ -144,6 +144,7 @@ DECLARE
 
   recent_rec RECORD; --検索結果レコード(現在年月)
   last_rec RECORD;--検索結果レコード(過去最新年月)
+  rec RECORD;
 BEGIN
 --  1.月次在庫サマリ＿倉庫別 INFO:
 
@@ -203,6 +204,15 @@ BEGIN
         shipping_quantity = t_shipping_quantity
     WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month = yyyymm;
   END IF;
+
+  -- 1.5.現在年月以降のデータ更新(存在する場合)
+  FOR rec IN SELECT * FROM inventories.month_inventory_summaries_every_site
+    WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month > yyyymm LOOP
+
+    UPDATE inventories.month_inventory_summaries_every_site
+    SET init_quantity = rec.init_quantity + NEW.variable_quantity
+    WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month = rec.year_month;
+  END LOOP;
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
@@ -316,6 +326,16 @@ BEGIN
         shipping_amount = t_shipping_amount
     WHERE product_id = NEW.product_id AND year_month = yyyymm;
   END IF;
+
+  -- 1.5.現在年月以降のデータ更新(存在する場合)
+  FOR rec IN SELECT * FROM inventories.month_inventory_summaries
+    WHERE product_id = NEW.product_id AND year_month > yyyymm LOOP
+
+    UPDATE inventories.month_inventory_summaries
+    SET init_quantity = rec.init_quantity + NEW.variable_quantity,
+        init_amount = rec.init_amount + NEW.variable_amount
+    WHERE product_id = NEW.product_id AND year_month = rec.year_month;
+  END LOOP;
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 --  4.現在在庫サマリー INFO:
