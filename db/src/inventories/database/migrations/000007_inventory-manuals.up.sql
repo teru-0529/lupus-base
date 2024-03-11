@@ -82,26 +82,26 @@ EXECUTE PROCEDURE inventories.current_summaries_pre_process();
 --  属性相関チェック制約(在庫変動種類/変動数量/変動金額)
 
 -- Create Constraint
-ALTER TABLE inventories.inventory_histories DROP CONSTRAINT IF EXISTS inventory_histories_taransaction_type_check;
-ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_taransaction_type_check CHECK (
+ALTER TABLE inventories.inventory_histories DROP CONSTRAINT IF EXISTS inventory_histories_inventory_type_check;
+ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_inventory_type_check CHECK (
   CASE
     -- 在庫変動種類が「倉庫間移動入庫」「仕入入庫」「売上返品入庫」の場合、変動数量が1以上であること
-    WHEN taransaction_type='MOVE_WAREHOUSEMENT' AND variable_quantity <= 0 THEN FALSE
-    WHEN taransaction_type='PURCHASE' AND variable_quantity <= 0 THEN FALSE
-    WHEN taransaction_type='SALES_RETURN' AND variable_quantity <= 0 THEN FALSE
+    WHEN inventory_type = 'MOVE_WAREHOUSEMENT' AND variable_quantity <= 0 THEN FALSE
+    WHEN inventory_type = 'PURCHASE' AND variable_quantity <= 0 THEN FALSE
+    WHEN inventory_type = 'SALES_RETURN' AND variable_quantity <= 0 THEN FALSE
     -- 在庫変動種類が「倉庫間移動出庫」「売上出庫」「仕入返品出庫」の場合、変動数量が-1以下であること
-    WHEN taransaction_type='MOVE_SHIPPMENT' AND variable_quantity >= 0 THEN FALSE
-    WHEN taransaction_type='SELES' AND variable_quantity >= 0 THEN FALSE
-    WHEN taransaction_type='ORDER_RETURN' AND variable_quantity >= 0 THEN FALSE
+    WHEN inventory_type = 'MOVE_SHIPPMENT' AND variable_quantity >= 0 THEN FALSE
+    WHEN inventory_type = 'SELES' AND variable_quantity >= 0 THEN FALSE
+    WHEN inventory_type = 'ORDER_RETURN' AND variable_quantity >= 0 THEN FALSE
     -- 在庫変動種類が「倉庫間移動入庫」「倉庫間移動出庫」の場合、変動金額が0であること
-    WHEN taransaction_type='MOVE_WAREHOUSEMENT' AND variable_amount != 0.00 THEN FALSE
-    WHEN taransaction_type='MOVE_SHIPPMENT' AND variable_amount != 0.00 THEN FALSE
+    WHEN inventory_type = 'MOVE_WAREHOUSEMENT' AND variable_amount != 0.00 THEN FALSE
+    WHEN inventory_type = 'MOVE_SHIPPMENT' AND variable_amount != 0.00 THEN FALSE
     -- 在庫変動種類が「仕入入庫」「売上返品入庫」の場合、変動金額が0より大きい値であること
-    WHEN taransaction_type='PURCHASE' AND variable_amount <= 0.00 THEN FALSE
-    WHEN taransaction_type='SALES_RETURN' AND variable_amount <= 0.00 THEN FALSE
+    WHEN inventory_type = 'PURCHASE' AND variable_amount <= 0.00 THEN FALSE
+    WHEN inventory_type = 'SALES_RETURN' AND variable_amount <= 0.00 THEN FALSE
     -- 在庫変動種類が「売上出庫」「仕入返品出庫」の場合、変動金額が0より小さい値であること
-    WHEN taransaction_type='SELES' AND variable_amount >= 0.00 THEN FALSE
-    WHEN taransaction_type='ORDER_RETURN' AND variable_amount >= 0.00 THEN FALSE
+    WHEN inventory_type = 'SELES' AND variable_amount >= 0.00 THEN FALSE
+    WHEN inventory_type = 'ORDER_RETURN' AND variable_amount >= 0.00 THEN FALSE
     ELSE TRUE
   END
 );
@@ -246,7 +246,7 @@ BEGIN
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
 -- 倉庫間移動は在庫内で動きのためここで抜ける
-  IF NEW.taransaction_type = 'MOVE_WAREHOUSEMENT' OR NEW.taransaction_type = 'MOVE_SHIPPMENT' THEN
+  IF NEW.inventory_type = 'MOVE_WAREHOUSEMENT' OR NEW.inventory_type = 'MOVE_SHIPPMENT' THEN
     RETURN NEW;
   END IF;
 

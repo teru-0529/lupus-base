@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-11T08:37:51+09:00
+create_at: 2024-03-11T23:50:14+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -313,7 +313,7 @@ elements:
     example: 55000.32
     description: 金額
   - name_jp: 在庫変動種類
-    name_en: taransactionType
+    name_en: inventoryType
     domain: 区分値
     reg_ex: null
     min_digits: null
@@ -342,6 +342,46 @@ elements:
     max_value: null
     example: 2024-03-15T12:34:56
     description: 日時
+  - name_jp: 買掛変動No
+    name_en: payableNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 3
+    description: 買掛変動履歴のサロゲートキー
+  - name_jp: 買掛変動種類
+    name_en: payableType
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: PURCHASE
+    description: 買掛変動の種類
+  - name_jp: 支払ID
+    name_en: paymantId
+    domain: NOKEY
+    reg_ex: ^PM[0-9]{8}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: PM00000002
+    description: 支払を一意に特定するID
+  - name_jp: 支払状況
+    name_en: paymentStatus
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: CONFIRMED
+    description: 支払状況の種類
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -475,6 +515,46 @@ delive_elements:
     name_jp: 指示実行者ID
     name_en: operatorId
     description: 取引指示を実行したアカウントID
+  - origin: 変動金額
+    name_jp: 月初残高
+    name_en: initBalance
+    description: 月初残高
+  - origin: 変動金額
+    name_jp: 残高
+    name_en: presentBalance
+    description: 現在残高
+  - origin: 変動金額
+    name_jp: 購入金額
+    name_en: purchaseAmount
+    description: 購入金額
+  - origin: 変動金額
+    name_jp: 支払金額
+    name_en: paymentAmount
+    description: 支払金額
+  - origin: 変動金額
+    name_jp: その他金額
+    name_en: otherAmount
+    description: その他金額
+  - origin: 日付
+    name_jp: 締日付
+    name_en: cutOffDate
+    description: 締日付
+  - origin: 日付
+    name_jp: 支払期限日付
+    name_en: depositDate
+    description: 支払期限日付
+  - origin: 日付
+    name_jp: 金額確定日付
+    name_en: amountConfirmedDate
+    description: 金額確定日付
+  - origin: 日付
+    name_jp: 支払日付
+    name_en: paymentDate
+    description: 支払日付
+  - origin: 日付
+    name_jp: 変更期限日付
+    name_en: changeDeadlineDate
+    description: 変更期限日付
 segments:
   - key: 取引状況
     value: READY
@@ -524,3 +604,31 @@ segments:
     value: OTHER
     name: その他雑入出庫
     description: その他
+  - key: 買掛変動種類
+    value: PURCHASE
+    name: 仕入購入
+    description: 仕入購入
+  - key: 買掛変動種類
+    value: ORDER_RETURN
+    name: 仕入返品
+    description: 仕入返品
+  - key: 買掛変動種類
+    value: PAYMENT
+    name: 支払
+    description: 支払
+  - key: 買掛変動種類
+    value: OTHER
+    name: その他取引
+    description: その他取引
+  - key: 支払状況
+    value: TO_BE_DETERMINED
+    name: 金額確定前
+    description: 金額確定前
+  - key: 支払状況
+    value: CONFIRMED
+    name: 金額確定
+    description: 金額確定
+  - key: 支払状況
+    value: COMPLETED
+    name: 支払完了
+    description: 支払完了
