@@ -317,7 +317,37 @@ BEGIN
     WHERE product_id = NEW.product_id AND year_month = yyyymm;
   END IF;
 
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+--  4.現在在庫サマリー INFO:
 
+  -- 4.1.最新データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.current_inventory_summaries
+    WHERE product_id = NEW.product_id
+    FOR UPDATE;
+
+  -- 4.2.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 最新データが存在しないケース
+    INSERT INTO inventories.current_inventory_summaries VALUES (
+      NEW.product_id,
+      NEW.variable_quantity,
+      NEW.variable_amount,
+      default,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 最新データが存在するケース
+    UPDATE inventories.current_inventory_summaries
+    SET present_quantity = recent_rec.present_quantity + NEW.variable_quantity,
+        present_amount = recent_rec.present_amount + NEW.variable_amount
+    WHERE product_id = NEW.product_id;
+  END IF;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
   RETURN NEW;
 END;
