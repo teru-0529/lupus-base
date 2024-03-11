@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-10T10:21:10+09:00
+create_at: 2024-03-11T08:37:51+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -112,7 +112,7 @@ elements:
     max_value: null
     example: 備考
     description: 備考
-  - name_jp: 日付
+  - name_jp: 日
     name_en: day
     domain: 整数
     reg_ex: null
@@ -242,6 +242,106 @@ elements:
     max_value: null
     example: true
     description: 利用することが可能な在庫であるかどうか
+  - name_jp: 年月
+    name_en: yearMonth
+    domain: 文字列
+    reg_ex: ^[12][0-9]{3}(0[1-9]|1[0-2])$
+    min_digits: 6
+    max_digits: 6
+    min_value: null
+    max_value: null
+    example: "202403"
+    description: 年月
+  - name_jp: 数量
+    name_en: quantity
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 0
+    max_value: null
+    example: 10
+    description: 数量
+  - name_jp: 在庫変動No
+    name_en: inventoryNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 20
+    description: 在庫変動履歴のサロゲートキー
+  - name_jp: 日付
+    name_en: sysDate
+    domain: 日付
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: "2024-03-15"
+    description: 日付
+  - name_jp: 変動数量
+    name_en: variableQuantity
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: -5
+    description: 変動数量(マイナスもあり得る)
+  - name_jp: 変動金額
+    name_en: variableAmount
+    domain: 実数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: -245.26
+    description: 変動金額(マイナスもあり得る)
+  - name_jp: 金額
+    name_en: amount
+    domain: 実数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 0
+    max_value: null
+    example: 55000.32
+    description: 金額
+  - name_jp: 在庫変動種類
+    name_en: taransactionType
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: SELLING
+    description: 在庫変動の種類
+  - name_jp: 取引管理No
+    name_en: tranzactionNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 5
+    description: 取引ごとに採番されるサロゲートキー
+  - name_jp: 日時
+    name_en: sysDatetime
+    domain: 日時
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 2024-03-15T12:34:56
+    description: 日時
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -255,16 +355,16 @@ delive_elements:
     name_jp: 銀行名称
     name_en: bankName
     description: 銀行名称
-  - origin: 日付
-    name_jp: 締日付
+  - origin: 日
+    name_jp: 締日
     name_en: cutOffDay
     description: 締め日
-  - origin: 日付
-    name_jp: 入金期限日付
+  - origin: 日
+    name_jp: 入金期限日
     name_en: depositDay
     description: 入金期限日
-  - origin: 日付
-    name_jp: 支払期限日付
+  - origin: 日
+    name_jp: 支払期限日
     name_en: paymentDay
     description: 支払期限日
   - origin: アカウントID
@@ -311,6 +411,70 @@ delive_elements:
     name_jp: 管理担当者ID
     name_en: managePIC
     description: 管理担当アカウントID
+  - origin: 数量
+    name_jp: 月初数量
+    name_en: initQuantity
+    description: 月初数量
+  - origin: 数量
+    name_jp: 入庫数量
+    name_en: warehousingQuantity
+    description: 入庫数量
+  - origin: 数量
+    name_jp: 出庫数量
+    name_en: shippingQuantity
+    description: 出庫数量
+  - origin: 数量
+    name_jp: 在庫数量
+    name_en: presentQuantity
+    description: 現在在庫数量
+  - origin: 金額
+    name_jp: 月初金額
+    name_en: initAmount
+    description: 月初金額
+  - origin: 金額
+    name_jp: 入庫金額
+    name_en: warehousingAmount
+    description: 入庫金額
+  - origin: 金額
+    name_jp: 出庫金額
+    name_en: shippingAmount
+    description: 出庫金額
+  - origin: 金額
+    name_jp: 在庫金額
+    name_en: presentAmount
+    description: 現在在庫金額
+  - origin: 日付
+    name_jp: 業務取引日付
+    name_en: businessDate
+    description: 取引日付（業務時間）
+  - origin: 取引管理No
+    name_jp: 在庫移動指示No
+    name_en: moveInstructionNo
+    description: 在庫移動指示単位で採番
+  - origin: 取引管理No
+    name_jp: 雑入出庫指示No
+    name_en: otherInventoryInstructionNo
+    description: 雑入出庫指示単位で採番
+  - origin: 倉庫ID
+    name_jp: 移動元倉庫ID
+    name_en: siteIdFrom
+    description: 移動元倉庫ID
+  - origin: 倉庫ID
+    name_jp: 移動先倉庫ID
+    name_en: siteIdTo
+    description: 移動先倉庫ID
+  - origin: 備考
+    name_jp: 指示目的
+    name_en: instructionCause
+    description: 取引処理の目的・理由
+  - origin: 日時
+    name_jp: 処理日時
+    name_en: operationTimestamp
+    description: 処理日時（システム時間）
+  - origin: アカウントID
+    name_jp: 指示実行者ID
+    name_en: operatorId
+    description: 取引指示を実行したアカウントID
 segments:
   - key: 取引状況
     value: READY
@@ -332,3 +496,31 @@ segments:
     value: AS_NEEDED
     name: 随時発注
     description: 必要な際に随時発注する
+  - key: 在庫変動種類
+    value: MOVE_WAREHOUSEMENT
+    name: 倉庫間移動入庫
+    description: 倉庫間移動
+  - key: 在庫変動種類
+    value: PURCHASE
+    name: 仕入入庫
+    description: 仕入
+  - key: 在庫変動種類
+    value: SALES_RETURN
+    name: 売上返品入庫
+    description: 売上返品
+  - key: 在庫変動種類
+    value: MOVE_SHIPPMENT
+    name: 倉庫間移動出庫
+    description: 倉庫間移動
+  - key: 在庫変動種類
+    value: SELES
+    name: 売上出庫
+    description: 売上
+  - key: 在庫変動種類
+    value: ORDER_RETURN
+    name: 仕入返品出庫
+    description: 仕入返品
+  - key: 在庫変動種類
+    value: OTHER
+    name: その他雑入出庫
+    description: その他

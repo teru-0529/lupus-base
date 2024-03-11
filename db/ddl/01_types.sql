@@ -15,3 +15,15 @@ CREATE TYPE order_policy AS enum (
   'AS_NEEDED'
 );
 
+-- 在庫変動種類
+DROP TYPE IF EXISTS taransaction_type;
+CREATE TYPE taransaction_type AS enum (
+  'MOVE_WAREHOUSEMENT',
+  'PURCHASE',
+  'SALES_RETURN',
+  'MOVE_SHIPPMENT',
+  'SELES',
+  'ORDER_RETURN',
+  'OTHER'
+);
+

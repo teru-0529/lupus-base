@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.4
-create_at: 2024-03-10T10:21:37+09:00
+create_at: 2024-03-11T08:38:04+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -78,13 +78,13 @@ tables:
       - name: 取引状況
         nullable: false
         default: READY
-      - name: 締日付
+      - name: 締日
         nullable: false
         default: "99"
       - name: 入金猶予月数
         nullable: false
         default: "1"
-      - name: 入金期限日付
+      - name: 入金期限日
         nullable: false
         default: "99"
       - name: 営業担当者ID
@@ -119,13 +119,13 @@ tables:
       - name: 取引状況
         nullable: false
         default: READY
-      - name: 締日付
+      - name: 締日
         nullable: false
         default: "99"
       - name: 支払猶予月数
         nullable: false
         default: "1"
-      - name: 支払期限日付
+      - name: 支払期限日
         nullable: false
         default: "99"
       - name: 仕入担当者ID
@@ -268,3 +268,351 @@ tables:
       uniques: []
       foreign_keys: []
     indexes: []
+  - name_jp: 月次在庫サマリ＿倉庫別
+    name_en: month_inventory_summaries_every_site
+    is_master: false
+    fields:
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 年月
+        nullable: false
+        default: null
+      - name: 倉庫ID
+        nullable: false
+        default: null
+      - name: 月初数量
+        nullable: false
+        default: "0"
+      - name: 入庫数量
+        nullable: false
+        default: "0"
+      - name: 出庫数量
+        nullable: false
+        default: "0"
+      - name: 在庫数量
+        nullable: false
+        default: "0"
+    constraint:
+      primary_key:
+        - 商品ID
+        - 年月
+        - 倉庫ID
+      uniques: []
+      foreign_keys:
+        - name: month_inventory_summaries_every_site_foreignKey_1
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+        - name: month_inventory_summaries_every_site_foreignKey_2
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 倉庫ID
+              ref: 倉庫ID
+    indexes: []
+  - name_jp: 月次在庫サマリ
+    name_en: month_inventory_summaries
+    is_master: false
+    fields:
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 年月
+        nullable: false
+        default: null
+      - name: 月初数量
+        nullable: false
+        default: "0"
+      - name: 入庫数量
+        nullable: false
+        default: "0"
+      - name: 出庫数量
+        nullable: false
+        default: "0"
+      - name: 在庫数量
+        nullable: false
+        default: "0"
+      - name: 月初金額
+        nullable: false
+        default: "0.00"
+      - name: 入庫金額
+        nullable: false
+        default: "0.00"
+      - name: 出庫金額
+        nullable: false
+        default: "0.00"
+      - name: 在庫金額
+        nullable: false
+        default: "0.00"
+      - name: 原価
+        nullable: true
+        default: null
+    constraint:
+      primary_key:
+        - 商品ID
+        - 年月
+      uniques: []
+      foreign_keys:
+        - name: month_inventory_summaries_foreignKey_1
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+    indexes: []
+  - name_jp: 現在在庫サマリ＿倉庫別
+    name_en: current_inventory_summaries_every_site
+    is_master: false
+    fields:
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 倉庫ID
+        nullable: false
+        default: null
+      - name: 在庫数量
+        nullable: false
+        default: "0"
+    constraint:
+      primary_key:
+        - 商品ID
+        - 倉庫ID
+      uniques: []
+      foreign_keys:
+        - name: current_inventory_summaries_every_site_foreignKey_1
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+        - name: current_inventory_summaries_every_site_foreignKey_2
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 倉庫ID
+              ref: 倉庫ID
+    indexes: []
+  - name_jp: 現在在庫サマリ
+    name_en: current_inventory_summaries
+    is_master: false
+    fields:
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 在庫数量
+        nullable: false
+        default: "0"
+      - name: 在庫金額
+        nullable: false
+        default: "0.00"
+      - name: 原価
+        nullable: true
+        default: null
+    constraint:
+      primary_key:
+        - 商品ID
+      uniques: []
+      foreign_keys:
+        - name: current_inventory_summaries_foreignKey_1
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+    indexes: []
+  - name_jp: 在庫変動履歴
+    name_en: inventory_histories
+    is_master: false
+    fields:
+      - name: 在庫変動No
+        nullable: false
+        default: null
+      - name: 業務取引日付
+        nullable: false
+        default: get_business_date()
+      - name: 処理日時
+        nullable: false
+        default: current_timestamp
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 倉庫ID
+        nullable: false
+        default: null
+      - name: 変動数量
+        nullable: false
+        default: null
+      - name: 変動金額
+        nullable: false
+        default: null
+      - name: 在庫変動種類
+        nullable: false
+        default: null
+      - name: 取引管理No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 在庫変動No
+      uniques: []
+      foreign_keys:
+        - name: inventory_histories_foreignKey_1
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 倉庫ID
+              ref: 倉庫ID
+        - name: inventory_histories_foreignKey_2
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+    indexes:
+      - name: idx_inventory_histories_1
+        unique: false
+        fields:
+          - name: 商品ID
+            asc: true
+          - name: 業務取引日付
+            asc: true
+          - name: 処理日時
+            asc: true
+  - name_jp: 倉庫移動指示
+    name_en: moving_instructions
+    is_master: false
+    fields:
+      - name: 在庫移動指示No
+        nullable: false
+        default: null
+      - name: 業務取引日付
+        nullable: false
+        default: get_business_date()
+      - name: 処理日時
+        nullable: false
+        default: current_timestamp
+      - name: 指示実行者ID
+        nullable: false
+        default: null
+      - name: 指示目的
+        nullable: true
+        default: null
+      - name: 移動元倉庫ID
+        nullable: false
+        default: null
+      - name: 移動先倉庫ID
+        nullable: false
+        default: null
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 数量
+        nullable: false
+        default: "0"
+    constraint:
+      primary_key:
+        - 在庫移動指示No
+      uniques: []
+      foreign_keys:
+        - name: moving_instructions_foreignKey_1
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 移動元倉庫ID
+              ref: 倉庫ID
+        - name: moving_instructions_foreignKey_2
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 移動先倉庫ID
+              ref: 倉庫ID
+        - name: moving_instructions_foreignKey_3
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+    indexes:
+      - name: idx_moving_instructions_1
+        unique: false
+        fields:
+          - name: 商品ID
+            asc: true
+          - name: 業務取引日付
+            asc: true
+          - name: 処理日時
+            asc: true
+  - name_jp: 雑入出庫指示
+    name_en: other_inventory_instructions
+    is_master: false
+    fields:
+      - name: 雑入出庫指示No
+        nullable: false
+        default: null
+      - name: 業務取引日付
+        nullable: false
+        default: get_business_date()
+      - name: 処理日時
+        nullable: false
+        default: current_timestamp
+      - name: 指示実行者ID
+        nullable: false
+        default: null
+      - name: 指示目的
+        nullable: true
+        default: null
+      - name: 倉庫ID
+        nullable: false
+        default: null
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 変動数量
+        nullable: false
+        default: null
+      - name: 変動金額
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 雑入出庫指示No
+      uniques: []
+      foreign_keys:
+        - name: other_inventory_instructions_foreignKey_1
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 倉庫ID
+              ref: 倉庫ID
+        - name: other_inventory_instructions_foreignKey_2
+          reference_table: 商品
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 商品ID
+              ref: 商品ID
+    indexes:
+      - name: idx_other_inventory_instructions_1
+        unique: false
+        fields:
+          - name: 商品ID
+            asc: true
+          - name: 業務取引日付
+            asc: true
+          - name: 処理日時
+            asc: true

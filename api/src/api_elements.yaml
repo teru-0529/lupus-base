@@ -87,7 +87,7 @@ note:
   description: 備考
   example: 備考
 
-# 日付
+# 日
 day:
   type: integer
   minimum: 1
@@ -181,4 +181,79 @@ allocatable:
   type: boolean
   description: 利用することが可能な在庫であるかどうか
   example: true
+
+# 年月
+yearMonth:
+  type: string
+  pattern: ^[12][0-9]{3}(0[1-9]|1[0-2])$
+  minLength: 6
+  maxLength: 6
+  description: 年月
+  example: "202403"
+
+# 数量
+quantity:
+  type: integer
+  minimum: 0
+  description: 数量
+  example: 10
+
+# 在庫変動No
+inventoryNo:
+  type: integer
+  description: 在庫変動履歴のサロゲートキー
+  example: 20
+
+# 日付
+sysDate:
+  type: string
+  format: date
+  description: 日付
+  example: "2024-03-15"
+
+# 変動数量
+variableQuantity:
+  type: integer
+  description: 変動数量(マイナスもあり得る)
+  example: -5
+
+# 変動金額
+variableAmount:
+  type: number
+  description: 変動金額(マイナスもあり得る)
+  example: -245.26
+
+# 金額
+amount:
+  type: number
+  minimum: 0
+  description: 金額
+  example: 55000.32
+
+# 在庫変動種類
+taransactionType:
+  type: string
+  enum:
+    - MOVE_WAREHOUSEMENT
+    - PURCHASE
+    - SALES_RETURN
+    - MOVE_SHIPPMENT
+    - SELES
+    - ORDER_RETURN
+    - OTHER
+  description: 在庫変動の種類
+  example: SELLING
+
+# 取引管理No
+tranzactionNo:
+  type: integer
+  description: 取引ごとに採番されるサロゲートキー
+  example: 5
+
+# 日時
+sysDatetime:
+  type: string
+  format: date-time
+  description: 日時
+  example: 2024-03-15T12:34:56
 

@@ -34,3 +34,41 @@ INSERT INTO inventories.company_destinations VALUES (default, 'E00101','160-0022
 INSERT INTO inventories.company_destinations VALUES (default, 'E00101','330-0853','埼玉県さいたま市大宮区錦町',null,null,default,default,'333333-P0673822','333333-P0673822');
 INSERT INTO inventories.company_destinations VALUES (default, 'E00101','980-0021','宮城県仙台市青葉区中央１丁目１−１',null,null,default,default,'333333-P0673822','333333-P0673822');
 ```
+
+## サンプルデータ登録SQL(inventory)
+
+``` SQL
+DELETE FROM inventories.inventory_histories;
+DELETE FROM inventories.month_inventory_summaries_every_site;
+DELETE FROM inventories.month_inventory_summaries;
+DELETE FROM inventories.current_inventory_summaries_every_site;
+DELETE FROM inventories.current_inventory_summaries;
+-- 3/20
+UPDATE business_date SET present_date = '2024-03-20' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','INSPACTTIN', 6, 18100, 'PURCHASE',999,default,default,'101001-P0673822','101001-P0673822');
+-- 3/25
+UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPACTTIN','ALOCATABLE','AAA002001E',5,default,default,'101002-P0673822','101002-P0673822');
+INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品不良品','INSPACTTIN','DAMAGED','AAA002001E',1,default,default,'101003-P0673822','101003-P0673822');
+-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','INSPACTTIN', -5, 0, 'MOVE_SHIPPMENT',999,default,default,'101002-P0673822','101002-P0673822');
+-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', 5, 0, 'MOVE_WAREHOUSEMENT',999,default,default,'101002-P0673822','101002-P0673822');
+-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','INSPACTTIN', -1, 0, 'MOVE_SHIPPMENT',999,default,default,'101003-P0673822','101003-P0673822');
+-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', 1, 0, 'MOVE_WAREHOUSEMENT',999,default,default,'101003-P0673822','101003-P0673822');
+-- 4/5
+UPDATE business_date SET present_date = '2024-04-05' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', -1, -3000, 'ORDER_RETURN',999,default,default,'101004-P0673822','101004-P0673822');
+INSERT INTO inventories.other_inventory_instructions VALUES (default,default,default,'P0673822','当社瑕疵損失','DAMAGED','AAA002001E',0,-100,default,default,'101004-P0673822','101004-P0673822');
+-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', 0, -100, 'OTHER',999,default,default,'101004-P0673822','101004-P0673822');
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', -3, -9000, 'SELES',999,default,default,'101005-P0673822','101005-P0673822');
+-- 4/6
+UPDATE business_date SET present_date = '2024-04-06' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.other_inventory_instructions VALUES (default,default,default,'P0673822','譲与による入荷','ALOCATABLE','AAA002001E',1, 2500,default,default,'101006-P0673822','101006-P0673822');
+-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', 1, 2500, 'OTHER',999,default,default,'101006-P0673822','101006-P0673822');
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', 2, 6000, 'SALES_RETURN',999,default,default,'101007-P0673822','101007-P0673822');
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', -2, -6000, 'SELES',999,default,default,'101008-P0673822','101008-P0673822');
+
+UPDATE business_date SET present_date = '2024-03-10' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', 1, 3500, 'PURCHASE',888,default,default,'101009-P0673822','101009-P0673822');
+INSERT INTO inventories.inventory_histories VALUES (default,'2024-02-01',default,'AAA002001E','ALOCATABLE', 2, 6400, 'PURCHASE',888,default,default,'101010-P0673822','101010-P0673822');
+INSERT INTO inventories.inventory_histories VALUES (default,'2024-03-01',default,'AAA002001E','ALOCATABLE',-6, -18000, 'SELES',888,default,default,'101011-P0673822','101011-P0673822');
+```

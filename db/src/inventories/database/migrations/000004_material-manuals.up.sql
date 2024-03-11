@@ -1,9 +1,9 @@
--- 商品:登録後処理
+-- 商品:登録「前」処理
 --  導出属性の算出(標準利益率)
 --  有効桁数調整(売価/原価)
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.products_registration_post_process() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION inventories.products_pre_process() RETURNS TRIGGER AS $$
 BEGIN
   -- 有効桁数調整(売価/原価)
   NEW.selling_price = ROUND(NEW.selling_price, 2);
@@ -19,11 +19,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create Trigger
-CREATE TRIGGER post_process
+CREATE TRIGGER pre_process
   BEFORE INSERT OR UPDATE
   ON inventories.products
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.products_registration_post_process();
+EXECUTE PROCEDURE inventories.products_pre_process();
 
 
 -- 仕入先:チェック制約
@@ -46,12 +46,9 @@ ALTER TABLE inventories.suppliers ADD CONSTRAINT suppliers_order_policy_check CH
 
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.exist_dealing_bank(i_company_id text) RETURNS boolean AS $$
-  DECLARE
-    result integer;
-  BEGIN
-  -- 取引銀行のPK検索
-  SELECT COUNT (1) INTO result FROM inventories.dealing_banks WHERE company_id = i_company_id;
-  RETURN result > 0;
+BEGIN
+  -- 取引銀行のPK検索し存在する場合にTrue
+  RETURN(SELECT COUNT(1) > 0 FROM inventories.dealing_banks WHERE company_id = i_company_id);
 END;
 $$ LANGUAGE plpgsql;
 

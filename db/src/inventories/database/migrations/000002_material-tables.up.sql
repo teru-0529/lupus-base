@@ -180,9 +180,9 @@ COMMENT ON TABLE inventories.costomers IS '得意先';
 -- Set Column Comment
 COMMENT ON COLUMN inventories.costomers.costomer_id IS '得意先ID';
 COMMENT ON COLUMN inventories.costomers.dealing_status IS '取引状況';
-COMMENT ON COLUMN inventories.costomers.cut_off_day IS '締日付';
+COMMENT ON COLUMN inventories.costomers.cut_off_day IS '締日';
 COMMENT ON COLUMN inventories.costomers.month_of_deposit_term IS '入金猶予月数';
-COMMENT ON COLUMN inventories.costomers.deposit_day IS '入金期限日付';
+COMMENT ON COLUMN inventories.costomers.deposit_day IS '入金期限日';
 COMMENT ON COLUMN inventories.costomers.sales_pic IS '営業担当者ID';
 COMMENT ON COLUMN inventories.costomers.contact_person IS '相手先担当者';
 COMMENT ON COLUMN inventories.costomers.note IS '備考';
@@ -256,9 +256,9 @@ COMMENT ON TABLE inventories.suppliers IS '仕入先';
 -- Set Column Comment
 COMMENT ON COLUMN inventories.suppliers.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.suppliers.dealing_status IS '取引状況';
-COMMENT ON COLUMN inventories.suppliers.cut_off_day IS '締日付';
+COMMENT ON COLUMN inventories.suppliers.cut_off_day IS '締日';
 COMMENT ON COLUMN inventories.suppliers.month_of_payment_term IS '支払猶予月数';
-COMMENT ON COLUMN inventories.suppliers.payment_day IS '支払期限日付';
+COMMENT ON COLUMN inventories.suppliers.payment_day IS '支払期限日';
 COMMENT ON COLUMN inventories.suppliers.purchase_pic IS '仕入担当者ID';
 COMMENT ON COLUMN inventories.suppliers.contact_person IS '相手先担当者';
 COMMENT ON COLUMN inventories.suppliers.order_policy IS '発注方針';
