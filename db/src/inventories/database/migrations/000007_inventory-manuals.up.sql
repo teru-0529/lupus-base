@@ -163,12 +163,8 @@ BEGIN
       WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month < yyyymm
       ORDER BY year_month DESC
       LIMIT 1;
-
-    IF last_quantity IS NULL THEN
-      t_init_quantity:=0;
-    ELSE
-      t_init_quantity:=last_quantity;
-    END IF;
+    -- 過去最新在庫数が取得できた場合は月初数量に設定
+    t_init_quantity:=CASE WHEN last_quantity IS NULL THEN 0 ELSE last_quantity END;
     t_warehousing_quantity:=0;
     t_shipping_quantity:=0;
   ELSE
