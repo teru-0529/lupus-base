@@ -144,7 +144,6 @@ DECLARE
 
   recent_rec RECORD; --検索結果レコード(現在年月)
   last_rec RECORD;--検索結果レコード(過去最新年月)
-  last_quantity integer; --過去最新在庫数
 BEGIN
 --  1.月次在庫サマリ＿倉庫別 INFO:
 
@@ -158,13 +157,13 @@ BEGIN
   IF recent_rec IS NULL THEN
     -- 現在年月データが存在しないケース
     -- 過去最新在庫数の取得
-    SELECT present_quantity INTO last_quantity
+    SELECT * INTO last_rec
       FROM inventories.month_inventory_summaries_every_site
       WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month < yyyymm
       ORDER BY year_month DESC
       LIMIT 1;
     -- 過去最新在庫数が取得できた場合は月初数量に設定
-    t_init_quantity:=CASE WHEN last_quantity IS NULL THEN 0 ELSE last_quantity END;
+    t_init_quantity:=CASE WHEN last_rec IS NULL THEN 0 ELSE last_rec.present_quantity END;
     t_warehousing_quantity:=0;
     t_shipping_quantity:=0;
   ELSE
@@ -204,6 +203,120 @@ BEGIN
         shipping_quantity = t_shipping_quantity
     WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month = yyyymm;
   END IF;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+--  2.現在在庫サマリ＿倉庫別 INFO:
+
+  -- 2.1.最新データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.current_inventory_summaries_every_site
+    WHERE product_id = NEW.product_id AND site_id = NEW.site_id
+    FOR UPDATE;
+
+  -- 2.2.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 最新データが存在しないケース
+    INSERT INTO inventories.current_inventory_summaries_every_site VALUES (
+      NEW.product_id,
+      NEW.site_id,
+      NEW.variable_quantity,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 最新データが存在するケース
+    UPDATE inventories.current_inventory_summaries_every_site
+    SET present_quantity = recent_rec.present_quantity + NEW.variable_quantity
+    WHERE product_id = NEW.product_id AND site_id = NEW.site_id;
+  END IF;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+-- 倉庫間移動は在庫内で動きのためここで抜ける
+  IF NEW.taransaction_type = 'MOVE_WAREHOUSEMENT' OR NEW.taransaction_type = 'MOVE_SHIPPMENT' THEN
+    RETURN NEW;
+  END IF;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+--  3.月次在庫サマリー INFO:
+
+  -- 3.1.現在年月データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.month_inventory_summaries
+    WHERE product_id = NEW.product_id AND year_month = yyyymm
+    FOR UPDATE;
+
+  -- 3.2.月初数量/入庫数量/出庫数量/月初金額/入庫金額/出庫金額の算出
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    -- 過去最新在庫数/過去最新在庫金額の取得
+    SELECT * INTO last_rec
+      FROM inventories.month_inventory_summaries
+      WHERE product_id = NEW.product_id AND year_month < yyyymm
+      ORDER BY year_month DESC
+      LIMIT 1;
+    -- 過去最新在庫数/過去最新在庫金額が取得できた場合は月初数量/月初金額に設定
+    t_init_quantity:=CASE WHEN last_rec IS NULL THEN 0 ELSE last_rec.present_quantity END;
+    t_warehousing_quantity:=0;
+    t_shipping_quantity:=0;
+    t_init_amount:=CASE WHEN last_rec IS NULL THEN 0 ELSE last_rec.present_amount END;
+    t_warehousing_amount:=0.00;
+    t_shipping_amount:=0.00;
+  ELSE
+    -- 現在年月データが存在するケース
+    t_init_quantity:=recent_rec.init_quantity;
+    t_warehousing_quantity:=recent_rec.warehousing_quantity;
+    t_shipping_quantity:=recent_rec.shipping_quantity;
+    t_init_amount:=recent_rec.init_amount;
+    t_warehousing_amount:=recent_rec.warehousing_amount;
+    t_shipping_amount:=recent_rec.shipping_amount;
+  END IF;
+
+  -- 3.3.取引数量/取引金額の計上(変動数量/変動金額の符号により判断)
+  IF NEW.variable_quantity > 0 THEN
+    t_warehousing_quantity:=t_warehousing_quantity + NEW.variable_quantity;
+  ELSE
+    t_shipping_quantity:=t_shipping_quantity - NEW.variable_quantity;
+  END IF;
+  IF NEW.variable_amount > 0 THEN
+    t_warehousing_amount:=t_warehousing_amount + NEW.variable_amount;
+  ELSE
+    t_shipping_amount:=t_shipping_amount - NEW.variable_amount;
+  END IF;
+
+  -- 3.4.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    INSERT INTO inventories.month_inventory_summaries VALUES (
+      NEW.product_id,
+      yyyymm,
+      t_init_quantity,
+      t_warehousing_quantity,
+      t_shipping_quantity,
+      default,
+      t_init_amount,
+      t_warehousing_amount,
+      t_shipping_amount,
+      default,
+      default,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 現在年月データが存在するケース
+    UPDATE inventories.month_inventory_summaries
+    SET warehousing_quantity = t_warehousing_quantity,
+        shipping_quantity = t_shipping_quantity,
+        warehousing_amount = t_warehousing_amount,
+        shipping_amount = t_shipping_amount
+    WHERE product_id = NEW.product_id AND year_month = yyyymm;
+  END IF;
+
 
 
   RETURN NEW;
