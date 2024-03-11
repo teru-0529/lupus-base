@@ -144,6 +144,7 @@ DECLARE
 
   recent_rec RECORD; --検索結果レコード(現在年月)
   last_rec RECORD;--検索結果レコード(過去最新年月)
+  last_quantity integer; --過去最新在庫数
 BEGIN
 --  1.月次在庫サマリ＿倉庫別 INFO:
 
@@ -156,17 +157,17 @@ BEGIN
   -- 1.2.月初数量/入庫数量/出庫数量の算出
   IF recent_rec IS NULL THEN
     -- 現在年月データが存在しないケース
-    -- 過去最新年月データの取得
-    SELECT * INTO last_rec
+    -- 過去最新在庫数の取得
+    SELECT present_quantity INTO last_quantity
       FROM inventories.month_inventory_summaries_every_site
       WHERE product_id = NEW.product_id AND site_id = NEW.site_id AND year_month < yyyymm
       ORDER BY year_month DESC
       LIMIT 1;
 
-    IF last_rec IS NULL THEN
+    IF last_quantity IS NULL THEN
       t_init_quantity:=0;
     ELSE
-      t_init_quantity:=last_rec.present_quantity;
+      t_init_quantity:=last_quantity;
     END IF;
     t_warehousing_quantity:=0;
     t_shipping_quantity:=0;
