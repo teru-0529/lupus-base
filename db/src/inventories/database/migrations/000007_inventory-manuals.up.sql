@@ -399,3 +399,90 @@ CREATE TRIGGER pre_process
   ON inventories.other_inventory_instructions
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.other_instruction_pre_process();
+
+
+-- 倉庫移動指示:登録「後」処理
+--  別テーブル登録(在庫変動履歴)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.insert_move_inventory_history() RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id_from,
+    - NEW.quantity,
+    0.00,
+    'MOVE_SHIPPMENT',
+    NEW.move_instruction_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id_to,
+    NEW.quantity,
+    0.00,
+    'MOVE_WAREHOUSEMENT',
+    NEW.move_instruction_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.moving_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.insert_move_inventory_history();
+
+
+-- 雑入出庫指示:登録「後」処理
+--  別テーブル登録(在庫変動履歴)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.insert_other_inventory_history() RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id,
+    NEW.variable_quantity,
+    NEW.variable_amount,
+    'OTHER',
+    NEW.other_inventory_instruction_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.other_inventory_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.insert_other_inventory_history();
