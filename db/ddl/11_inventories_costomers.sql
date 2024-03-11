@@ -3,6 +3,7 @@
 -- 3.得意先(costomers)
 
 -- Set FK Constraint
+ALTER TABLE inventories.costomers DROP CONSTRAINT IF EXISTS costomers_foreignKey_1;
 ALTER TABLE inventories.costomers ADD CONSTRAINT costomers_foreignKey_1 FOREIGN KEY (
   costomer_id
 ) REFERENCES inventories.companies (
