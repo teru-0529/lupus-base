@@ -379,3 +379,23 @@ CREATE TRIGGER post_process
   ON inventories.inventory_histories
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.upsert_inventory_summaries();
+
+
+-- 雑入出庫指示:登録「前」処理
+--  有効桁数調整(変動金額)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.other_instruction_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+--  有効桁数調整(変動金額)
+  NEW.variable_amount = ROUND(NEW.variable_amount, 2);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT
+  ON inventories.other_inventory_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.other_instruction_pre_process();
