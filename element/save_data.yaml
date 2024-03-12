@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-12T20:09:28+09:00
+create_at: 2024-03-12T21:13:35+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -551,10 +551,10 @@ delive_elements:
     name_jp: 支払日付
     name_en: paymentDate
     description: 支払日付
-  - origin: 日付
-    name_jp: 変更期限日付
-    name_en: changeDeadlineDate
-    description: 変更期限日付
+  - origin: 日時
+    name_jp: 変更凍結日時
+    name_en: freezeChangedTimestamp
+    description: 変更凍結日時
 segments:
   - key: 取引状況
     value: READY

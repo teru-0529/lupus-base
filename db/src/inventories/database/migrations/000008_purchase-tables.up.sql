@@ -30,9 +30,9 @@ CREATE TABLE inventories.payments (
   deposit_date date NOT NULL DEFAULT get_business_date(),
   payment_amount numeric NOT NULL DEFAULT 0.00,
   payment_status payment_status NOT NULL,
-  change_deadline_date date NOT NULL DEFAULT get_business_date(),
   amount_confirmed_date date,
   payment_date date,
+  freeze_changed_timestamp timestamp,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -49,9 +49,9 @@ COMMENT ON COLUMN inventories.payments.cut_off_date IS '締日付';
 COMMENT ON COLUMN inventories.payments.deposit_date IS '支払期限日付';
 COMMENT ON COLUMN inventories.payments.payment_amount IS '支払金額';
 COMMENT ON COLUMN inventories.payments.payment_status IS '支払状況';
-COMMENT ON COLUMN inventories.payments.change_deadline_date IS '変更期限日付';
 COMMENT ON COLUMN inventories.payments.amount_confirmed_date IS '金額確定日付';
 COMMENT ON COLUMN inventories.payments.payment_date IS '支払日付';
+COMMENT ON COLUMN inventories.payments.freeze_changed_timestamp IS '変更凍結日時';
 COMMENT ON COLUMN inventories.payments.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.payments.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.payments.created_by IS '作成者';
