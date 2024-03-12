@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-12T21:15:35+09:00
+create_at: 2024-03-13T07:41:54+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -314,7 +314,16 @@ tables:
           fields:
             - this: 倉庫ID
               ref: 倉庫ID
-    indexes: []
+    indexes:
+      - name: idx_month_inventory_summaries_every_site_1
+        unique: true
+        fields:
+          - name: 商品ID
+            asc: true
+          - name: 倉庫ID
+            asc: true
+          - name: 年月
+            asc: true
   - name_jp: 月次在庫サマリ
     name_en: month_inventory_summaries
     is_master: false
@@ -620,7 +629,7 @@ tables:
     name_en: payments
     is_master: false
     fields:
-      - name: 支払ID
+      - name: 支払番号
         nullable: false
         default: null
       - name: 仕入先ID
@@ -649,7 +658,7 @@ tables:
         default: null
     constraint:
       primary_key:
-        - 支払ID
+        - 支払番号
       uniques:
         - name: payments_unique_1
           fields:
@@ -752,7 +761,7 @@ tables:
       - name: 取引管理No
         nullable: false
         default: null
-      - name: 支払ID
+      - name: 支払番号
         nullable: true
         default: null
     constraint:
@@ -772,6 +781,15 @@ tables:
           delete_option: null
           update_option: null
           fields:
-            - this: 支払ID
-              ref: 支払ID
-    indexes: []
+            - this: 支払番号
+              ref: 支払番号
+    indexes:
+      - name: idx_payable_histories_1
+        unique: false
+        fields:
+          - name: 仕入先ID
+            asc: true
+          - name: 業務取引日付
+            asc: true
+          - name: 処理日時
+            asc: true

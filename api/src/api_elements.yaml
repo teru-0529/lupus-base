@@ -274,7 +274,7 @@ payableType:
   description: 買掛変動の種類
   example: PURCHASE
 
-# 支払ID
+# 支払番号
 paymentId:
   type: string
   pattern: ^PM[0-9]{8}$

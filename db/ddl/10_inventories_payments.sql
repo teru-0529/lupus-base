@@ -24,7 +24,7 @@ CREATE TABLE inventories.payments (
 COMMENT ON TABLE inventories.payments IS '支払';
 
 -- Set Column Comment
-COMMENT ON COLUMN inventories.payments.payment_id IS '支払ID';
+COMMENT ON COLUMN inventories.payments.payment_id IS '支払番号';
 COMMENT ON COLUMN inventories.payments.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.payments.cut_off_date IS '締日付';
 COMMENT ON COLUMN inventories.payments.deposit_date IS '支払期限日付';

@@ -55,6 +55,13 @@ ALTER TABLE inventories.month_inventory_summaries_every_site ADD PRIMARY KEY (
   site_id
 );
 
+-- create index
+CREATE UNIQUE INDEX idx_month_inventory_summaries_every_site_1 ON inventories.month_inventory_summaries_every_site (
+  product_id,
+  site_id,
+  year_month
+);
+
 -- Create 'set_update_at' Trigger
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE

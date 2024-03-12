@@ -43,7 +43,7 @@ CREATE TABLE inventories.payments (
 COMMENT ON TABLE inventories.payments IS '支払';
 
 -- Set Column Comment
-COMMENT ON COLUMN inventories.payments.payment_id IS '支払ID';
+COMMENT ON COLUMN inventories.payments.payment_id IS '支払番号';
 COMMENT ON COLUMN inventories.payments.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.payments.cut_off_date IS '締日付';
 COMMENT ON COLUMN inventories.payments.deposit_date IS '支払期限日付';
@@ -264,7 +264,7 @@ COMMENT ON COLUMN inventories.payable_histories.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.payable_histories.variable_amount IS '変動金額';
 COMMENT ON COLUMN inventories.payable_histories.payable_type IS '買掛変動種類';
 COMMENT ON COLUMN inventories.payable_histories.tranzaction_no IS '取引管理No';
-COMMENT ON COLUMN inventories.payable_histories.payment_id IS '支払ID';
+COMMENT ON COLUMN inventories.payable_histories.payment_id IS '支払番号';
 COMMENT ON COLUMN inventories.payable_histories.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.payable_histories.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.payable_histories.created_by IS '作成者';
@@ -273,6 +273,13 @@ COMMENT ON COLUMN inventories.payable_histories.updated_by IS '更新者';
 -- Set PK Constraint
 ALTER TABLE inventories.payable_histories ADD PRIMARY KEY (
   payable_no
+);
+
+-- create index
+CREATE INDEX idx_payable_histories_1 ON inventories.payable_histories (
+  supplier_id,
+  business_date,
+  operation_timestamp
 );
 
 -- Create 'set_update_at' Trigger
