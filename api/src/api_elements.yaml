@@ -275,7 +275,7 @@ payableType:
   example: PURCHASE
 
 # 支払ID
-paymantId:
+paymentId:
   type: string
   pattern: ^PM[0-9]{8}$
   minLength: 10

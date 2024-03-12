@@ -12,7 +12,7 @@ CREATE TABLE inventories.payable_histories (
   variable_amount numeric NOT NULL DEFAULT 0.00,
   payable_type payable_type NOT NULL,
   tranzaction_no serial NOT NULL,
-  paymant_id varchar(10) check (paymant_id ~* '^PM[0-9]{8}$'),
+  payment_id varchar(10) check (payment_id ~* '^PM[0-9]{8}$'),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -30,7 +30,7 @@ COMMENT ON COLUMN inventories.payable_histories.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.payable_histories.variable_amount IS '変動金額';
 COMMENT ON COLUMN inventories.payable_histories.payable_type IS '買掛変動種類';
 COMMENT ON COLUMN inventories.payable_histories.tranzaction_no IS '取引管理No';
-COMMENT ON COLUMN inventories.payable_histories.paymant_id IS '支払ID';
+COMMENT ON COLUMN inventories.payable_histories.payment_id IS '支払ID';
 COMMENT ON COLUMN inventories.payable_histories.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.payable_histories.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.payable_histories.created_by IS '作成者';

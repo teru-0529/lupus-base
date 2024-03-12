@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-12T07:58:00+09:00
+create_at: 2024-03-12T20:09:28+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -363,7 +363,7 @@ elements:
     example: PURCHASE
     description: 買掛変動の種類
   - name_jp: 支払ID
-    name_en: paymantId
+    name_en: paymentId
     domain: NOKEY
     reg_ex: ^PM[0-9]{8}$
     min_digits: 10

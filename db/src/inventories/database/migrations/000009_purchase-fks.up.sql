@@ -42,7 +42,7 @@ ALTER TABLE inventories.payable_histories ADD CONSTRAINT payable_histories_forei
 
 ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_foreignKey_2;
 ALTER TABLE inventories.payable_histories ADD CONSTRAINT payable_histories_foreignKey_2 FOREIGN KEY (
-  paymant_id
+  payment_id
 ) REFERENCES inventories.payments (
-  paymant_id
+  payment_id
 );

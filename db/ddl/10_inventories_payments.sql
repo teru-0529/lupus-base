@@ -5,7 +5,7 @@
 -- Create Table
 DROP TABLE IF EXISTS inventories.payments CASCADE;
 CREATE TABLE inventories.payments (
-  paymant_id varchar(10) NOT NULL check (paymant_id ~* '^PM[0-9]{8}$'),
+  payment_id varchar(10) NOT NULL check (payment_id ~* '^PM[0-9]{8}$'),
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   cut_off_date date NOT NULL DEFAULT get_business_date(),
   deposit_date date NOT NULL DEFAULT get_business_date(),
@@ -24,7 +24,7 @@ CREATE TABLE inventories.payments (
 COMMENT ON TABLE inventories.payments IS '支払';
 
 -- Set Column Comment
-COMMENT ON COLUMN inventories.payments.paymant_id IS '支払ID';
+COMMENT ON COLUMN inventories.payments.payment_id IS '支払ID';
 COMMENT ON COLUMN inventories.payments.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.payments.cut_off_date IS '締日付';
 COMMENT ON COLUMN inventories.payments.deposit_date IS '支払期限日付';
@@ -40,7 +40,7 @@ COMMENT ON COLUMN inventories.payments.updated_by IS '更新者';
 
 -- Set PK Constraint
 ALTER TABLE inventories.payments ADD PRIMARY KEY (
-  paymant_id
+  payment_id
 );
 
 -- Set Unique Constraint
@@ -63,13 +63,13 @@ CREATE OR REPLACE FUNCTION inventories.payments_audit() RETURNS TRIGGER AS $$
 BEGIN
   IF (TG_OP = 'DELETE') THEN
     INSERT INTO operation_histories(schema_name, table_name, operation_type, table_key)
-    SELECT TG_TABLE_SCHEMA, TG_TABLE_NAME, 'DELETE', OLD.paymant_id;
+    SELECT TG_TABLE_SCHEMA, TG_TABLE_NAME, 'DELETE', OLD.payment_id;
   ELSIF (TG_OP = 'UPDATE') THEN
     INSERT INTO operation_histories(operated_by, schema_name, table_name, operation_type, table_key)
-    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'UPDATE', NEW.paymant_id;
+    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'UPDATE', NEW.payment_id;
   ELSIF (TG_OP = 'INSERT') THEN
     INSERT INTO operation_histories(operated_by, schema_name, table_name, operation_type, table_key)
-    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'INSERT', NEW.paymant_id;
+    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'INSERT', NEW.payment_id;
   END IF;
   RETURN null;
 END;
