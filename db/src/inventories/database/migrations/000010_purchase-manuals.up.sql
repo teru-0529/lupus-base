@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION inventories.payments_pre_process() RETURNS TRIGGER AS
 BEGIN
   -- 導出属性の算出(支払ID)
   IF (TG_OP = 'INSERT') THEN
-    NEW.payment_id:='PM'||to_char(nextval('inventories.payment_no_seed'),'FM00000000');
+    NEW.payment_id:='PM-'||to_char(nextval('inventories.payment_no_seed'),'FM0000000');
   END IF;
 
   -- 導出属性の算出(変更凍結日時)

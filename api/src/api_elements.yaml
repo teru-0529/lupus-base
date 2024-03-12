@@ -277,11 +277,11 @@ payableType:
 # 支払番号
 paymentId:
   type: string
-  pattern: ^PM[0-9]{8}$
+  pattern: ^PM-[0-9]{7}$
   minLength: 10
   maxLength: 10
   description: 支払を一意に特定するID
-  example: PM00000002
+  example: PM-0000002
 
 # 支払状況
 paymentStatus:
@@ -292,4 +292,13 @@ paymentStatus:
     - COMPLETED
   description: 支払状況の種類
   example: CONFIRMED
+
+# 発注番号
+orderingId:
+  type: string
+  pattern: ^PO-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 発注を一意に特定するID
+  example: PO-0000004
 

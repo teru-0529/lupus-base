@@ -5,7 +5,7 @@
 -- Create Table
 DROP TABLE IF EXISTS inventories.payments CASCADE;
 CREATE TABLE inventories.payments (
-  payment_id varchar(10) NOT NULL check (payment_id ~* '^PM[0-9]{8}$'),
+  payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   cut_off_date date NOT NULL DEFAULT get_business_date(),
   deposit_date date NOT NULL DEFAULT get_business_date(),

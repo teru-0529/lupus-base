@@ -24,7 +24,7 @@ CREATE TYPE payment_status AS enum (
 -- Create Table
 DROP TABLE IF EXISTS inventories.payments CASCADE;
 CREATE TABLE inventories.payments (
-  payment_id varchar(10) NOT NULL check (payment_id ~* '^PM[0-9]{8}$'),
+  payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   cut_off_date date NOT NULL DEFAULT get_business_date(),
   deposit_date date NOT NULL DEFAULT get_business_date(),
@@ -246,7 +246,7 @@ CREATE TABLE inventories.payable_histories (
   variable_amount numeric NOT NULL DEFAULT 0.00,
   payable_type payable_type NOT NULL,
   tranzaction_no serial NOT NULL,
-  payment_id varchar(10) check (payment_id ~* '^PM[0-9]{8}$'),
+  payment_id varchar(10) check (payment_id ~* '^PM-[0-9]{7}$'),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),

@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-13T07:29:11+09:00
+create_at: 2024-03-13T07:51:29+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -365,12 +365,12 @@ elements:
   - name_jp: 支払番号
     name_en: paymentId
     domain: NOKEY
-    reg_ex: ^PM[0-9]{8}$
+    reg_ex: ^PM-[0-9]{7}$
     min_digits: 10
     max_digits: 10
     min_value: null
     max_value: null
-    example: PM00000002
+    example: PM-0000002
     description: 支払を一意に特定するID
   - name_jp: 支払状況
     name_en: paymentStatus
@@ -382,6 +382,16 @@ elements:
     max_value: null
     example: CONFIRMED
     description: 支払状況の種類
+  - name_jp: 発注番号
+    name_en: orderingId
+    domain: NOKEY
+    reg_ex: ^PO-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: PO-0000004
+    description: 発注を一意に特定するID
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
