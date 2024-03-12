@@ -272,7 +272,7 @@ BEGIN
     t_init_quantity:=CASE WHEN last_rec IS NULL THEN 0 ELSE last_rec.present_quantity END;
     t_warehousing_quantity:=0;
     t_shipping_quantity:=0;
-    t_init_amount:=CASE WHEN last_rec IS NULL THEN 0 ELSE last_rec.present_amount END;
+    t_init_amount:=CASE WHEN last_rec IS NULL THEN 0.00 ELSE last_rec.present_amount END;
     t_warehousing_amount:=0.00;
     t_shipping_amount:=0.00;
   ELSE

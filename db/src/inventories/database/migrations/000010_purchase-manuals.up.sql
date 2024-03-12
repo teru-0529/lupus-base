@@ -159,3 +159,135 @@ CREATE TRIGGER pre_process
   ON inventories.payable_histories
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.payable_histories_pre_process();
+
+
+-- 買掛変動履歴:登録「後」処理
+--  別テーブル登録/更新(月次買掛金サマリ/現在買掛金サマリ)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.upsert_accounts_payables() RETURNS TRIGGER AS $$
+DECLARE
+  yyyymm text:=to_char(NEW.business_date, 'YYYYMM');
+
+  t_init_balance numeric;
+  t_purchase_amount numeric;
+  t_payment_amount numeric;
+  t_other_amount numeric;
+
+  recent_rec RECORD; --検索結果レコード(現在年月)
+  last_rec RECORD;--検索結果レコード(過去最新年月)
+  rec RECORD;
+BEGIN
+--  1.月次買掛金サマリ INFO:
+
+  -- 1.1.現在年月データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.month_accounts_payables
+    WHERE supplier_id = NEW.supplier_id AND year_month = yyyymm
+    FOR UPDATE;
+
+  -- 1.2.月初残高/購入金額/支払金額/その他金額の算出
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    -- 過去最新残高の取得
+    SELECT * INTO last_rec
+      FROM inventories.month_accounts_payables
+      WHERE supplier_id = NEW.supplier_id AND year_month < yyyymm
+      ORDER BY year_month DESC
+      LIMIT 1;
+    -- 過去最新在庫数が取得できた場合は月初残高に設定
+    t_init_balance:=CASE WHEN last_rec IS NULL THEN 0.00 ELSE last_rec.present_balance END;
+    t_purchase_amount:=0.00;
+    t_payment_amount:=0.00;
+    t_other_amount:=0.00;
+  ELSE
+    -- 現在年月データが存在するケース
+    t_init_balance:=recent_rec.init_balance;
+    t_purchase_amount:=recent_rec.purchase_amount;
+    t_payment_amount:=recent_rec.payment_amount;
+    t_other_amount:=recent_rec.other_amount;
+  END IF;
+
+  -- 1.3.取引数量の計上(買掛変動種類により判断)
+  IF NEW.payable_type='PURCHASE' OR NEW.payable_type='ORDER_RETURN' THEN
+    t_purchase_amount:=t_purchase_amount + NEW.variable_amount;
+  ELSEIF NEW.payable_type='PAYMENT' THEN
+    t_payment_amount:=t_payment_amount - NEW.variable_amount;
+  ELSEIF NEW.payable_type='OTHER' THEN
+    t_other_amount:=t_other_amount + NEW.variable_amount;
+  END IF;
+
+  -- 1.4.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    INSERT INTO inventories.month_accounts_payables VALUES (
+      NEW.supplier_id,
+      yyyymm,
+      t_init_balance,
+      t_purchase_amount,
+      t_payment_amount,
+      t_other_amount,
+      default,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 現在年月データが存在するケース
+    UPDATE inventories.month_accounts_payables
+    SET purchase_amount = t_purchase_amount,
+        payment_amount = t_payment_amount,
+        other_amount = t_other_amount
+    WHERE supplier_id = NEW.supplier_id AND year_month = yyyymm;
+  END IF;
+
+  -- 1.5.現在年月以降のデータ更新(存在する場合)
+  FOR rec IN SELECT * FROM inventories.month_accounts_payables
+    WHERE supplier_id = NEW.supplier_id AND year_month > yyyymm LOOP
+
+    UPDATE inventories.month_accounts_payables
+    SET init_balance = rec.init_balance + NEW.variable_amount
+    WHERE supplier_id = NEW.supplier_id AND year_month = rec.year_month;
+  END LOOP;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+--  2.現在買掛金サマリ INFO:
+
+  -- 2.1.最新データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.current_accounts_payables
+    WHERE supplier_id = NEW.supplier_id
+    FOR UPDATE;
+
+  -- 2.2.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 最新データが存在しないケース
+    INSERT INTO inventories.current_accounts_payables VALUES (
+      NEW.supplier_id,
+      NEW.variable_amount,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 最新データが存在するケース
+    UPDATE inventories.current_accounts_payables
+    SET present_balance = recent_rec.present_balance + NEW.variable_amount
+    WHERE supplier_id = NEW.supplier_id;
+  END IF;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.payable_histories
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.upsert_accounts_payables();

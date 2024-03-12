@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS inventories.upsert_accounts_payables() CASCADE;
 DROP FUNCTION IF EXISTS inventories.payable_histories_pre_process() CASCADE;
 ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_payable_type_check;
 
