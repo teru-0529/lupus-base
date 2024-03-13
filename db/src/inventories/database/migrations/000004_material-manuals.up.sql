@@ -245,7 +245,7 @@ DECLARE
   first_date date;
   last_date date;
 BEGIN
-  -- 1.仕入先検索
+  -- 1.得意先検索
   SELECT * INTO rec FROM inventories.costomers WHERE costomer_id = i_costomer_id;
   cutoff_day_interval = CAST((rec.cut_off_day - 1) || ' Day' AS interval);
   deposit_day_interval = CAST((rec.deposit_day - 1) || ' Day' AS interval);
@@ -267,13 +267,13 @@ BEGIN
     cut_off_date = DATE(first_date + cutoff_day_interval);
   END IF;
 
-  -- 4.支払月月初日付/月末日付算出
+  -- 4.入金月月初日付/月末日付算出
   first_date = DATE(DATE_TRUNC('month', cut_off_date) + month_interval);
   last_date = DATE(first_date + interval '1 month' - interval '1 Day');
 
   -- 5.入金期限日付算出
   IF EXTRACT(day FROM last_date) < rec.deposit_day THEN
-    -- 支払期限日が支払月末日よりも後(=支払期限日99指定)の場合・・・月末支払
+    -- 入金期限日が入金月末日よりも後(=入金期限日99指定)の場合・・・月末支払
     deposit_date = last_date;
   ELSE
     deposit_date = DATE(first_date + deposit_day_interval);
