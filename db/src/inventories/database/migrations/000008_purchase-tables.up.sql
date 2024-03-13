@@ -401,7 +401,7 @@ CREATE TABLE inventories.ordering_details (
   warehousing_quantity integer NOT NULL DEFAULT 0 check (warehousing_quantity >= 0),
   cancel_quantity integer NOT NULL DEFAULT 0 check (cancel_quantity >= 0),
   remaining_quantity integer NOT NULL DEFAULT 0 check (remaining_quantity >= 0),
-  unit_price numeric NOT NULL DEFAULT 0.00 check (unit_price >= 0),
+  unit_price numeric NOT NULL check (unit_price >= 0),
   estimate_profit_rate numeric NOT NULL DEFAULT 0.00 check (estimate_profit_rate >= 0),
   standard_arrival_date date NOT NULL DEFAULT get_business_date(),
   estimate_arrival_date date NOT NULL DEFAULT get_business_date(),
