@@ -13,6 +13,7 @@ CREATE TABLE inventories.warehousings (
   cut_off_date date NOT NULL,
   payment_limit_date date NOT NULL,
   payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
+  note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -31,6 +32,7 @@ COMMENT ON COLUMN inventories.warehousings.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.warehousings.cut_off_date IS '締日付';
 COMMENT ON COLUMN inventories.warehousings.payment_limit_date IS '支払期限日付';
 COMMENT ON COLUMN inventories.warehousings.payment_id IS '支払番号';
+COMMENT ON COLUMN inventories.warehousings.note IS '備考';
 COMMENT ON COLUMN inventories.warehousings.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.warehousings.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.warehousings.created_by IS '作成者';
