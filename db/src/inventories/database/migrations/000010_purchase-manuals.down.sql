@@ -1,5 +1,8 @@
 DROP FUNCTION IF EXISTS inventories.ordering_details_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.is_after_arrival_date() CASCADE;
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_supplier_id_check;
 DROP FUNCTION IF EXISTS inventories.orderings_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.supplier_id_for_orderings() CASCADE;
 
 DROP FUNCTION IF EXISTS inventories.upsert_accounts_payables() CASCADE;
 DROP FUNCTION IF EXISTS inventories.payable_histories_pre_process() CASCADE;

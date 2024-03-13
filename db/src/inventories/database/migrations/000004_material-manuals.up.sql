@@ -106,7 +106,7 @@ CREATE OR REPLACE VIEW inventories.view_company_destinations AS
   ORDER BY company_id, seq_no;
 
 
--- 商品得意先取得
+-- 商品仕入先取得
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.supplier_id_for_products(i_product_id text) RETURNS text AS $$
 BEGIN
@@ -158,7 +158,7 @@ $$ LANGUAGE plpgsql;
 
 -- 標準納期日数計算(商品に指定のない場合は仕入れ先の値)
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.calc_days_to_arrival(i_product_id text) RETURNS integer AS $$
+CREATE OR REPLACE FUNCTION inventories.calc_days_to_arriva(i_product_id text) RETURNS integer AS $$
 DECLARE
   rec RECORD;
   i_days_to_arrive integer;

@@ -317,6 +317,43 @@ CREATE TRIGGER pre_process
 EXECUTE PROCEDURE inventories.orderings_pre_process();
 
 
+-- 発注仕入先取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.supplier_id_for_orderings(i_ordering_id text) RETURNS text AS $$
+BEGIN
+  RETURN(SELECT supplier_id FROM inventories.orderings WHERE ordering_id = i_ordering_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 発注明細:チェック制約
+--  属性相関チェック制約(発注番号/商品ID)
+
+-- Create Constraint
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_supplier_id_check;
+ALTER TABLE inventories.ordering_details ADD CONSTRAINT ordering_details_supplier_id_check CHECK (
+  inventories.supplier_id_for_orderings(ordering_id) = inventories.supplier_id_for_products(product_id)
+);
+
+
+-- 発注明細:チェック制約
+--  属性相関チェック制約(発注番号/予定納期日付)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.is_after_arrival_date(i_ordering_id text, arrival_date date) RETURNS boolean AS $$
+BEGIN
+  -- 発注日付よりも納期日付が後である場合にTrue
+  RETURN(SELECT order_date < arrival_date FROM inventories.orderings WHERE ordering_id = i_ordering_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Constraint
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_estimate_arrival_date_check;
+ALTER TABLE inventories.ordering_details ADD CONSTRAINT ordering_details_estimate_arrival_date_check CHECK (
+  inventories.is_after_arrival_date(ordering_id, estimate_arrival_date)
+);
+
+
 -- 発注明細:登録「前」処理
 --  登録時初期化(入庫数量/キャンセル数量)
 --  導出属性の算出:登録時のみ(単価/想定利益率/標準納期日付/予定納期日付)
@@ -324,6 +361,9 @@ EXECUTE PROCEDURE inventories.orderings_pre_process();
 
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.ordering_details_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  t_order_date date;
+  t_days_to_arrive integer;
 BEGIN
   -- 導出属性の算出(支払ID)
   IF (TG_OP = 'INSERT') THEN
@@ -331,11 +371,24 @@ BEGIN
     NEW.warehousing_quantity:=0;
     NEW.cancel_quantity:=0;
 
---  導出属性の算出:登録時のみ(単価)TODO:
+--  導出属性の算出:登録時のみ(単価)
+    IF NEW.unit_price IS NULL THEN
+      NEW.unit_price = inventories.cost_price_for_products(NEW.product_id);
+    ELSE
+      NEW.unit_price = ROUND(NEW.unit_price, 2);
+    END IF;
 
---  導出属性の算出:登録時のみ(想定利益率)TODO:
+--  導出属性の算出:登録時のみ(想定利益率)
+    NEW.estimate_profit_rate = inventories.calc_profit_rate_by_cost_price(NEW.product_id, NEW.unit_price);
 
---  導出属性の算出:登録時のみ(標準納期日付/予定納期日付)TODO:
+--  導出属性の算出:登録時のみ(標準納期日付/予定納期日付)
+    -- 発注日の取得
+    SELECT order_date INTO t_order_date FROM inventories.orderings WHERE ordering_id = NEW.ordering_id;
+    -- 標準入荷日数の取得
+    t_days_to_arrive = inventories.calc_days_to_arriva(NEW.product_id);
+    NEW.standard_arrival_date = DATE(t_order_date + CAST((t_days_to_arrive) || ' Day' AS interval));
+    NEW.estimate_arrival_date = NEW.standard_arrival_date;
+
   END IF;
 
   --  導出属性の算出(残数量)

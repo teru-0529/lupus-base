@@ -1,6 +1,6 @@
 DROP FUNCTION IF EXISTS inventories.calc_deposit_deadline() CASCADE;
 DROP FUNCTION IF EXISTS inventories.calc_payment_deadline() CASCADE;
-DROP FUNCTION IF EXISTS inventories.calc_days_to_arrival() CASCADE;
+DROP FUNCTION IF EXISTS inventories.calc_days_to_arriva() CASCADE;
 DROP FUNCTION IF EXISTS inventories.calc_profit_rate_by_selling_price() CASCADE;
 DROP FUNCTION IF EXISTS inventories.calc_profit_rate_by_cost_price() CASCADE;
 DROP FUNCTION IF EXISTS inventories.cost_price_for_products() CASCADE;
