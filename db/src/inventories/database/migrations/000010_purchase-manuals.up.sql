@@ -46,9 +46,9 @@ EXECUTE PROCEDURE inventories.payments_pre_process();
 --  属性相関チェック制約(締日付/支払期限日付)
 
 -- Create Constraint
-ALTER TABLE inventories.payments DROP CONSTRAINT IF EXISTS deposit_date_check;
-ALTER TABLE inventories.payments ADD CONSTRAINT deposit_date_check CHECK (
-  cut_off_date < deposit_date
+ALTER TABLE inventories.payments DROP CONSTRAINT IF EXISTS payment_limit_date_check;
+ALTER TABLE inventories.payments ADD CONSTRAINT payment_limit_date_check CHECK (
+  cut_off_date < payment_limit_date
 );
 
 -- 支払:チェック制約

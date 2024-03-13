@@ -27,7 +27,7 @@ CREATE TABLE inventories.payments (
   payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   cut_off_date date NOT NULL DEFAULT get_business_date(),
-  deposit_date date NOT NULL DEFAULT get_business_date(),
+  payment_limit_date date NOT NULL DEFAULT get_business_date(),
   payment_amount numeric NOT NULL DEFAULT 0.00,
   payment_status payment_status NOT NULL,
   amount_confirmed_date date,
@@ -46,7 +46,7 @@ COMMENT ON TABLE inventories.payments IS '支払';
 COMMENT ON COLUMN inventories.payments.payment_id IS '支払番号';
 COMMENT ON COLUMN inventories.payments.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.payments.cut_off_date IS '締日付';
-COMMENT ON COLUMN inventories.payments.deposit_date IS '支払期限日付';
+COMMENT ON COLUMN inventories.payments.payment_limit_date IS '支払期限日付';
 COMMENT ON COLUMN inventories.payments.payment_amount IS '支払金額';
 COMMENT ON COLUMN inventories.payments.payment_status IS '支払状況';
 COMMENT ON COLUMN inventories.payments.amount_confirmed_date IS '金額確定日付';
@@ -66,7 +66,7 @@ ALTER TABLE inventories.payments ADD PRIMARY KEY (
 ALTER TABLE inventories.payments ADD CONSTRAINT payments_unique_1 UNIQUE (
   supplier_id,
   cut_off_date,
-  deposit_date
+  payment_limit_date
 );
 
 -- Create 'set_update_at' Trigger
@@ -474,12 +474,12 @@ EXECUTE PROCEDURE inventories.ordering_details_audit();
 DROP TABLE IF EXISTS inventories.warehousings CASCADE;
 CREATE TABLE inventories.warehousings (
   warehousing_id varchar(10) NOT NULL check (warehousing_id ~* '^WH-[0-9]{7}$'),
-  warehouse_date date NOT NULL,
-  operation_timestamp timestamp NOT NULL,
+  warehouse_date date NOT NULL DEFAULT get_business_date(),
+  operation_timestamp timestamp NOT NULL DEFAULT current_timestamp,
   operator_id varchar(8) NOT NULL check (operator_id ~* '^P[0-9]{7}$'),
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   cut_off_date date NOT NULL,
-  deposit_date date NOT NULL,
+  payment_limit_date date NOT NULL,
   payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -497,7 +497,7 @@ COMMENT ON COLUMN inventories.warehousings.operation_timestamp IS '処理日時'
 COMMENT ON COLUMN inventories.warehousings.operator_id IS '指示実行者ID';
 COMMENT ON COLUMN inventories.warehousings.supplier_id IS '仕入先ID';
 COMMENT ON COLUMN inventories.warehousings.cut_off_date IS '締日付';
-COMMENT ON COLUMN inventories.warehousings.deposit_date IS '支払期限日付';
+COMMENT ON COLUMN inventories.warehousings.payment_limit_date IS '支払期限日付';
 COMMENT ON COLUMN inventories.warehousings.payment_id IS '支払番号';
 COMMENT ON COLUMN inventories.warehousings.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.warehousings.updated_at IS '更新日時';
@@ -513,7 +513,7 @@ ALTER TABLE inventories.warehousings ADD PRIMARY KEY (
 CREATE INDEX idx_warehousings_1 ON inventories.warehousings (
   supplier_id,
   cut_off_date,
-  deposit_date
+  payment_limit_date
 );
 
 -- Create 'set_update_at' Trigger

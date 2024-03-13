@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-13T08:50:02+09:00
+create_at: 2024-03-13T22:05:30+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -561,7 +561,7 @@ delive_elements:
     description: 締日付
   - origin: 日付
     name_jp: 支払期限日付
-    name_en: depositDate
+    name_en: paymentLimitDate
     description: 支払期限日付
   - origin: 日付
     name_jp: 金額確定日付
