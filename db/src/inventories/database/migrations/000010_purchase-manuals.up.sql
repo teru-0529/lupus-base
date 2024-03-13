@@ -212,9 +212,9 @@ BEGIN
   -- 1.3.取引数量の計上(買掛変動種類により判断)
   IF NEW.payable_type='PURCHASE' OR NEW.payable_type='ORDER_RETURN' THEN
     t_purchase_amount:=t_purchase_amount + NEW.variable_amount;
-  ELSEIF NEW.payable_type='PAYMENT' THEN
+  ELSIF NEW.payable_type='PAYMENT' THEN
     t_payment_amount:=t_payment_amount - NEW.variable_amount;
-  ELSEIF NEW.payable_type='OTHER' THEN
+  ELSIF NEW.payable_type='OTHER' THEN
     t_other_amount:=t_other_amount + NEW.variable_amount;
   END IF;
 
@@ -331,11 +331,11 @@ BEGIN
     NEW.warehousing_quantity:=0;
     NEW.cancel_quantity:=0;
 
---  導出属性の算出:登録時のみ(単価)
+--  導出属性の算出:登録時のみ(単価)TODO:
 
---  導出属性の算出:登録時のみ(想定利益率)
+--  導出属性の算出:登録時のみ(想定利益率)TODO:
 
---  導出属性の算出:登録時のみ(標準納期日付/予定納期日付)
+--  導出属性の算出:登録時のみ(標準納期日付/予定納期日付)TODO:
   END IF;
 
   --  導出属性の算出(残数量)
