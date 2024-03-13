@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-13T07:51:29+09:00
+create_at: 2024-03-13T08:50:02+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -392,6 +392,16 @@ elements:
     max_value: null
     example: PO-0000004
     description: 発注を一意に特定するID
+  - name_jp: 入荷番号
+    name_en: warehousingId
+    domain: NOKEY
+    reg_ex: ^WH-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: WH-0000011
+    description: 入荷を一意に特定するID
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -565,6 +575,46 @@ delive_elements:
     name_jp: 変更凍結日時
     name_en: freezeChangedTimestamp
     description: 変更凍結日時
+  - origin: 日付
+    name_jp: 発注日付
+    name_en: orderDate
+    description: 発注日付
+  - origin: 数量
+    name_jp: 発注数量
+    name_en: orderingQuantity
+    description: 発注数量
+  - origin: 数量
+    name_jp: キャンセル数量
+    name_en: cancelQuantity
+    description: キャンセル数量
+  - origin: 数量
+    name_jp: 残数量
+    name_en: remainingQuantity
+    description: 残数量
+  - origin: 利益率
+    name_jp: 想定利益率
+    name_en: estimateProfitRate
+    description: 算出される想定利益率
+  - origin: 日付
+    name_jp: 標準納期日付
+    name_en: standardArrivalDate
+    description: 標準入荷日数から算出される納期日付
+  - origin: 日付
+    name_jp: 予定納期日付
+    name_en: estimateArrivalDate
+    description: 最新の納期予定日付
+  - origin: 日付
+    name_jp: 入荷日付
+    name_en: warehouseDate
+    description: 入荷日付
+  - origin: 数量
+    name_jp: 返品数量
+    name_en: returnQuantity
+    description: 返品数量
+  - origin: 金額
+    name_jp: 単価
+    name_en: unitPrice
+    description: 単価
 segments:
   - key: 取引状況
     value: READY

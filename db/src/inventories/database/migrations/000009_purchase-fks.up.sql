@@ -46,3 +46,66 @@ ALTER TABLE inventories.payable_histories ADD CONSTRAINT payable_histories_forei
 ) REFERENCES inventories.payments (
   payment_id
 );
+
+-- 19.発注(orderings)
+
+-- Set FK Constraint
+ALTER TABLE inventories.orderings DROP CONSTRAINT IF EXISTS orderings_foreignKey_1;
+ALTER TABLE inventories.orderings ADD CONSTRAINT orderings_foreignKey_1 FOREIGN KEY (
+  supplier_id
+) REFERENCES inventories.suppliers (
+  supplier_id
+);
+
+-- 20.発注明細(ordering_details)
+
+-- Set FK Constraint
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_foreignKey_1;
+ALTER TABLE inventories.ordering_details ADD CONSTRAINT ordering_details_foreignKey_1 FOREIGN KEY (
+  ordering_id
+) REFERENCES inventories.orderings (
+  ordering_id
+) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_foreignKey_2;
+ALTER TABLE inventories.ordering_details ADD CONSTRAINT ordering_details_foreignKey_2 FOREIGN KEY (
+  product_id
+) REFERENCES inventories.products (
+  product_id
+);
+
+-- 21.入荷(warehousings)
+
+-- Set FK Constraint
+ALTER TABLE inventories.warehousings DROP CONSTRAINT IF EXISTS warehousings_foreignKey_1;
+ALTER TABLE inventories.warehousings ADD CONSTRAINT warehousings_foreignKey_1 FOREIGN KEY (
+  supplier_id
+) REFERENCES inventories.suppliers (
+  supplier_id
+);
+
+ALTER TABLE inventories.warehousings DROP CONSTRAINT IF EXISTS warehousings_foreignKey_2;
+ALTER TABLE inventories.warehousings ADD CONSTRAINT warehousings_foreignKey_2 FOREIGN KEY (
+  payment_id
+) REFERENCES inventories.payments (
+  payment_id
+);
+
+-- 22.入荷明細(warehousing_details)
+
+-- Set FK Constraint
+ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_foreignKey_1;
+ALTER TABLE inventories.warehousing_details ADD CONSTRAINT warehousing_details_foreignKey_1 FOREIGN KEY (
+  ordering_id,
+  product_id
+) REFERENCES inventories.ordering_details (
+  ordering_id,
+  product_id
+);
+
+ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_foreignKey_2;
+ALTER TABLE inventories.warehousing_details ADD CONSTRAINT warehousing_details_foreignKey_2 FOREIGN KEY (
+  site_id
+) REFERENCES inventories.inventory_sites (
+  site_id
+);

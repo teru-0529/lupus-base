@@ -302,3 +302,12 @@ orderingId:
   description: 発注を一意に特定するID
   example: PO-0000004
 
+# 入荷番号
+warehousingId:
+  type: string
+  pattern: ^WH-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 入荷を一意に特定するID
+  example: WH-0000011
+
