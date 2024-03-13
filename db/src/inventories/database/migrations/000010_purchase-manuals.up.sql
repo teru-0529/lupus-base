@@ -10,13 +10,14 @@ CREATE SEQUENCE inventories.warehousing_no_seed START 1;
 
 
 -- 支払:登録「前」処理
---  導出属性の算出(支払ID/変更凍結日時)
+--  導出属性の算出:登録時のみ(支払ID)
+--  導出属性の算出(変更凍結日時)
 --  有効桁数調整(支払金額)
 
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.payments_pre_process() RETURNS TRIGGER AS $$
 BEGIN
-  -- 導出属性の算出(支払ID)
+  -- 導出属性の算出:登録時のみ(支払ID)
   IF (TG_OP = 'INSERT') THEN
     NEW.payment_id:='PM-'||to_char(nextval('inventories.payment_no_seed'),'FM0000000');
   END IF;
@@ -291,3 +292,62 @@ CREATE TRIGGER post_process
   ON inventories.payable_histories
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.upsert_accounts_payables();
+
+
+-- 発注:登録「前」処理
+--  導出属性の算出:登録時のみ(発注ID)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.orderings_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  -- 導出属性の算出:登録時のみ(支払ID)
+  IF (TG_OP = 'INSERT') THEN
+    NEW.ordering_id:='PO-'||to_char(nextval('inventories.ordering_no_seed'),'FM0000000');
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.orderings
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.orderings_pre_process();
+
+
+-- 発注明細:登録「前」処理
+--  登録時初期化(入庫数量/キャンセル数量)
+--  導出属性の算出:登録時のみ(単価/想定利益率/標準納期日付/予定納期日付)
+--  導出属性の算出(残数量)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.ordering_details_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  -- 導出属性の算出(支払ID)
+  IF (TG_OP = 'INSERT') THEN
+    --  登録時初期化(入庫数量/キャンセル数量)
+    NEW.warehousing_quantity:=0;
+    NEW.cancel_quantity:=0;
+
+--  導出属性の算出:登録時のみ(単価)
+
+--  導出属性の算出:登録時のみ(想定利益率)
+
+--  導出属性の算出:登録時のみ(標準納期日付/予定納期日付)
+  END IF;
+
+  --  導出属性の算出(残数量)
+  NEW.remaining_quantity:=NEW.ordering_quantity - NEW.warehousing_quantity - NEW.cancel_quantity;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.ordering_details
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.ordering_details_pre_process();

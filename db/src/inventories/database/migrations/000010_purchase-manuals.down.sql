@@ -1,9 +1,10 @@
+DROP FUNCTION IF EXISTS inventories.ordering_details_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.orderings_pre_process() CASCADE;
+
 DROP FUNCTION IF EXISTS inventories.upsert_accounts_payables() CASCADE;
 DROP FUNCTION IF EXISTS inventories.payable_histories_pre_process() CASCADE;
 ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_payable_type_check;
-
 DROP FUNCTION IF EXISTS inventories.current_payables_pre_process() CASCADE;
-
 DROP FUNCTION IF EXISTS inventories.month_payables_pre_process() CASCADE;
 
 ALTER TABLE inventories.payments DROP CONSTRAINT IF EXISTS deposit_date_check;
