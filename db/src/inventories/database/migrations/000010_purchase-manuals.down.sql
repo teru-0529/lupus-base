@@ -1,3 +1,7 @@
+DROP FUNCTION IF EXISTS inventories.warehousings_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.is_before_freeze_paymant_amounts() CASCADE;
+DROP FUNCTION IF EXISTS inventories.supplier_id_for_warehousings() CASCADE;
+
 DROP FUNCTION IF EXISTS inventories.ordering_details_pre_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.is_after_arrival_date() CASCADE;
 ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_supplier_id_check;
@@ -8,6 +12,7 @@ DROP FUNCTION IF EXISTS inventories.upsert_accounts_payables() CASCADE;
 DROP FUNCTION IF EXISTS inventories.payable_histories_pre_process() CASCADE;
 ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_payable_type_check;
 DROP FUNCTION IF EXISTS inventories.current_payables_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.upsert_payments_for_cutoff_date() CASCADE;
 DROP FUNCTION IF EXISTS inventories.month_payables_pre_process() CASCADE;
 
 ALTER TABLE inventories.payments DROP CONSTRAINT IF EXISTS payment_limit_date_check;

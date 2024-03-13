@@ -42,6 +42,53 @@ CREATE TRIGGER pre_process
 EXECUTE PROCEDURE inventories.payments_pre_process();
 
 
+-- 支払登録/金額更新
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.upsert_payments_for_cutoff_date(
+  i_supplier_id text,
+  i_cut_off_date date,
+  i_payment_limit_date date,
+  i_variable_amount numeric,
+  i_create_by text
+) RETURNS text AS $$
+DECLARE
+  rec RECORD;
+  r_payment_id text;
+BEGIN
+  SELECT * INTO rec FROM inventories.payments
+    WHERE  supplier_id = i_supplier_id AND cut_off_date = i_cut_off_date AND payment_limit_date = i_payment_limit_date
+    FOR UPDATE;
+
+  IF rec IS NULL THEN
+    INSERT INTO inventories.payments VALUES (
+      default,
+      i_supplier_id,
+      i_cut_off_date,
+      i_payment_limit_date,
+      i_variable_amount,
+      default,
+      NULL,
+      NULL,
+      NULL,
+      default,
+      default,
+      i_create_by,
+      i_create_by
+    ) RETURNING payment_id INTO r_payment_id;
+    RETURN r_payment_id;
+
+  ELSE
+    UPDATE inventories.payments
+    SET payment_amount = rec.payment_amount + i_variable_amount,
+        updated_by = i_create_by
+    WHERE  supplier_id = i_supplier_id AND cut_off_date = i_cut_off_date AND payment_limit_date = i_payment_limit_date;
+    RETURN rec.payment_id;
+  END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 支払:チェック制約
 --  属性相関チェック制約(締日付/支払期限日付)
 
@@ -294,6 +341,15 @@ CREATE TRIGGER post_process
 EXECUTE PROCEDURE inventories.upsert_accounts_payables();
 
 
+-- 発注仕入先取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.supplier_id_for_orderings(i_ordering_id text) RETURNS text AS $$
+BEGIN
+  RETURN(SELECT supplier_id FROM inventories.orderings WHERE ordering_id = i_ordering_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 発注:登録「前」処理
 --  導出属性の算出:登録時のみ(発注ID)
 
@@ -315,15 +371,6 @@ CREATE TRIGGER pre_process
   ON inventories.orderings
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.orderings_pre_process();
-
-
--- 発注仕入先取得
--- Create Function
-CREATE OR REPLACE FUNCTION inventories.supplier_id_for_orderings(i_ordering_id text) RETURNS text AS $$
-BEGIN
-  RETURN(SELECT supplier_id FROM inventories.orderings WHERE ordering_id = i_ordering_id);
-END;
-$$ LANGUAGE plpgsql;
 
 
 -- 発注明細:チェック制約
@@ -404,3 +451,67 @@ CREATE TRIGGER pre_process
   ON inventories.ordering_details
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.ordering_details_pre_process();
+
+
+-- 入荷仕入先取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.supplier_id_for_warehousings(i_warehousing_id text) RETURNS text AS $$
+BEGIN
+  RETURN(SELECT supplier_id FROM inventories.warehousings WHERE warehousing_id = i_warehousing_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 入荷:チェック制約
+--  テーブル相関チェック制約(支払(締日付/支払期限日付)の金額未確定チェック)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.is_before_freeze_paymant_amounts(i_supplier_id text, i_cut_off_date date, i_payment_limit_date date, operation_timestamp timestamp) RETURNS boolean AS $$
+BEGIN
+  -- 支払金額確定日時よりも処理日時が前である場合にTrue
+  RETURN(SELECT freeze_changed_timestamp > operation_timestamp FROM inventories.payments
+    WHERE  supplier_id = i_supplier_id AND cut_off_date = i_cut_off_date AND payment_limit_date = i_payment_limit_date);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Constraint
+ALTER TABLE inventories.warehousings DROP CONSTRAINT IF EXISTS warehousings_payment_id_check;
+ALTER TABLE inventories.warehousings ADD CONSTRAINT warehousings_payment_id_check CHECK (
+  inventories.is_before_freeze_paymant_amounts(supplier_id, cut_off_date,payment_limit_date, operation_timestamp)
+);
+
+
+-- 入荷:登録「前」処理
+--  導出属性の算出:登録時のみ(入荷ID/締日付/支払期限日付/支払番号)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.warehousings_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    -- 導出属性の算出:登録時のみ(入荷ID)
+    NEW.warehousing_id:='WH-'||to_char(nextval('inventories.warehousing_no_seed'),'FM0000000');
+
+    -- 導出属性の算出:登録時のみ(締日付/支払期限日付)
+    -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+    IF NEW.cut_off_date IS NULL AND NEW.payment_limit_date IS NULL THEN
+      rec = inventories.calc_payment_deadline(NEW.supplier_id, NEW.warehouse_date);
+      NEW.cut_off_date = rec.cut_off_date;
+      NEW.payment_limit_date = rec.payment_date;
+    END IF;
+
+    -- 導出属性の算出:登録時のみ(支払番号)
+    NEW.payment_id = inventories.upsert_payments_for_cutoff_date(NEW.supplier_id, NEW.cut_off_date, NEW.payment_limit_date, 0, NEW.created_by);
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.warehousings
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.warehousings_pre_process();
