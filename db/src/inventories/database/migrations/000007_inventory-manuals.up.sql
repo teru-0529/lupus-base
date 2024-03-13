@@ -510,8 +510,8 @@ INSERT INTO inventories.dealing_banks VALUES ('E00102','0005','三菱ＵＦＪ�
 INSERT INTO inventories.dealing_banks VALUES ('S00201','0009','三井住友銀行','546','12345-0756832',default,default,'100003-P0673822','100003-P0673822');
 
 -- 仕入先
-INSERT INTO inventories.suppliers VALUES ('E00101','ACTIVE',20,2,99,'P0673822','織田信長','AS_NEEDED',null,10,null,default,default,'100005-P0673822','100005-P0673822');
-INSERT INTO inventories.suppliers VALUES ('E00102','ACTIVE',20,2,99,'P0673822','豊臣秀吉','PERIODICALLY',3,5,null,default,default,'100005-P0673822','100005-P0673822');
+INSERT INTO inventories.suppliers VALUES ('E00101','ACTIVE',20,1,99,'P0673822','織田信長','AS_NEEDED',null,10,null,default,default,'100005-P0673822','100005-P0673822');
+INSERT INTO inventories.suppliers VALUES ('E00102','ACTIVE',10,1,15,'P0673822','豊臣秀吉','PERIODICALLY',3,5,null,default,default,'100005-P0673822','100005-P0673822');
 
 -- 得意先
 INSERT INTO inventories.costomers VALUES ('E00101','ACTIVE',5,1,99,'P0673822','織田信雄',null,default,default,'100004-P0673822','100004-P0673822');
