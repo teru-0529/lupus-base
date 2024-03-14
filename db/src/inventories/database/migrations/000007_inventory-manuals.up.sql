@@ -494,7 +494,7 @@ EXECUTE PROCEDURE inventories.insert_other_inventory_history();
 -- 倉庫
 INSERT INTO inventories.inventory_sites VALUES ('ALOCATABLE', 'P0673822', True,default,default,'100001-P0673822','100001-P0673822');
 INSERT INTO inventories.inventory_sites VALUES ('KEEP', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
-INSERT INTO inventories.inventory_sites VALUES ('INSPACTTIN', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('INSPECTION', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
 INSERT INTO inventories.inventory_sites VALUES ('DAMAGED', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
 INSERT INTO inventories.inventory_sites VALUES ('PRIVATE_ORDER', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
 
