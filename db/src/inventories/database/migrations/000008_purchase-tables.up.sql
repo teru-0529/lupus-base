@@ -556,8 +556,8 @@ EXECUTE PROCEDURE inventories.warehousings_audit();
 DROP TABLE IF EXISTS inventories.warehousing_details CASCADE;
 CREATE TABLE inventories.warehousing_details (
   warehousing_id varchar(10) NOT NULL check (warehousing_id ~* '^WH-[0-9]{7}$'),
-  product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
   ordering_id varchar(10) NOT NULL check (ordering_id ~* '^PO-[0-9]{7}$'),
+  product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
   warehousing_quantity integer NOT NULL DEFAULT 0 check (warehousing_quantity >= 0),
   return_quantity integer NOT NULL DEFAULT 0 check (return_quantity >= 0),
   unit_price numeric NOT NULL DEFAULT 0.00 check (unit_price >= 0),
@@ -574,8 +574,8 @@ COMMENT ON TABLE inventories.warehousing_details IS '入荷明細';
 
 -- Set Column Comment
 COMMENT ON COLUMN inventories.warehousing_details.warehousing_id IS '入荷番号';
-COMMENT ON COLUMN inventories.warehousing_details.product_id IS '商品ID';
 COMMENT ON COLUMN inventories.warehousing_details.ordering_id IS '発注番号';
+COMMENT ON COLUMN inventories.warehousing_details.product_id IS '商品ID';
 COMMENT ON COLUMN inventories.warehousing_details.warehousing_quantity IS '入庫数量';
 COMMENT ON COLUMN inventories.warehousing_details.return_quantity IS '返品数量';
 COMMENT ON COLUMN inventories.warehousing_details.unit_price IS '単価';
@@ -589,6 +589,7 @@ COMMENT ON COLUMN inventories.warehousing_details.updated_by IS '更新者';
 -- Set PK Constraint
 ALTER TABLE inventories.warehousing_details ADD PRIMARY KEY (
   warehousing_id,
+  ordering_id,
   product_id
 );
 
@@ -605,13 +606,13 @@ CREATE OR REPLACE FUNCTION inventories.warehousing_details_audit() RETURNS TRIGG
 BEGIN
   IF (TG_OP = 'DELETE') THEN
     INSERT INTO operation_histories(schema_name, table_name, operation_type, table_key)
-    SELECT TG_TABLE_SCHEMA, TG_TABLE_NAME, 'DELETE', OLD.warehousing_id || '-' || OLD.product_id;
+    SELECT TG_TABLE_SCHEMA, TG_TABLE_NAME, 'DELETE', OLD.warehousing_id || '-' || OLD.ordering_id || '-' || OLD.product_id;
   ELSIF (TG_OP = 'UPDATE') THEN
     INSERT INTO operation_histories(operated_by, schema_name, table_name, operation_type, table_key)
-    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'UPDATE', NEW.warehousing_id || '-' || NEW.product_id;
+    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'UPDATE', NEW.warehousing_id || '-' || NEW.ordering_id || '-' || NEW.product_id;
   ELSIF (TG_OP = 'INSERT') THEN
     INSERT INTO operation_histories(operated_by, schema_name, table_name, operation_type, table_key)
-    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'INSERT', NEW.warehousing_id || '-' || NEW.product_id;
+    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'INSERT', NEW.warehousing_id || '-' || NEW.ordering_id || '-' || NEW.product_id;
   END IF;
   RETURN null;
 END;
