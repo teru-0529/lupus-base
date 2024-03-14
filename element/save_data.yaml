@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-13T22:05:30+09:00
+create_at: 2024-03-14T19:45:04+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -510,11 +510,11 @@ delive_elements:
   - origin: 取引管理No
     name_jp: 在庫移動指示No
     name_en: moveInstructionNo
-    description: 在庫移動指示単位で採番
+    description: 在庫移動指示単位で採番する取引管理No
   - origin: 取引管理No
     name_jp: 雑入出庫指示No
     name_en: otherInventoryInstructionNo
-    description: 雑入出庫指示単位で採番
+    description: 雑入出庫指示単位で採番する取引管理No
   - origin: 倉庫ID
     name_jp: 移動元倉庫ID
     name_en: siteIdFrom
@@ -615,6 +615,10 @@ delive_elements:
     name_jp: 単価
     name_en: unitPrice
     description: 単価
+  - origin: 取引管理No
+    name_jp: 入荷明細No
+    name_en: warehousingDetailNo
+    description: 入荷明細単位で採番する取引管理No
 segments:
   - key: 取引状況
     value: READY

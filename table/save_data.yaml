@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-14T19:14:57+09:00
+create_at: 2024-03-14T19:47:23+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -980,12 +980,18 @@ tables:
       - name: 倉庫ID
         nullable: false
         default: null
+      - name: 入荷明細No
+        nullable: false
+        default: null
     constraint:
       primary_key:
         - 入荷番号
         - 発注番号
         - 商品ID
-      uniques: []
+      uniques:
+        - name: warehousing_details_unique_1
+          fields:
+            - 入荷明細No
       foreign_keys:
         - name: warehousing_details_foreignKey_1
           reference_table: 発注明細

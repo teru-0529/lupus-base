@@ -13,6 +13,7 @@ CREATE TABLE inventories.warehousing_details (
   unit_price numeric NOT NULL DEFAULT 0.00 check (unit_price >= 0),
   estimate_profit_rate numeric NOT NULL DEFAULT 0.00 check (estimate_profit_rate >= 0),
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
+  warehousing_detail_no serial NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -31,6 +32,7 @@ COMMENT ON COLUMN inventories.warehousing_details.return_quantity IS '返品数�
 COMMENT ON COLUMN inventories.warehousing_details.unit_price IS '単価';
 COMMENT ON COLUMN inventories.warehousing_details.estimate_profit_rate IS '想定利益率';
 COMMENT ON COLUMN inventories.warehousing_details.site_id IS '倉庫ID';
+COMMENT ON COLUMN inventories.warehousing_details.warehousing_detail_no IS '入荷明細No';
 COMMENT ON COLUMN inventories.warehousing_details.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.warehousing_details.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.warehousing_details.created_by IS '作成者';
@@ -41,6 +43,11 @@ ALTER TABLE inventories.warehousing_details ADD PRIMARY KEY (
   warehousing_id,
   ordering_id,
   product_id
+);
+
+-- Set Unique Constraint
+ALTER TABLE inventories.warehousing_details ADD CONSTRAINT warehousing_details_unique_1 UNIQUE (
+  warehousing_detail_no
 );
 
 -- Create 'set_update_at' Trigger
