@@ -373,6 +373,15 @@ CREATE TRIGGER pre_process
 EXECUTE PROCEDURE inventories.orderings_pre_process();
 
 
+-- 発注時単価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.cost_price_for_orders(i_ordering_id text, i_product_id text) RETURNS numeric AS $$
+BEGIN
+  RETURN(SELECT unit_price FROM inventories.ordering_details WHERE ordering_id = i_ordering_id AND product_id = i_product_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 発注明細:チェック制約
 --  属性相関チェック制約(発注番号/商品ID)
 
@@ -412,7 +421,6 @@ DECLARE
   t_order_date date;
   t_days_to_arrive integer;
 BEGIN
-  -- 導出属性の算出(支払ID)
   IF (TG_OP = 'INSERT') THEN
     --  登録時初期化(入庫数量/キャンセル数量)
     NEW.warehousing_quantity:=0;
@@ -515,3 +523,47 @@ CREATE TRIGGER pre_process
   ON inventories.warehousings
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.warehousings_pre_process();
+
+
+-- 入荷明細:チェック制約
+--  属性相関チェック制約(入荷数量/返品数量)
+
+-- Create Constraint
+ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_return_quantity_check;
+ALTER TABLE inventories.warehousing_details ADD CONSTRAINT warehousing_details_return_quantity_check CHECK (
+  return_quantity <= warehousing_quantity
+);
+
+
+-- 入荷明細:登録「前」処理
+--  登録時初期化(返品数量)
+--  導出属性の算出:登録時のみ(単価/想定利益率)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.warehousing_details_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    --  登録時初期化(返品数量)
+    NEW.return_quantity:=0;
+
+--  導出属性の算出:登録時のみ(単価)
+    IF NEW.unit_price IS NULL THEN
+      NEW.unit_price = inventories.cost_price_for_orders(NEW.ordering_id, NEW.product_id);
+    ELSE
+      NEW.unit_price = ROUND(NEW.unit_price, 2);
+    END IF;
+
+--  導出属性の算出:登録時のみ(想定利益率)
+    NEW.estimate_profit_rate = inventories.calc_profit_rate_by_cost_price(NEW.product_id, NEW.unit_price);
+
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.warehousing_details
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.warehousing_details_pre_process();

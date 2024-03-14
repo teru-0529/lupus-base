@@ -560,7 +560,7 @@ CREATE TABLE inventories.warehousing_details (
   product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
   warehousing_quantity integer NOT NULL DEFAULT 0 check (warehousing_quantity >= 0),
   return_quantity integer NOT NULL DEFAULT 0 check (return_quantity >= 0),
-  unit_price numeric NOT NULL DEFAULT 0.00 check (unit_price >= 0),
+  unit_price numeric NOT NULL check (unit_price >= 0),
   estimate_profit_rate numeric NOT NULL DEFAULT 0.00 check (estimate_profit_rate >= 0),
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   warehousing_detail_no serial NOT NULL,
