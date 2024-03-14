@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS inventories.warehousing_post_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.warehousing_details_pre_process() CASCADE;
 ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_return_quantity_check;
 DROP FUNCTION IF EXISTS inventories.warehousings_pre_process() CASCADE;

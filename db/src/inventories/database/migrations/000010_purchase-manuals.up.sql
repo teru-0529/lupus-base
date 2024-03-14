@@ -567,3 +567,83 @@ CREATE TRIGGER pre_process
   ON inventories.warehousing_details
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.warehousing_details_pre_process();
+
+
+-- 入荷明細:登録「後」処理
+--  別テーブル登録/更新(発注明細/支払/買掛変動履歴/在庫変動履歴)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.warehousing_post_process() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  SELECT * INTO rec FROM inventories.warehousings WHERE warehousing_id = NEW.warehousing_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  1.発注明細 INFO:
+  UPDATE inventories.ordering_details
+  SET warehousing_quantity = warehousing_quantity + NEW.warehousing_quantity,
+      updated_by = NEW.created_by
+  WHERE ordering_id = NEW.ordering_id AND product_id = NEW.product_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  2.支払 INFO:
+  UPDATE inventories.payments
+  SET payment_amount = payment_amount + NEW.warehousing_quantity * NEW.unit_price,
+      updated_by = NEW.created_by
+  WHERE payment_id = rec.payment_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  3.買掛変動履歴 INFO:
+  INSERT INTO inventories.payable_histories
+  VALUES (
+    default,
+    rec.warehouse_date,
+    rec.operation_timestamp,
+    rec.supplier_id,
+    NEW.warehousing_quantity * NEW.unit_price,
+    'PURCHASE',
+    NEW.warehousing_detail_no,
+    rec.payment_id,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  4.在庫変動履歴 INFO:
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    rec.warehouse_date,
+    rec.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id,
+    NEW.warehousing_quantity,
+    NEW.warehousing_quantity * NEW.unit_price,
+    'PURCHASE',
+    NEW.warehousing_detail_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.warehousing_details
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.warehousing_post_process();
