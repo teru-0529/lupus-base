@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-14T20:12:38+09:00
+create_at: 2024-03-15T07:37:04+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -361,6 +361,9 @@ tables:
       - name: 原価
         nullable: true
         default: null
+      - name: 想定利益率
+        nullable: true
+        default: null
     constraint:
       primary_key:
         - 商品ID
@@ -423,6 +426,9 @@ tables:
         nullable: false
         default: "0.00"
       - name: 原価
+        nullable: true
+        default: null
+      - name: 想定利益率
         nullable: true
         default: null
     constraint:

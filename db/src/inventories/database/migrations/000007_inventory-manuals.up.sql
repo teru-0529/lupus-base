@@ -19,7 +19,7 @@ EXECUTE PROCEDURE inventories.month_summaries_es_pre_process();
 
 
 -- 月次在庫サマリ:登録「前」処理
---  導出属性の算出(在庫数量/在庫金額/原価)
+--  導出属性の算出(在庫数量/在庫金額/原価/想定利益率)
 --  有効桁数調整(月初金額/入庫金額/出庫金額)
 
 -- Create Function
@@ -39,6 +39,8 @@ BEGIN
   ELSE
     NEW.cost_price = ROUND(NEW.present_amount / NEW.present_quantity, 2);
   END IF;
+  -- 導出属性の算出(想定利益率)
+  NEW.estimate_profit_rate = inventories.calc_profit_rate_by_cost_price(NEW.product_id, NEW.cost_price);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -52,7 +54,7 @@ EXECUTE PROCEDURE inventories.month_summaries_pre_process();
 
 
 -- 現在在庫サマリ:登録「前」処理
---  導出属性の算出(原価)
+--  導出属性の算出(原価/想定利益率)
 --  有効桁数調整(在庫金額)
 
 -- Create Function
@@ -66,6 +68,8 @@ BEGIN
   ELSE
     NEW.cost_price = ROUND(NEW.present_amount / NEW.present_quantity, 2);
   END IF;
+  -- 導出属性の算出(想定利益率)
+  NEW.estimate_profit_rate = inventories.calc_profit_rate_by_cost_price(NEW.product_id, NEW.cost_price);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -314,6 +318,7 @@ BEGIN
       default,
       default,
       default,
+      default,
       NEW.created_by,
       NEW.created_by
     );
@@ -353,6 +358,7 @@ BEGIN
       NEW.product_id,
       NEW.variable_quantity,
       NEW.variable_amount,
+      default,
       default,
       default,
       default,

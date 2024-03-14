@@ -16,6 +16,7 @@ CREATE TABLE inventories.month_inventory_summaries (
   shipping_amount numeric NOT NULL DEFAULT 0.00 check (shipping_amount >= 0),
   present_amount numeric NOT NULL DEFAULT 0.00 check (present_amount >= 0),
   cost_price numeric check (cost_price >= 0),
+  estimate_profit_rate numeric check (estimate_profit_rate >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -37,6 +38,7 @@ COMMENT ON COLUMN inventories.month_inventory_summaries.warehousing_amount IS '�
 COMMENT ON COLUMN inventories.month_inventory_summaries.shipping_amount IS '出庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.present_amount IS '在庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.cost_price IS '原価';
+COMMENT ON COLUMN inventories.month_inventory_summaries.estimate_profit_rate IS '想定利益率';
 COMMENT ON COLUMN inventories.month_inventory_summaries.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.month_inventory_summaries.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.month_inventory_summaries.created_by IS '作成者';
