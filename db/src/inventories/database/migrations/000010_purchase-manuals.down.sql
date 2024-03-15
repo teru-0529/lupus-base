@@ -1,3 +1,6 @@
+DROP FUNCTION IF EXISTS inventories.update_order_estimate_arrive_date() CASCADE;
+DROP FUNCTION IF EXISTS inventories.update_order_cancel_quantity() CASCADE;
+
 DROP FUNCTION IF EXISTS inventories.warehousing_post_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.warehousing_details_pre_process() CASCADE;
 ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_return_quantity_check;

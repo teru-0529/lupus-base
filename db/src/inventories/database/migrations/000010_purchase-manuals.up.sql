@@ -647,3 +647,49 @@ CREATE TRIGGER post_process
   ON inventories.warehousing_details
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.warehousing_post_process();
+
+
+-- 発注キャンセル指示:登録「後」処理
+--  別テーブル変更(発注明細)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.update_order_cancel_quantity() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE inventories.ordering_details
+  SET cancel_quantity = cancel_quantity + NEW.quantity,
+      updated_by = NEW.created_by
+  WHERE ordering_id = NEW.ordering_id AND product_id = NEW.product_id;
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.order_cancel_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.update_order_cancel_quantity();
+
+
+-- 発注納期変更指示:登録「後」処理
+--  別テーブル変更(発注明細)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.update_order_estimate_arrive_date() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE inventories.ordering_details
+  SET estimate_arrival_date = NEW.changed_arrival_date,
+      updated_by = NEW.created_by
+  WHERE ordering_id = NEW.ordering_id AND product_id = NEW.product_id;
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.order_arrival_change_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.update_order_estimate_arrive_date();
