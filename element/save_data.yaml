@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-14T19:45:04+09:00
+create_at: 2024-03-15T16:22:25+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -512,9 +512,9 @@ delive_elements:
     name_en: moveInstructionNo
     description: 在庫移動指示単位で採番する取引管理No
   - origin: 取引管理No
-    name_jp: 雑入出庫指示No
-    name_en: otherInventoryInstructionNo
-    description: 雑入出庫指示単位で採番する取引管理No
+    name_jp: 在庫修正指示No
+    name_en: inventoryCorrectInstructionNo
+    description: 在庫修正指示単位で採番する取引管理No
   - origin: 倉庫ID
     name_jp: 移動元倉庫ID
     name_en: siteIdFrom
@@ -619,6 +619,34 @@ delive_elements:
     name_jp: 入荷明細No
     name_en: warehousingDetailNo
     description: 入荷明細単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 金額確定指示No
+    name_en: amountConfirmNo
+    description: 金額確定指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 支払指示No
+    name_en: paymentInstructionNo
+    description: 支払指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: キャンセル指示No
+    name_en: cancelInstructionNo
+    description: キャンセル指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 納期変更指示No
+    name_en: arrivalChangeInstructionNo
+    description: 納期変更指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 返品指示No
+    name_en: returnInstructionNo
+    description: 返品指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 買掛修正指示No
+    name_en: payableCorrectInstructionNo
+    description: 買掛金修正指示単位で採番する取引管理No
+  - origin: 日付
+    name_jp: 変更後納期日付
+    name_en: changedArrivalDate
+    description: 変更後の納期日付
 segments:
   - key: 取引状況
     value: READY

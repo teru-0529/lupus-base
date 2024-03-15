@@ -387,11 +387,11 @@ CREATE TRIGGER post_process
 EXECUTE PROCEDURE inventories.upsert_inventory_summaries();
 
 
--- 雑入出庫指示:登録「前」処理
+-- 在庫修正指示:登録「前」処理
 --  有効桁数調整(変動金額)
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.other_instruction_pre_process() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION inventories.correct_inventory_instruction_pre_process() RETURNS TRIGGER AS $$
 BEGIN
 --  有効桁数調整(変動金額)
   NEW.variable_amount = ROUND(NEW.variable_amount, 2);
@@ -402,9 +402,9 @@ $$ LANGUAGE plpgsql;
 -- Create Trigger
 CREATE TRIGGER pre_process
   BEFORE INSERT
-  ON inventories.other_inventory_instructions
+  ON inventories.correct_inventory_instructions
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.other_instruction_pre_process();
+EXECUTE PROCEDURE inventories.correct_inventory_instruction_pre_process();
 
 
 -- 倉庫移動指示:登録「後」処理
@@ -459,11 +459,11 @@ CREATE TRIGGER post_process
 EXECUTE PROCEDURE inventories.insert_move_inventory_history();
 
 
--- 雑入出庫指示:登録「後」処理
+-- 在庫修正指示:登録「後」処理
 --  別テーブル登録(在庫変動履歴)
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.insert_other_inventory_history() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION inventories.insert_correct_inventory_history() RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO inventories.inventory_histories
   VALUES (
@@ -475,7 +475,7 @@ BEGIN
     NEW.variable_quantity,
     NEW.variable_amount,
     'OTHER',
-    NEW.other_inventory_instruction_no,
+    NEW.inventory_correct_instruction_no,
     default,
     default,
     NEW.created_by,
@@ -489,9 +489,9 @@ $$ LANGUAGE plpgsql;
 -- Create Trigger
 CREATE TRIGGER post_process
   BEFORE INSERT
-  ON inventories.other_inventory_instructions
+  ON inventories.correct_inventory_instructions
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.insert_other_inventory_history();
+EXECUTE PROCEDURE inventories.insert_correct_inventory_history();
 
 
 

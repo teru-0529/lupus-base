@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-15T07:37:04+09:00
+create_at: 2024-03-15T16:23:21+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -571,11 +571,11 @@ tables:
             asc: true
           - name: 処理日時
             asc: true
-  - name_jp: 雑入出庫指示
-    name_en: other_inventory_instructions
+  - name_jp: 在庫修正指示
+    name_en: correct_inventory_instructions
     is_master: false
     fields:
-      - name: 雑入出庫指示No
+      - name: 在庫修正指示No
         nullable: false
         default: null
       - name: 業務取引日付
@@ -604,17 +604,17 @@ tables:
         default: null
     constraint:
       primary_key:
-        - 雑入出庫指示No
+        - 在庫修正指示No
       uniques: []
       foreign_keys:
-        - name: other_inventory_instructions_foreignKey_1
+        - name: correct_inventory_instructions_foreignKey_1
           reference_table: 倉庫
           delete_option: null
           update_option: null
           fields:
             - this: 倉庫ID
               ref: 倉庫ID
-        - name: other_inventory_instructions_foreignKey_2
+        - name: correct_inventory_instructions_foreignKey_2
           reference_table: 商品
           delete_option: null
           update_option: null
@@ -622,7 +622,7 @@ tables:
             - this: 商品ID
               ref: 商品ID
     indexes:
-      - name: idx_other_inventory_instructions_1
+      - name: idx_correct_inventory_instructions_1
         unique: false
         fields:
           - name: 商品ID
@@ -1015,4 +1015,82 @@ tables:
           fields:
             - this: 倉庫ID
               ref: 倉庫ID
+    indexes: []
+  - name_jp: 発注キャンセル指示
+    name_en: order_cancel_instructions
+    is_master: false
+    fields:
+      - name: キャンセル指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - キャンセル指示No
+      uniques: []
+      foreign_keys: []
+    indexes: []
+  - name_jp: 発注納期変更指示
+    name_en: order_arrival_change_instructions
+    is_master: false
+    fields:
+      - name: 納期変更指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 納期変更指示No
+      uniques: []
+      foreign_keys: []
+    indexes: []
+  - name_jp: 支払金額確定指示
+    name_en: payment_confirm_instructions
+    is_master: false
+    fields:
+      - name: 金額確定指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 金額確定指示No
+      uniques: []
+      foreign_keys: []
+    indexes: []
+  - name_jp: 支払指示
+    name_en: payment_instructions
+    is_master: false
+    fields:
+      - name: 支払指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 支払指示No
+      uniques: []
+      foreign_keys: []
+    indexes: []
+  - name_jp: 入荷返品指示
+    name_en: warehousing_return_instructions
+    is_master: false
+    fields:
+      - name: 返品指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 返品指示No
+      uniques: []
+      foreign_keys: []
+    indexes: []
+  - name_jp: 買掛金修正指示
+    name_en: correct_payable_instructions
+    is_master: false
+    fields:
+      - name: 買掛修正指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 買掛修正指示No
+      uniques: []
+      foreign_keys: []
     indexes: []
