@@ -841,23 +841,23 @@ BEGIN
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
-  --  2.在庫変動履歴 INFO:
-  -- INSERT INTO inventories.inventory_histories
-  -- VALUES (
-  --   default,
-  --   NEW.business_date,
-  --   NEW.operation_timestamp,
-  --   NEW.product_id,
-  --   NEW.site_id,FIXME:
-  --   - NEW.quantity,
-  --   - NEW.quantity * NEW.unit_price,
-  --   'ORDER_RETURN',
-  --   NEW.return_instruction_no,
-  --   default,
-  --   default,
-  --   NEW.created_by,
-  --   NEW.created_by
-  -- );
+  -- 2.在庫変動履歴 INFO:
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id,
+    - NEW.quantity,
+    - NEW.quantity * NEW.unit_price,
+    'ORDER_RETURN',
+    NEW.return_instruction_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 

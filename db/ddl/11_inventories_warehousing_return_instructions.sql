@@ -20,3 +20,10 @@ ALTER TABLE inventories.warehousing_return_instructions ADD CONSTRAINT warehousi
 ) REFERENCES inventories.payments (
   payment_id
 );
+
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_3;
+ALTER TABLE inventories.warehousing_return_instructions ADD CONSTRAINT warehousing_return_instructions_foreignKey_3 FOREIGN KEY (
+  site_id
+) REFERENCES inventories.inventory_sites (
+  site_id
+);

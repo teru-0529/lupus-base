@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-15T20:31:33+09:00
+create_at: 2024-03-15T21:22:32+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -1224,6 +1224,9 @@ tables:
       - name: 商品ID
         nullable: false
         default: null
+      - name: 倉庫ID
+        nullable: false
+        default: null
       - name: 数量
         nullable: false
         default: "0"
@@ -1262,6 +1265,13 @@ tables:
           fields:
             - this: 支払番号
               ref: 支払番号
+        - name: warehousing_return_instructions_foreignKey_3
+          reference_table: 倉庫
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 倉庫ID
+              ref: 倉庫ID
     indexes:
       - name: idx_warehousing_return_instructions_1
         unique: false

@@ -175,6 +175,13 @@ ALTER TABLE inventories.warehousing_return_instructions ADD CONSTRAINT warehousi
   payment_id
 );
 
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_3;
+ALTER TABLE inventories.warehousing_return_instructions ADD CONSTRAINT warehousing_return_instructions_foreignKey_3 FOREIGN KEY (
+  site_id
+) REFERENCES inventories.inventory_sites (
+  site_id
+);
+
 -- 28.買掛金修正指示(correct_payable_instructions)
 
 -- Set FK Constraint

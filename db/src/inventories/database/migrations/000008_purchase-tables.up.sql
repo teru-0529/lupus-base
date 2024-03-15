@@ -956,6 +956,7 @@ CREATE TABLE inventories.warehousing_return_instructions (
   warehousing_id varchar(10) NOT NULL check (warehousing_id ~* '^WH-[0-9]{7}$'),
   ordering_id varchar(10) NOT NULL check (ordering_id ~* '^PO-[0-9]{7}$'),
   product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
+  site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   quantity integer NOT NULL DEFAULT 0 check (quantity >= 0),
   unit_price numeric NOT NULL check (unit_price >= 0),
   cut_off_date date NOT NULL,
@@ -979,6 +980,7 @@ COMMENT ON COLUMN inventories.warehousing_return_instructions.instruction_cause 
 COMMENT ON COLUMN inventories.warehousing_return_instructions.warehousing_id IS '入荷番号';
 COMMENT ON COLUMN inventories.warehousing_return_instructions.ordering_id IS '発注番号';
 COMMENT ON COLUMN inventories.warehousing_return_instructions.product_id IS '商品ID';
+COMMENT ON COLUMN inventories.warehousing_return_instructions.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.warehousing_return_instructions.quantity IS '数量';
 COMMENT ON COLUMN inventories.warehousing_return_instructions.unit_price IS '単価';
 COMMENT ON COLUMN inventories.warehousing_return_instructions.cut_off_date IS '締日付';
