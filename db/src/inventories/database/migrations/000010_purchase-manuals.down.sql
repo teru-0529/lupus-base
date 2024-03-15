@@ -1,4 +1,6 @@
+DROP FUNCTION IF EXISTS inventories.correct_payable_instructions_post_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.correct_payable_instructions_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.warehousing_return_instructions_post_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.warehousing_return_instructions_pre_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.execute_payment() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_payment_comfirm_date() CASCADE;
