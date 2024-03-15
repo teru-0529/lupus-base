@@ -12,7 +12,7 @@ CREATE TABLE inventories.payable_histories (
   variable_amount numeric NOT NULL DEFAULT 0.00,
   payable_type payable_type NOT NULL,
   tranzaction_no serial NOT NULL,
-  payment_id varchar(10) check (payment_id ~* '^PM-[0-9]{7}$'),
+  payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),

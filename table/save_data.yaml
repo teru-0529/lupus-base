@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-15T18:02:30+09:00
+create_at: 2024-03-15T19:09:20+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -768,7 +768,7 @@ tables:
         nullable: false
         default: null
       - name: 支払番号
-        nullable: true
+        nullable: false
         default: null
     constraint:
       primary_key:

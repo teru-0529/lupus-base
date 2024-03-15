@@ -166,7 +166,7 @@ EXECUTE PROCEDURE inventories.current_payables_pre_process();
 
 
 -- 買掛変動履歴:チェック制約
---  属性相関チェック制約(買掛変動種類/変動金額/支払ID)
+--  属性相関チェック制約(買掛変動種類/変動金額)
 
 -- Create Constraint
 ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_payable_type_check;
@@ -177,12 +177,6 @@ ALTER TABLE inventories.payable_histories ADD CONSTRAINT payable_histories_payab
     -- 買掛変動種類が「仕入返品」「支払」の場合、変動金額が0より小さい値であること
     WHEN payable_type = 'ORDER_RETURN' AND variable_amount >= 0.00 THEN FALSE
     WHEN payable_type = 'PAYMENT' AND variable_amount >= 0.00 THEN FALSE
-    -- 買掛変動種類が「仕入購入」「仕入返品」「その他」の場合、支払IDがnullではないこと
-    WHEN payable_type = 'PURCHASE' AND payment_id IS NULL THEN FALSE
-    WHEN payable_type = 'ORDER_RETURN' AND payment_id IS NULL THEN FALSE
-    WHEN payable_type = 'OTHER' AND payment_id IS NULL THEN FALSE
-    -- 買掛変動種類が「支払」の場合、支払IDがnullであること
-    WHEN payable_type = 'PAYMENT' AND payment_id IS NOT NULL THEN FALSE
     ELSE TRUE
   END
 );
@@ -749,8 +743,7 @@ BEGIN
     - rec.payment_amount,
     'PAYMENT',
     NEW.payment_instruction_no,
-    NULL,
-    -- NEW.payment_id,
+    NEW.payment_id,
     default,
     default,
     NEW.created_by,
