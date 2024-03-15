@@ -693,3 +693,77 @@ CREATE TRIGGER post_process
   ON inventories.order_arrival_change_instructions
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.update_order_estimate_arrive_date();
+
+
+-- 支払金額確定指示:登録「後」処理
+--  別テーブル変更(支払)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.update_payment_comfirm_date() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE inventories.payments
+  SET payment_status = 'CONFIRMED',
+      amount_confirmed_date = NEW.business_date,
+      updated_by = NEW.created_by
+  WHERE payment_id = NEW.payment_id;
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.payment_confirm_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.update_payment_comfirm_date();
+
+
+-- 支払指示:登録「後」処理
+--  別テーブル登録/変更(買掛変動履歴/支払)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.execute_payment() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  SELECT * INTO rec FROM inventories.payments WHERE payment_id = NEW.payment_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  1.支払 INFO:
+  UPDATE inventories.payments
+  SET payment_status = 'COMPLETED',
+      payment_date = NEW.business_date,
+      updated_by = NEW.created_by
+  WHERE payment_id = NEW.payment_id;
+
+  --  2.買掛変動履歴 INFO:
+  INSERT INTO inventories.payable_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    rec.supplier_id,
+    - rec.payment_amount,
+    'PAYMENT',
+    NEW.payment_instruction_no,
+    NULL,
+    -- NEW.payment_id,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.payment_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.execute_payment();

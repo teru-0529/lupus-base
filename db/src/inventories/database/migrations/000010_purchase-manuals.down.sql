@@ -1,3 +1,5 @@
+DROP FUNCTION IF EXISTS inventories.execute_payment() CASCADE;
+DROP FUNCTION IF EXISTS inventories.update_payment_comfirm_date() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_order_estimate_arrive_date() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_order_cancel_quantity() CASCADE;
 
