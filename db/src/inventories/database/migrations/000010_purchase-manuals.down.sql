@@ -1,3 +1,5 @@
+DROP FUNCTION IF EXISTS inventories.correct_payable_instructions_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.warehousing_return_instructions_pre_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.execute_payment() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_payment_comfirm_date() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_order_estimate_arrive_date() CASCADE;
@@ -6,6 +8,7 @@ DROP FUNCTION IF EXISTS inventories.update_order_cancel_quantity() CASCADE;
 DROP FUNCTION IF EXISTS inventories.warehousing_post_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.warehousing_details_pre_process() CASCADE;
 ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_return_quantity_check;
+DROP FUNCTION IF EXISTS inventories.cost_price_for_warehouse() CASCADE;
 DROP FUNCTION IF EXISTS inventories.warehousings_pre_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.is_before_freeze_paymant_amounts() CASCADE;
 DROP FUNCTION IF EXISTS inventories.supplier_id_for_warehousings() CASCADE;

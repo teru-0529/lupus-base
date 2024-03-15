@@ -14,7 +14,7 @@ CREATE TABLE inventories.warehousing_return_instructions (
   ordering_id varchar(10) NOT NULL check (ordering_id ~* '^PO-[0-9]{7}$'),
   product_id varchar(10) NOT NULL check (LENGTH(product_id) >= 9),
   quantity integer NOT NULL DEFAULT 0 check (quantity >= 0),
-  unit_price numeric NOT NULL DEFAULT 0.00 check (unit_price >= 0),
+  unit_price numeric NOT NULL check (unit_price >= 0),
   cut_off_date date NOT NULL,
   payment_limit_date date NOT NULL,
   payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),

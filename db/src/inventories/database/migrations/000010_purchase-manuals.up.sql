@@ -485,7 +485,6 @@ ALTER TABLE inventories.warehousings ADD CONSTRAINT warehousings_payment_id_chec
 
 -- 入荷:登録「前」処理
 --  導出属性の算出:登録時のみ(入荷ID/締日付/支払期限日付/支払番号)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.warehousings_pre_process() RETURNS TRIGGER AS $$
 DECLARE
@@ -519,6 +518,15 @@ CREATE TRIGGER pre_process
 EXECUTE PROCEDURE inventories.warehousings_pre_process();
 
 
+-- 入荷時単価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.cost_price_for_warehouse(i_warehousing_id text, i_ordering_id text, i_product_id text) RETURNS numeric AS $$
+BEGIN
+  RETURN(SELECT unit_price FROM inventories.warehousing_details WHERE warehousing_id = i_warehousing_id AND ordering_id = i_ordering_id AND product_id = i_product_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 入荷明細:チェック制約
 --  属性相関チェック制約(入荷数量/返品数量)
 
@@ -532,7 +540,6 @@ ALTER TABLE inventories.warehousing_details ADD CONSTRAINT warehousing_details_r
 -- 入荷明細:登録「前」処理
 --  登録時初期化(返品数量)
 --  導出属性の算出:登録時のみ(単価/想定利益率)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.warehousing_details_pre_process() RETURNS TRIGGER AS $$
 BEGIN
@@ -565,7 +572,6 @@ EXECUTE PROCEDURE inventories.warehousing_details_pre_process();
 
 -- 入荷明細:登録「後」処理
 --  別テーブル登録/更新(発注明細/支払/買掛変動履歴/在庫変動履歴)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.warehousing_post_process() RETURNS TRIGGER AS $$
 DECLARE
@@ -645,7 +651,6 @@ EXECUTE PROCEDURE inventories.warehousing_post_process();
 
 -- 発注キャンセル指示:登録「後」処理
 --  別テーブル変更(発注明細)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.update_order_cancel_quantity() RETURNS TRIGGER AS $$
 BEGIN
@@ -668,7 +673,6 @@ EXECUTE PROCEDURE inventories.update_order_cancel_quantity();
 
 -- 発注納期変更指示:登録「後」処理
 --  別テーブル変更(発注明細)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.update_order_estimate_arrive_date() RETURNS TRIGGER AS $$
 BEGIN
@@ -691,7 +695,6 @@ EXECUTE PROCEDURE inventories.update_order_estimate_arrive_date();
 
 -- 支払金額確定指示:登録「後」処理
 --  別テーブル変更(支払)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.update_payment_comfirm_date() RETURNS TRIGGER AS $$
 BEGIN
@@ -715,7 +718,6 @@ EXECUTE PROCEDURE inventories.update_payment_comfirm_date();
 
 -- 支払指示:登録「後」処理
 --  別テーブル登録/変更(買掛変動履歴/支払)
-
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.execute_payment() RETURNS TRIGGER AS $$
 DECLARE
@@ -760,3 +762,119 @@ CREATE TRIGGER post_process
   ON inventories.payment_instructions
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.execute_payment();
+
+
+-- 入荷返品指示:登録「前」処理
+--  導出属性の算出(単価/締日付/支払期限日付/支払番号)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.warehousing_return_instructions_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  warehousing_rec RECORD;
+  rec RECORD;
+BEGIN
+
+  --  導出属性の算出(単価)
+  IF NEW.unit_price IS NULL THEN
+    NEW.unit_price = inventories.cost_price_for_warehouse(NEW.warehousing_id, NEW.ordering_id, NEW.product_id);
+  ELSE
+    NEW.unit_price = ROUND(NEW.unit_price, 2);
+  END IF;
+
+  -- 導出属性の算出(締日付/支払期限日付)
+  -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+  IF NEW.cut_off_date IS NULL AND NEW.payment_limit_date IS NULL THEN
+    SELECT * INTO warehousing_rec FROM inventories.warehousings WHERE warehousing_id = NEW.warehousing_id;
+
+    rec = inventories.calc_payment_deadline(warehousing_rec.supplier_id, NEW.business_date);
+    NEW.cut_off_date = rec.cut_off_date;
+    NEW.payment_limit_date = rec.payment_date;
+  END IF;
+
+  -- 導出属性の算出(支払番号)
+  NEW.payment_id = inventories.upsert_payments_for_cutoff_date(
+    warehousing_rec.supplier_id,
+    NEW.cut_off_date,
+    NEW.payment_limit_date,
+    - NEW.quantity * NEW.unit_price,
+    NEW.created_by
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT
+  ON inventories.warehousing_return_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.warehousing_return_instructions_pre_process();
+
+
+-- 買掛金修正指示:登録「前」処理
+--  有効桁数調整(変動金額)
+--  導出属性の算出(締日付/支払期限日付/支払番号)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.correct_payable_instructions_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  --  有効桁数調整(変動金額)
+  NEW.variable_amount = ROUND(NEW.variable_amount, 2);
+
+
+  -- 導出属性の算出(締日付/支払期限日付)
+  -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+  IF NEW.cut_off_date IS NULL AND NEW.payment_limit_date IS NULL THEN
+    rec = inventories.calc_payment_deadline(NEW.supplier_id, NEW.business_date);
+    NEW.cut_off_date = rec.cut_off_date;
+    NEW.payment_limit_date = rec.payment_date;
+  END IF;
+
+  -- 導出属性の算出(支払番号)
+  NEW.payment_id = inventories.upsert_payments_for_cutoff_date(
+    NEW.supplier_id,
+    NEW.cut_off_date,
+    NEW.payment_limit_date,
+    NEW.variable_amount,
+    NEW.created_by
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT
+  ON inventories.correct_payable_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.correct_payable_instructions_pre_process();
+
+--  導出属性の算出:登録時のみ(入荷ID/締日付/支払期限日付/支払番号)
+
+-- -- Create Function
+-- CREATE OR REPLACE FUNCTION inventories.warehousings_pre_process() RETURNS TRIGGER AS $$
+-- DECLARE
+--   rec RECORD;
+-- BEGIN
+--   IF (TG_OP = 'INSERT') THEN
+--     -- 導出属性の算出:登録時のみ(入荷ID)
+--     NEW.warehousing_id:='WH-'||to_char(nextval('inventories.warehousing_no_seed'),'FM0000000');
+
+--     -- 導出属性の算出:登録時のみ(締日付/支払期限日付)
+--     -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+--     IF NEW.cut_off_date IS NULL AND NEW.payment_limit_date IS NULL THEN
+--       rec = inventories.calc_payment_deadline(NEW.supplier_id, NEW.warehouse_date);
+--       NEW.cut_off_date = rec.cut_off_date;
+--       NEW.payment_limit_date = rec.payment_date;
+--     END IF;
+
+--     -- 導出属性の算出:登録時のみ(支払番号)
+--     NEW.payment_id = inventories.upsert_payments_for_cutoff_date(NEW.supplier_id, NEW.cut_off_date, NEW.payment_limit_date, 0, NEW.created_by);
+--   END IF;
+
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
