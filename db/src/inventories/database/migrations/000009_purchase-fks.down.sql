@@ -1,3 +1,5 @@
+ALTER TABLE inventories.payment_instructions DROP CONSTRAINT IF EXISTS payment_instructions_foreignKey_1;
+ALTER TABLE inventories.payment_confirm_instructions DROP CONSTRAINT IF EXISTS payment_confirm_instructions_foreignKey_1;
 ALTER TABLE inventories.order_arrival_change_instructions DROP CONSTRAINT IF EXISTS order_arrival_change_instructions_foreignKey_1;
 ALTER TABLE inventories.order_cancel_instructions DROP CONSTRAINT IF EXISTS order_cancel_instructions_foreignKey_1;
 

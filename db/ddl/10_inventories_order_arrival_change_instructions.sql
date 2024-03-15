@@ -41,6 +41,12 @@ ALTER TABLE inventories.order_arrival_change_instructions ADD PRIMARY KEY (
   arrival_change_instruction_no
 );
 
+-- create index
+CREATE INDEX idx_order_arrival_change_instructions_1 ON inventories.order_arrival_change_instructions (
+  ordering_id,
+  product_id
+);
+
 -- Create 'set_update_at' Trigger
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE
