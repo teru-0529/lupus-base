@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS inventories.order_arrival_change_instructions CASCADE;
+DROP TABLE IF EXISTS inventories.order_cancel_instructions CASCADE;
+
+DROP FUNCTION IF EXISTS inventories.order_arrival_change_instructions_audit();
+DROP FUNCTION IF EXISTS inventories.order_cancel_instructions_audit();
+
+
 DROP TABLE IF EXISTS inventories.warehousing_details CASCADE;
 DROP TABLE IF EXISTS inventories.warehousings CASCADE;
 DROP TABLE IF EXISTS inventories.ordering_details CASCADE;

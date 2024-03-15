@@ -1,3 +1,6 @@
+ALTER TABLE inventories.order_arrival_change_instructions DROP CONSTRAINT IF EXISTS order_arrival_change_instructions_foreignKey_1;
+ALTER TABLE inventories.order_cancel_instructions DROP CONSTRAINT IF EXISTS order_cancel_instructions_foreignKey_1;
+
 ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_foreignKey_1;
 ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_foreignKey_2;
 ALTER TABLE inventories.warehousings DROP CONSTRAINT IF EXISTS warehousings_foreignKey_1;
