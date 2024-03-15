@@ -3,6 +3,7 @@
 -- 2.取引銀行(dealing_banks)
 
 -- Set FK Constraint
+ALTER TABLE inventories.dealing_banks DROP CONSTRAINT IF EXISTS dealing_banks_foreignKey_1;
 ALTER TABLE inventories.dealing_banks ADD CONSTRAINT dealing_banks_foreignKey_1 FOREIGN KEY (
   company_id
 ) REFERENCES inventories.companies (

@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-11T08:37:51+09:00
+create_at: 2024-03-15T16:22:25+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -313,7 +313,7 @@ elements:
     example: 55000.32
     description: 金額
   - name_jp: 在庫変動種類
-    name_en: taransactionType
+    name_en: inventoryType
     domain: 区分値
     reg_ex: null
     min_digits: null
@@ -342,6 +342,66 @@ elements:
     max_value: null
     example: 2024-03-15T12:34:56
     description: 日時
+  - name_jp: 買掛変動No
+    name_en: payableNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 3
+    description: 買掛変動履歴のサロゲートキー
+  - name_jp: 買掛変動種類
+    name_en: payableType
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: PURCHASE
+    description: 買掛変動の種類
+  - name_jp: 支払番号
+    name_en: paymentId
+    domain: NOKEY
+    reg_ex: ^PM-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: PM-0000002
+    description: 支払を一意に特定するID
+  - name_jp: 支払状況
+    name_en: paymentStatus
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: CONFIRMED
+    description: 支払状況の種類
+  - name_jp: 発注番号
+    name_en: orderingId
+    domain: NOKEY
+    reg_ex: ^PO-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: PO-0000004
+    description: 発注を一意に特定するID
+  - name_jp: 入荷番号
+    name_en: warehousingId
+    domain: NOKEY
+    reg_ex: ^WH-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: WH-0000011
+    description: 入荷を一意に特定するID
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -450,11 +510,11 @@ delive_elements:
   - origin: 取引管理No
     name_jp: 在庫移動指示No
     name_en: moveInstructionNo
-    description: 在庫移動指示単位で採番
+    description: 在庫移動指示単位で採番する取引管理No
   - origin: 取引管理No
-    name_jp: 雑入出庫指示No
-    name_en: otherInventoryInstructionNo
-    description: 雑入出庫指示単位で採番
+    name_jp: 在庫修正指示No
+    name_en: inventoryCorrectInstructionNo
+    description: 在庫修正指示単位で採番する取引管理No
   - origin: 倉庫ID
     name_jp: 移動元倉庫ID
     name_en: siteIdFrom
@@ -475,6 +535,118 @@ delive_elements:
     name_jp: 指示実行者ID
     name_en: operatorId
     description: 取引指示を実行したアカウントID
+  - origin: 変動金額
+    name_jp: 月初残高
+    name_en: initBalance
+    description: 月初残高
+  - origin: 変動金額
+    name_jp: 残高
+    name_en: presentBalance
+    description: 現在残高
+  - origin: 変動金額
+    name_jp: 購入金額
+    name_en: purchaseAmount
+    description: 購入金額
+  - origin: 変動金額
+    name_jp: 支払金額
+    name_en: paymentAmount
+    description: 支払金額
+  - origin: 変動金額
+    name_jp: その他金額
+    name_en: otherAmount
+    description: その他金額
+  - origin: 日付
+    name_jp: 締日付
+    name_en: cutOffDate
+    description: 締日付
+  - origin: 日付
+    name_jp: 支払期限日付
+    name_en: paymentLimitDate
+    description: 支払期限日付
+  - origin: 日付
+    name_jp: 金額確定日付
+    name_en: amountConfirmedDate
+    description: 金額確定日付
+  - origin: 日付
+    name_jp: 支払日付
+    name_en: paymentDate
+    description: 支払日付
+  - origin: 日時
+    name_jp: 変更凍結日時
+    name_en: freezeChangedTimestamp
+    description: 変更凍結日時
+  - origin: 日付
+    name_jp: 発注日付
+    name_en: orderDate
+    description: 発注日付
+  - origin: 数量
+    name_jp: 発注数量
+    name_en: orderingQuantity
+    description: 発注数量
+  - origin: 数量
+    name_jp: キャンセル数量
+    name_en: cancelQuantity
+    description: キャンセル数量
+  - origin: 数量
+    name_jp: 残数量
+    name_en: remainingQuantity
+    description: 残数量
+  - origin: 利益率
+    name_jp: 想定利益率
+    name_en: estimateProfitRate
+    description: 算出される想定利益率
+  - origin: 日付
+    name_jp: 標準納期日付
+    name_en: standardArrivalDate
+    description: 標準入荷日数から算出される納期日付
+  - origin: 日付
+    name_jp: 予定納期日付
+    name_en: estimateArrivalDate
+    description: 最新の納期予定日付
+  - origin: 日付
+    name_jp: 入荷日付
+    name_en: warehouseDate
+    description: 入荷日付
+  - origin: 数量
+    name_jp: 返品数量
+    name_en: returnQuantity
+    description: 返品数量
+  - origin: 金額
+    name_jp: 単価
+    name_en: unitPrice
+    description: 単価
+  - origin: 取引管理No
+    name_jp: 入荷明細No
+    name_en: warehousingDetailNo
+    description: 入荷明細単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 金額確定指示No
+    name_en: amountConfirmNo
+    description: 金額確定指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 支払指示No
+    name_en: paymentInstructionNo
+    description: 支払指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: キャンセル指示No
+    name_en: cancelInstructionNo
+    description: キャンセル指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 納期変更指示No
+    name_en: arrivalChangeInstructionNo
+    description: 納期変更指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 返品指示No
+    name_en: returnInstructionNo
+    description: 返品指示単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 買掛修正指示No
+    name_en: payableCorrectInstructionNo
+    description: 買掛金修正指示単位で採番する取引管理No
+  - origin: 日付
+    name_jp: 変更後納期日付
+    name_en: changedArrivalDate
+    description: 変更後の納期日付
 segments:
   - key: 取引状況
     value: READY
@@ -524,3 +696,31 @@ segments:
     value: OTHER
     name: その他雑入出庫
     description: その他
+  - key: 買掛変動種類
+    value: PURCHASE
+    name: 仕入購入
+    description: 仕入購入
+  - key: 買掛変動種類
+    value: ORDER_RETURN
+    name: 仕入返品
+    description: 仕入返品
+  - key: 買掛変動種類
+    value: PAYMENT
+    name: 支払
+    description: 支払
+  - key: 買掛変動種類
+    value: OTHER
+    name: その他取引
+    description: その他取引
+  - key: 支払状況
+    value: TO_BE_DETERMINED
+    name: 金額確定前
+    description: 金額確定前
+  - key: 支払状況
+    value: CONFIRMED
+    name: 金額確定
+    description: 金額確定
+  - key: 支払状況
+    value: COMPLETED
+    name: 支払完了
+    description: 支払完了

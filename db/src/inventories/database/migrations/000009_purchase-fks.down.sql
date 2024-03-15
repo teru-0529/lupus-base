@@ -1,0 +1,23 @@
+ALTER TABLE inventories.correct_payable_instructions DROP CONSTRAINT IF EXISTS correct_payable_instructions_foreignKey_1;
+ALTER TABLE inventories.correct_payable_instructions DROP CONSTRAINT IF EXISTS correct_payable_instructions_foreignKey_2;
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_1;
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_2;
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_3;
+ALTER TABLE inventories.payment_instructions DROP CONSTRAINT IF EXISTS payment_instructions_foreignKey_1;
+ALTER TABLE inventories.payment_confirm_instructions DROP CONSTRAINT IF EXISTS payment_confirm_instructions_foreignKey_1;
+ALTER TABLE inventories.order_arrival_change_instructions DROP CONSTRAINT IF EXISTS order_arrival_change_instructions_foreignKey_1;
+ALTER TABLE inventories.order_cancel_instructions DROP CONSTRAINT IF EXISTS order_cancel_instructions_foreignKey_1;
+
+ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_foreignKey_1;
+ALTER TABLE inventories.warehousing_details DROP CONSTRAINT IF EXISTS warehousing_details_foreignKey_2;
+ALTER TABLE inventories.warehousings DROP CONSTRAINT IF EXISTS warehousings_foreignKey_1;
+ALTER TABLE inventories.warehousings DROP CONSTRAINT IF EXISTS warehousings_foreignKey_2;
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_foreignKey_1;
+ALTER TABLE inventories.ordering_details DROP CONSTRAINT IF EXISTS ordering_details_foreignKey_2;
+ALTER TABLE inventories.orderings DROP CONSTRAINT IF EXISTS orderings_foreignKey_1;
+
+ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_foreignKey_1;
+ALTER TABLE inventories.payable_histories DROP CONSTRAINT IF EXISTS payable_histories_foreignKey_2;
+ALTER TABLE inventories.current_accounts_payables DROP CONSTRAINT IF EXISTS current_accounts_payables_foreignKey_1;
+ALTER TABLE inventories.month_accounts_payables DROP CONSTRAINT IF EXISTS month_accounts_payables_foreignKey_1;
+ALTER TABLE inventories.payments DROP CONSTRAINT IF EXISTS payments_foreignKey_1;

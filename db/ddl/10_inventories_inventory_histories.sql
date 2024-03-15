@@ -12,7 +12,7 @@ CREATE TABLE inventories.inventory_histories (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   variable_quantity integer NOT NULL,
   variable_amount numeric NOT NULL,
-  taransaction_type taransaction_type NOT NULL,
+  inventory_type inventory_type NOT NULL,
   tranzaction_no serial NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -31,7 +31,7 @@ COMMENT ON COLUMN inventories.inventory_histories.product_id IS '商品ID';
 COMMENT ON COLUMN inventories.inventory_histories.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.inventory_histories.variable_quantity IS '変動数量';
 COMMENT ON COLUMN inventories.inventory_histories.variable_amount IS '変動金額';
-COMMENT ON COLUMN inventories.inventory_histories.taransaction_type IS '在庫変動種類';
+COMMENT ON COLUMN inventories.inventory_histories.inventory_type IS '在庫変動種類';
 COMMENT ON COLUMN inventories.inventory_histories.tranzaction_no IS '取引管理No';
 COMMENT ON COLUMN inventories.inventory_histories.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.inventory_histories.updated_at IS '更新日時';

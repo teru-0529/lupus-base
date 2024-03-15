@@ -395,7 +395,7 @@ CREATE TABLE inventories.products (
   selling_price numeric NOT NULL DEFAULT 0.00 check (selling_price >= 0),
   cost_price numeric NOT NULL DEFAULT 0.00 check (cost_price >= 0),
   standard_profit_rate numeric check (standard_profit_rate >= 0),
-  days_to_arrive integer NOT NULL DEFAULT 1 check (days_to_arrive >= 1),
+  days_to_arrive integer check (days_to_arrive >= 1),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),

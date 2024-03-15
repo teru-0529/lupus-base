@@ -1,8 +1,8 @@
 -- Enum Type DDL
 
 -- 在庫変動種類
-DROP TYPE IF EXISTS taransaction_type;
-CREATE TYPE taransaction_type AS enum (
+DROP TYPE IF EXISTS inventory_type;
+CREATE TYPE inventory_type AS enum (
   'MOVE_WAREHOUSEMENT',
   'PURCHASE',
   'SALES_RETURN',
@@ -55,6 +55,13 @@ ALTER TABLE inventories.month_inventory_summaries_every_site ADD PRIMARY KEY (
   site_id
 );
 
+-- create index
+CREATE UNIQUE INDEX idx_month_inventory_summaries_every_site_1 ON inventories.month_inventory_summaries_every_site (
+  product_id,
+  site_id,
+  year_month
+);
+
 -- Create 'set_update_at' Trigger
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE
@@ -103,6 +110,7 @@ CREATE TABLE inventories.month_inventory_summaries (
   shipping_amount numeric NOT NULL DEFAULT 0.00 check (shipping_amount >= 0),
   present_amount numeric NOT NULL DEFAULT 0.00 check (present_amount >= 0),
   cost_price numeric check (cost_price >= 0),
+  estimate_profit_rate numeric check (estimate_profit_rate >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -124,6 +132,7 @@ COMMENT ON COLUMN inventories.month_inventory_summaries.warehousing_amount IS '�
 COMMENT ON COLUMN inventories.month_inventory_summaries.shipping_amount IS '出庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.present_amount IS '在庫金額';
 COMMENT ON COLUMN inventories.month_inventory_summaries.cost_price IS '原価';
+COMMENT ON COLUMN inventories.month_inventory_summaries.estimate_profit_rate IS '想定利益率';
 COMMENT ON COLUMN inventories.month_inventory_summaries.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.month_inventory_summaries.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.month_inventory_summaries.created_by IS '作成者';
@@ -240,6 +249,7 @@ CREATE TABLE inventories.current_inventory_summaries (
   present_quantity integer NOT NULL DEFAULT 0 check (present_quantity >= 0),
   present_amount numeric NOT NULL DEFAULT 0.00 check (present_amount >= 0),
   cost_price numeric check (cost_price >= 0),
+  estimate_profit_rate numeric check (estimate_profit_rate >= 0),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -254,6 +264,7 @@ COMMENT ON COLUMN inventories.current_inventory_summaries.product_id IS '商品I
 COMMENT ON COLUMN inventories.current_inventory_summaries.present_quantity IS '在庫数量';
 COMMENT ON COLUMN inventories.current_inventory_summaries.present_amount IS '在庫金額';
 COMMENT ON COLUMN inventories.current_inventory_summaries.cost_price IS '原価';
+COMMENT ON COLUMN inventories.current_inventory_summaries.estimate_profit_rate IS '想定利益率';
 COMMENT ON COLUMN inventories.current_inventory_summaries.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.current_inventory_summaries.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.current_inventory_summaries.created_by IS '作成者';
@@ -308,7 +319,7 @@ CREATE TABLE inventories.inventory_histories (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   variable_quantity integer NOT NULL,
   variable_amount numeric NOT NULL,
-  taransaction_type taransaction_type NOT NULL,
+  inventory_type inventory_type NOT NULL,
   tranzaction_no serial NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -327,7 +338,7 @@ COMMENT ON COLUMN inventories.inventory_histories.product_id IS '商品ID';
 COMMENT ON COLUMN inventories.inventory_histories.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.inventory_histories.variable_quantity IS '変動数量';
 COMMENT ON COLUMN inventories.inventory_histories.variable_amount IS '変動金額';
-COMMENT ON COLUMN inventories.inventory_histories.taransaction_type IS '在庫変動種類';
+COMMENT ON COLUMN inventories.inventory_histories.inventory_type IS '在庫変動種類';
 COMMENT ON COLUMN inventories.inventory_histories.tranzaction_no IS '取引管理No';
 COMMENT ON COLUMN inventories.inventory_histories.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.inventory_histories.updated_at IS '更新日時';
@@ -460,12 +471,12 @@ CREATE TRIGGER audit
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.moving_instructions_audit();
 
--- 14.雑入出庫指示(other_inventory_instructions)
+-- 14.在庫修正指示(correct_inventory_instructions)
 
 -- Create Table
-DROP TABLE IF EXISTS inventories.other_inventory_instructions CASCADE;
-CREATE TABLE inventories.other_inventory_instructions (
-  other_inventory_instruction_no serial NOT NULL,
+DROP TABLE IF EXISTS inventories.correct_inventory_instructions CASCADE;
+CREATE TABLE inventories.correct_inventory_instructions (
+  inventory_correct_instruction_no serial NOT NULL,
   business_date date NOT NULL DEFAULT get_business_date(),
   operation_timestamp timestamp NOT NULL DEFAULT current_timestamp,
   operator_id varchar(8) NOT NULL check (operator_id ~* '^P[0-9]{7}$'),
@@ -481,30 +492,30 @@ CREATE TABLE inventories.other_inventory_instructions (
 );
 
 -- Set Table Comment
-COMMENT ON TABLE inventories.other_inventory_instructions IS '雑入出庫指示';
+COMMENT ON TABLE inventories.correct_inventory_instructions IS '在庫修正指示';
 
 -- Set Column Comment
-COMMENT ON COLUMN inventories.other_inventory_instructions.other_inventory_instruction_no IS '雑入出庫指示No';
-COMMENT ON COLUMN inventories.other_inventory_instructions.business_date IS '業務取引日付';
-COMMENT ON COLUMN inventories.other_inventory_instructions.operation_timestamp IS '処理日時';
-COMMENT ON COLUMN inventories.other_inventory_instructions.operator_id IS '指示実行者ID';
-COMMENT ON COLUMN inventories.other_inventory_instructions.instruction_cause IS '指示目的';
-COMMENT ON COLUMN inventories.other_inventory_instructions.site_id IS '倉庫ID';
-COMMENT ON COLUMN inventories.other_inventory_instructions.product_id IS '商品ID';
-COMMENT ON COLUMN inventories.other_inventory_instructions.variable_quantity IS '変動数量';
-COMMENT ON COLUMN inventories.other_inventory_instructions.variable_amount IS '変動金額';
-COMMENT ON COLUMN inventories.other_inventory_instructions.created_at IS '作成日時';
-COMMENT ON COLUMN inventories.other_inventory_instructions.updated_at IS '更新日時';
-COMMENT ON COLUMN inventories.other_inventory_instructions.created_by IS '作成者';
-COMMENT ON COLUMN inventories.other_inventory_instructions.updated_by IS '更新者';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.inventory_correct_instruction_no IS '在庫修正指示No';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.business_date IS '業務取引日付';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.operation_timestamp IS '処理日時';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.operator_id IS '指示実行者ID';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.instruction_cause IS '指示目的';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.site_id IS '倉庫ID';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.product_id IS '商品ID';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.variable_quantity IS '変動数量';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.variable_amount IS '変動金額';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.created_at IS '作成日時';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.updated_at IS '更新日時';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.created_by IS '作成者';
+COMMENT ON COLUMN inventories.correct_inventory_instructions.updated_by IS '更新者';
 
 -- Set PK Constraint
-ALTER TABLE inventories.other_inventory_instructions ADD PRIMARY KEY (
-  other_inventory_instruction_no
+ALTER TABLE inventories.correct_inventory_instructions ADD PRIMARY KEY (
+  inventory_correct_instruction_no
 );
 
 -- create index
-CREATE INDEX idx_other_inventory_instructions_1 ON inventories.other_inventory_instructions (
+CREATE INDEX idx_correct_inventory_instructions_1 ON inventories.correct_inventory_instructions (
   product_id,
   business_date,
   operation_timestamp
@@ -513,23 +524,23 @@ CREATE INDEX idx_other_inventory_instructions_1 ON inventories.other_inventory_i
 -- Create 'set_update_at' Trigger
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE
-  ON inventories.other_inventory_instructions
+  ON inventories.correct_inventory_instructions
   FOR EACH ROW
 EXECUTE PROCEDURE set_updated_at();
 
 -- Create 'append_history' Function
-DROP FUNCTION IF EXISTS inventories.other_inventory_instructions_audit();
-CREATE OR REPLACE FUNCTION inventories.other_inventory_instructions_audit() RETURNS TRIGGER AS $$
+DROP FUNCTION IF EXISTS inventories.correct_inventory_instructions_audit();
+CREATE OR REPLACE FUNCTION inventories.correct_inventory_instructions_audit() RETURNS TRIGGER AS $$
 BEGIN
   IF (TG_OP = 'DELETE') THEN
     INSERT INTO operation_histories(schema_name, table_name, operation_type, table_key)
-    SELECT TG_TABLE_SCHEMA, TG_TABLE_NAME, 'DELETE', OLD.other_inventory_instruction_no;
+    SELECT TG_TABLE_SCHEMA, TG_TABLE_NAME, 'DELETE', OLD.inventory_correct_instruction_no;
   ELSIF (TG_OP = 'UPDATE') THEN
     INSERT INTO operation_histories(operated_by, schema_name, table_name, operation_type, table_key)
-    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'UPDATE', NEW.other_inventory_instruction_no;
+    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'UPDATE', NEW.inventory_correct_instruction_no;
   ELSIF (TG_OP = 'INSERT') THEN
     INSERT INTO operation_histories(operated_by, schema_name, table_name, operation_type, table_key)
-    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'INSERT', NEW.other_inventory_instruction_no;
+    SELECT NEW.updated_by, TG_TABLE_SCHEMA, TG_TABLE_NAME, 'INSERT', NEW.inventory_correct_instruction_no;
   END IF;
   RETURN null;
 END;
@@ -538,6 +549,6 @@ $$ LANGUAGE plpgsql;
 -- Create 'audit' Trigger
 CREATE TRIGGER audit
   AFTER INSERT OR UPDATE OR DELETE
-  ON inventories.other_inventory_instructions
+  ON inventories.correct_inventory_instructions
   FOR EACH ROW
-EXECUTE PROCEDURE inventories.other_inventory_instructions_audit();
+EXECUTE PROCEDURE inventories.correct_inventory_instructions_audit();

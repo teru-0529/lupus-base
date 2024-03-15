@@ -231,7 +231,7 @@ amount:
   example: 55000.32
 
 # 在庫変動種類
-taransactionType:
+inventoryType:
   type: string
   enum:
     - MOVE_WAREHOUSEMENT
@@ -256,4 +256,58 @@ sysDatetime:
   format: date-time
   description: 日時
   example: 2024-03-15T12:34:56
+
+# 買掛変動No
+payableNo:
+  type: integer
+  description: 買掛変動履歴のサロゲートキー
+  example: 3
+
+# 買掛変動種類
+payableType:
+  type: string
+  enum:
+    - PURCHASE
+    - ORDER_RETURN
+    - PAYMENT
+    - OTHER
+  description: 買掛変動の種類
+  example: PURCHASE
+
+# 支払番号
+paymentId:
+  type: string
+  pattern: ^PM-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 支払を一意に特定するID
+  example: PM-0000002
+
+# 支払状況
+paymentStatus:
+  type: string
+  enum:
+    - TO_BE_DETERMINED
+    - CONFIRMED
+    - COMPLETED
+  description: 支払状況の種類
+  example: CONFIRMED
+
+# 発注番号
+orderingId:
+  type: string
+  pattern: ^PO-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 発注を一意に特定するID
+  example: PO-0000004
+
+# 入荷番号
+warehousingId:
+  type: string
+  pattern: ^WH-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 入荷を一意に特定するID
+  example: WH-0000011
 
