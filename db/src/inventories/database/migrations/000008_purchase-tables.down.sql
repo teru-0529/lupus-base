@@ -1,8 +1,12 @@
+DROP TABLE IF EXISTS inventories.correct_payable_instructions CASCADE;
+DROP TABLE IF EXISTS inventories.warehousing_return_instructions CASCADE;
 DROP TABLE IF EXISTS inventories.payment_instructions CASCADE;
 DROP TABLE IF EXISTS inventories.payment_confirm_instructions CASCADE;
 DROP TABLE IF EXISTS inventories.order_arrival_change_instructions CASCADE;
 DROP TABLE IF EXISTS inventories.order_cancel_instructions CASCADE;
 
+DROP FUNCTION IF EXISTS inventories.correct_payable_instructions_audit();
+DROP FUNCTION IF EXISTS inventories.warehousing_return_instructions_audit();
 DROP FUNCTION IF EXISTS inventories.payment_instructions_audit();
 DROP FUNCTION IF EXISTS inventories.payment_confirm_instructions_audit();
 DROP FUNCTION IF EXISTS inventories.order_arrival_change_instructions_audit();

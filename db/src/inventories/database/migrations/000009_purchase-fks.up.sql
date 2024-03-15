@@ -153,3 +153,41 @@ ALTER TABLE inventories.payment_instructions ADD CONSTRAINT payment_instructions
 ) REFERENCES inventories.payments (
   payment_id
 );
+
+-- 27.入荷返品指示(warehousing_return_instructions)
+
+-- Set FK Constraint
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_1;
+ALTER TABLE inventories.warehousing_return_instructions ADD CONSTRAINT warehousing_return_instructions_foreignKey_1 FOREIGN KEY (
+  warehousing_id,
+  ordering_id,
+  product_id
+) REFERENCES inventories.warehousing_details (
+  warehousing_id,
+  ordering_id,
+  product_id
+);
+
+ALTER TABLE inventories.warehousing_return_instructions DROP CONSTRAINT IF EXISTS warehousing_return_instructions_foreignKey_2;
+ALTER TABLE inventories.warehousing_return_instructions ADD CONSTRAINT warehousing_return_instructions_foreignKey_2 FOREIGN KEY (
+  payment_id
+) REFERENCES inventories.payments (
+  payment_id
+);
+
+-- 28.買掛金修正指示(correct_payable_instructions)
+
+-- Set FK Constraint
+ALTER TABLE inventories.correct_payable_instructions DROP CONSTRAINT IF EXISTS correct_payable_instructions_foreignKey_1;
+ALTER TABLE inventories.correct_payable_instructions ADD CONSTRAINT correct_payable_instructions_foreignKey_1 FOREIGN KEY (
+  supplier_id
+) REFERENCES inventories.suppliers (
+  supplier_id
+);
+
+ALTER TABLE inventories.correct_payable_instructions DROP CONSTRAINT IF EXISTS correct_payable_instructions_foreignKey_2;
+ALTER TABLE inventories.correct_payable_instructions ADD CONSTRAINT correct_payable_instructions_foreignKey_2 FOREIGN KEY (
+  payment_id
+) REFERENCES inventories.payments (
+  payment_id
+);

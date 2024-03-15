@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-15T19:09:20+09:00
+create_at: 2024-03-15T19:36:37+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -1215,12 +1215,63 @@ tables:
       - name: 指示目的
         nullable: true
         default: null
+      - name: 入荷番号
+        nullable: false
+        default: null
+      - name: 発注番号
+        nullable: false
+        default: null
+      - name: 商品ID
+        nullable: false
+        default: null
+      - name: 数量
+        nullable: false
+        default: "0"
+      - name: 単価
+        nullable: false
+        default: "0.00"
+      - name: 締日付
+        nullable: false
+        default: null
+      - name: 支払期限日付
+        nullable: false
+        default: null
+      - name: 支払番号
+        nullable: false
+        default: null
     constraint:
       primary_key:
         - 返品指示No
       uniques: []
-      foreign_keys: []
-    indexes: []
+      foreign_keys:
+        - name: warehousing_return_instructions_foreignKey_1
+          reference_table: 入荷明細
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 入荷番号
+              ref: 入荷番号
+            - this: 発注番号
+              ref: 発注番号
+            - this: 商品ID
+              ref: 商品ID
+        - name: warehousing_return_instructions_foreignKey_2
+          reference_table: 支払
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 支払番号
+              ref: 支払番号
+    indexes:
+      - name: idx_warehousing_return_instructions_1
+        unique: false
+        fields:
+          - name: 入荷番号
+            asc: true
+          - name: 発注番号
+            asc: true
+          - name: 商品ID
+            asc: true
   - name_jp: 買掛金修正指示
     name_en: correct_payable_instructions
     is_master: false
@@ -1240,9 +1291,43 @@ tables:
       - name: 指示目的
         nullable: true
         default: null
+      - name: 仕入先ID
+        nullable: false
+        default: null
+      - name: 変動金額
+        nullable: false
+        default: "0.00"
+      - name: 締日付
+        nullable: false
+        default: null
+      - name: 支払期限日付
+        nullable: false
+        default: null
+      - name: 支払番号
+        nullable: false
+        default: null
     constraint:
       primary_key:
         - 買掛修正指示No
       uniques: []
-      foreign_keys: []
-    indexes: []
+      foreign_keys:
+        - name: correct_payable_instructions_foreignKey_1
+          reference_table: 仕入先
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 仕入先ID
+              ref: 仕入先ID
+        - name: correct_payable_instructions_foreignKey_2
+          reference_table: 支払
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 支払番号
+              ref: 支払番号
+    indexes:
+      - name: idx_correct_payable_instructions_1
+        unique: false
+        fields:
+          - name: 仕入先ID
+            asc: true
