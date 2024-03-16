@@ -1,3 +1,7 @@
+ALTER TABLE inventories.receiving_details DROP CONSTRAINT IF EXISTS receiving_details_foreignKey_1;
+ALTER TABLE inventories.receiving_details DROP CONSTRAINT IF EXISTS receiving_details_foreignKey_2;
+ALTER TABLE inventories.receivings DROP CONSTRAINT IF EXISTS receivings_foreignKey_1;
+
 ALTER TABLE inventories.receivable_histories DROP CONSTRAINT IF EXISTS receivable_histories_foreignKey_1;
 ALTER TABLE inventories.receivable_histories DROP CONSTRAINT IF EXISTS receivable_histories_foreignKey_2;
 ALTER TABLE inventories.receivable_histories DROP CONSTRAINT IF EXISTS receivable_histories_foreignKey_3;
