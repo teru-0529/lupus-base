@@ -239,3 +239,233 @@ CREATE TRIGGER post_process
   ON inventories.deposits
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.apply_deposit_from_deposit();
+
+
+-- 月次売掛金サマリ:登録「前」処理
+--  導出属性の算出(残高)
+--  有効桁数調整(月初残高/売上金額/入金金額/その他金額)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.month_receivables_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  --  有効桁数調整(月初残高/購入金額/支払金額/その他金額)
+  NEW.init_balance = ROUND(NEW.init_balance, 2);
+  NEW.sales_amount = ROUND(NEW.sales_amount, 2);
+  NEW.deposit_amount = ROUND(NEW.deposit_amount, 2);
+  NEW.other_amount = ROUND(NEW.other_amount, 2);
+  -- 導出属性の算出(在庫数量)
+  NEW.present_balance = NEW.init_balance + NEW.sales_amount - NEW.deposit_amount + NEW.other_amount;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.month_accounts_receivables
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.month_receivables_pre_process();
+
+
+-- 現在売掛金サマリ:登録「前」処理
+--  有効桁数調整(残高)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.current_receivables_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  --  有効桁数調整(残高)
+  NEW.present_balance = ROUND(NEW.present_balance, 2);
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.current_accounts_receivables
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.current_receivables_pre_process();
+
+
+-- 売掛変動履歴:チェック制約
+--  属性相関チェック制約(売掛変動種類/変動金額/請求番号/入金番号)
+
+-- Create Constraint
+ALTER TABLE inventories.receivable_histories DROP CONSTRAINT IF EXISTS receivable_histories_receivable_type_check;
+ALTER TABLE inventories.receivable_histories ADD CONSTRAINT receivable_histories_receivable_type_check CHECK (
+  CASE
+    -- 売掛変動種類が「販売売上」の場合、変動金額が0より大きい値であること
+    WHEN receivable_type = 'SELLING' AND variable_amount <= 0.00 THEN FALSE
+    -- 売掛変動種類が「売上返品」「入金」の場合、変動金額が0より小さい値であること
+    WHEN receivable_type = 'SALES_RETURN' AND variable_amount >= 0.00 THEN FALSE
+    WHEN receivable_type = 'DEPOSIT' AND variable_amount >= 0.00 THEN FALSE
+    -- 売掛変動種類が「入金」の場合、請求番号がNULLであること
+    WHEN receivable_type = 'DEPOSIT' AND billing_id IS NOT NULL THEN FALSE
+    -- 売掛変動種類が「販売売上」「売上返品」「その他取引」の場合、請求番号がNULLではないこと
+    WHEN receivable_type = 'SELLING' AND billing_id IS NULL THEN FALSE
+    WHEN receivable_type = 'SALES_RETURN' AND billing_id IS NULL THEN FALSE
+    WHEN receivable_type = 'OTHER' AND billing_id IS NULL THEN FALSE
+    -- 売掛変動種類が「入金」の場合、入金番号がNULLではないこと
+    WHEN receivable_type = 'DEPOSIT' AND deposit_id IS NULL THEN FALSE
+    -- 売掛変動種類が「販売売上」「売上返品」「その他取引」の場合、入金番号がNULLであること
+    WHEN receivable_type = 'SELLING' AND deposit_id IS NOT NULL THEN FALSE
+    WHEN receivable_type = 'SALES_RETURN' AND deposit_id IS NOT NULL THEN FALSE
+    WHEN receivable_type = 'OTHER' AND deposit_id IS NOT NULL THEN FALSE
+    ELSE TRUE
+  END
+);
+
+
+-- 売掛変動履歴:登録「前」処理
+--  有効桁数調整(変動金額)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.receivable_histories_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  --  有効桁数調整(変動金額)
+  NEW.variable_amount = ROUND(NEW.variable_amount, 2);
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.receivable_histories
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.receivable_histories_pre_process();
+
+
+-- 売掛変動履歴:登録「後」処理
+--  別テーブル登録/更新(月次売掛金サマリ/現在売掛金サマリ)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.upsert_accounts_receivables() RETURNS TRIGGER AS $$
+DECLARE
+  yyyymm text:=to_char(NEW.business_date, 'YYYYMM');
+
+  t_init_balance numeric;
+  t_sales_amount numeric;
+  t_deposit_amount numeric;
+  t_other_amount numeric;
+
+  recent_rec RECORD; --検索結果レコード(現在年月)
+  last_rec RECORD;--検索結果レコード(過去最新年月)
+  rec RECORD;
+BEGIN
+--  1.月次売掛金サマリ INFO:
+
+  -- 1.1.現在年月データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.month_accounts_receivables
+    WHERE costomer_id = NEW.costomer_id AND year_month = yyyymm
+    FOR UPDATE;
+
+  -- 1.2.月初残高/購入金額/支払金額/その他金額の算出
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    -- 過去最新残高の取得
+    SELECT * INTO last_rec
+      FROM inventories.month_accounts_receivables
+      WHERE costomer_id = NEW.costomer_id AND year_month < yyyymm
+      ORDER BY year_month DESC
+      LIMIT 1;
+    -- 過去最新在庫数が取得できた場合は月初残高に設定
+    t_init_balance:=CASE WHEN last_rec IS NULL THEN 0.00 ELSE last_rec.present_balance END;
+    t_sales_amount:=0.00;
+    t_deposit_amount:=0.00;
+    t_other_amount:=0.00;
+  ELSE
+    -- 現在年月データが存在するケース
+    t_init_balance:=recent_rec.init_balance;
+    t_sales_amount:=recent_rec.sales_amount;
+    t_deposit_amount:=recent_rec.deposit_amount;
+    t_other_amount:=recent_rec.other_amount;
+  END IF;
+
+  -- 1.3.取引数量の計上(売掛変動種類により判断)
+  IF NEW.receivable_type='SELLING' OR NEW.receivable_type='SALES_RETURN' THEN
+    t_sales_amount:=t_sales_amount + NEW.variable_amount;
+  ELSIF NEW.receivable_type='DEPOSIT' THEN
+    t_deposit_amount:=t_deposit_amount - NEW.variable_amount;
+  ELSIF NEW.receivable_type='OTHER' THEN
+    t_other_amount:=t_other_amount + NEW.variable_amount;
+  END IF;
+
+  -- 1.4.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 現在年月データが存在しないケース
+    INSERT INTO inventories.month_accounts_receivables VALUES (
+      NEW.costomer_id,
+      yyyymm,
+      t_init_balance,
+      t_sales_amount,
+      t_deposit_amount,
+      t_other_amount,
+      default,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 現在年月データが存在するケース
+    UPDATE inventories.month_accounts_receivables
+    SET sales_amount = t_sales_amount,
+        deposit_amount = t_deposit_amount,
+        other_amount = t_other_amount
+    WHERE costomer_id = NEW.costomer_id AND year_month = yyyymm;
+  END IF;
+
+  -- 1.5.現在年月以降のデータ更新(存在する場合)
+  FOR rec IN SELECT * FROM inventories.month_accounts_receivables
+    WHERE costomer_id = NEW.costomer_id AND year_month > yyyymm LOOP
+
+    UPDATE inventories.month_accounts_receivables
+    SET init_balance = rec.init_balance + NEW.variable_amount
+    WHERE costomer_id = NEW.costomer_id AND year_month = rec.year_month;
+  END LOOP;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+--  2.現在売掛金サマリ INFO:
+
+  -- 2.1.最新データの取得
+  SELECT * INTO recent_rec
+    FROM inventories.current_accounts_receivables
+    WHERE costomer_id = NEW.costomer_id
+    FOR UPDATE;
+
+  -- 2.2.登録/更新
+  IF recent_rec IS NULL THEN
+    -- 最新データが存在しないケース
+    INSERT INTO inventories.current_accounts_receivables VALUES (
+      NEW.costomer_id,
+      NEW.variable_amount,
+      default,
+      default,
+      NEW.created_by,
+      NEW.created_by
+    );
+  ELSE
+    -- 最新データが存在するケース
+    UPDATE inventories.current_accounts_receivables
+    SET present_balance = recent_rec.present_balance + NEW.variable_amount
+    WHERE costomer_id = NEW.costomer_id;
+  END IF;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.receivable_histories
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.upsert_accounts_receivables();
