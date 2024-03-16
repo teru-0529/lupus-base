@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-16T09:03:57+09:00
+create_at: 2024-03-16T09:56:45+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -1406,6 +1406,9 @@ tables:
       - name: 処理日時
         nullable: false
         default: current_timestamp
+      - name: 指示実行者ID
+        nullable: false
+        default: null
       - name: 得意先ID
         nullable: false
         default: null

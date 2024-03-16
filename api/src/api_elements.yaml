@@ -352,7 +352,7 @@ billingStatus:
   enum:
     - TO_BE_DETERMINED
     - CONFIRMED
-    - PART_OF
+    - PART_OF_DEPOSITED
     - COMPLETED
   description: 請求・入金状況の種類
   example: TO_BE_DETERMINED

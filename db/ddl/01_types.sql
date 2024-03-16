@@ -58,7 +58,7 @@ DROP TYPE IF EXISTS billing_status;
 CREATE TYPE billing_status AS enum (
   'TO_BE_DETERMINED',
   'CONFIRMED',
-  'PART_OF',
+  'PART_OF_DEPOSITED',
   'COMPLETED'
 );
 
