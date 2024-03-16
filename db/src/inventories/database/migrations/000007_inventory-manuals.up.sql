@@ -53,6 +53,25 @@ CREATE TRIGGER pre_process
 EXECUTE PROCEDURE inventories.month_summaries_pre_process();
 
 
+-- 在庫原価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.cost_price_for_inventory(i_product_id text) RETURNS numeric AS $$
+DECLARE
+  rec RECORD;
+
+BEGIN
+  SELECT * INTO rec FROM inventories.current_inventory_summaries WHERE product_id = i_product_id;
+  IF rec IS NOT NULL AND rec.present_quantity > 0 THEN
+    RETURN rec.cost_price;
+  ELSE
+    -- 現在在庫サマリが存在しない/数量0の場合は、商品の原価を返す
+    RETURN(SELECT cost_price FROM inventories.products WHERE product_id = i_product_id);
+  END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 現在在庫サマリ:登録「前」処理
 --  導出属性の算出(原価/想定利益率)
 --  有効桁数調整(在庫金額)
