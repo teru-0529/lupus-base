@@ -15,6 +15,18 @@ CREATE TYPE order_policy AS enum (
   'AS_NEEDED'
 );
 
+-- 曜日
+DROP TYPE IF EXISTS week;
+CREATE TYPE week AS enum (
+  'SUN',
+  'MON',
+  'TUE',
+  'WED',
+  'THU',
+  'FRI',
+  'SAT'
+);
+
 -- Tables DDL
 
 -- 1.企業(companies)

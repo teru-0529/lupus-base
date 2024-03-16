@@ -18,18 +18,6 @@ CREATE TYPE billing_status AS enum (
   'COMPLETED'
 );
 
--- 曜日
-DROP TYPE IF EXISTS week;
-CREATE TYPE week AS enum (
-  'SUN',
-  'MON',
-  'TUE',
-  'WED',
-  'THU',
-  'FRI',
-  'SAT'
-);
-
 -- 商品入荷状況
 DROP TYPE IF EXISTS product_shipping_situation;
 CREATE TYPE product_shipping_situation AS enum (
