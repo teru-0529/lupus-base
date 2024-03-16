@@ -1,6 +1,6 @@
 data_type: define_tables
 version: 3.2.6
-create_at: 2024-03-15T21:22:32+09:00
+create_at: 2024-03-16T09:03:57+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -1341,3 +1341,216 @@ tables:
         fields:
           - name: 仕入先ID
             asc: true
+  - name_jp: 請求
+    name_en: bills
+    is_master: false
+    fields:
+      - name: 請求番号
+        nullable: false
+        default: null
+      - name: 得意先ID
+        nullable: false
+        default: null
+      - name: 締日付
+        nullable: false
+        default: get_business_date()
+      - name: 入金期限日付
+        nullable: false
+        default: get_business_date()
+      - name: 請求金額
+        nullable: false
+        default: "0.00"
+      - name: 充当済金額
+        nullable: false
+        default: "0.00"
+      - name: 残額
+        nullable: false
+        default: "0.00"
+      - name: 請求状況
+        nullable: false
+        default: TO_BE_DETERMINED
+      - name: 金額確定日付
+        nullable: true
+        default: null
+      - name: 変更凍結日時
+        nullable: true
+        default: null
+    constraint:
+      primary_key:
+        - 請求番号
+      uniques:
+        - name: bills_unique_1
+          fields:
+            - 得意先ID
+            - 締日付
+            - 入金期限日付
+      foreign_keys:
+        - name: bills_foreignKey_1
+          reference_table: 得意先
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 得意先ID
+              ref: 得意先ID
+    indexes: []
+  - name_jp: 入金
+    name_en: deposits
+    is_master: false
+    fields:
+      - name: 入金番号
+        nullable: false
+        default: null
+      - name: 入金日付
+        nullable: false
+        default: get_business_date()
+      - name: 処理日時
+        nullable: false
+        default: current_timestamp
+      - name: 得意先ID
+        nullable: false
+        default: null
+      - name: 入金金額
+        nullable: false
+        default: "0.00"
+      - name: 充当済金額
+        nullable: false
+        default: "0.00"
+      - name: 残額
+        nullable: false
+        default: "0.00"
+      - name: 入金指示No
+        nullable: false
+        default: null
+    constraint:
+      primary_key:
+        - 入金番号
+      uniques: []
+      foreign_keys:
+        - name: deposits_foreignKey_1
+          reference_table: 得意先
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 得意先ID
+              ref: 得意先ID
+    indexes: []
+  - name_jp: 月次売掛金サマリ
+    name_en: month_accounts_receivables
+    is_master: false
+    fields:
+      - name: 得意先ID
+        nullable: false
+        default: null
+      - name: 年月
+        nullable: false
+        default: null
+      - name: 月初残高
+        nullable: false
+        default: "0.00"
+      - name: 売上金額
+        nullable: false
+        default: "0.00"
+      - name: 入金金額
+        nullable: false
+        default: "0.00"
+      - name: その他金額
+        nullable: false
+        default: "0.00"
+      - name: 残高
+        nullable: false
+        default: "0.00"
+    constraint:
+      primary_key:
+        - 得意先ID
+        - 年月
+      uniques: []
+      foreign_keys:
+        - name: month_accounts_receivables_foreignKey_1
+          reference_table: 得意先
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 得意先ID
+              ref: 得意先ID
+    indexes: []
+  - name_jp: 現在売掛金サマリ
+    name_en: current_accounts_receivables
+    is_master: false
+    fields:
+      - name: 得意先ID
+        nullable: false
+        default: null
+      - name: 残高
+        nullable: false
+        default: "0.00"
+    constraint:
+      primary_key:
+        - 得意先ID
+      uniques: []
+      foreign_keys:
+        - name: current_accounts_receivables_foreignKey_1
+          reference_table: 得意先
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 得意先ID
+              ref: 得意先ID
+    indexes: []
+  - name_jp: 売掛変動履歴
+    name_en: receivable_histories
+    is_master: false
+    fields:
+      - name: 売掛変動No
+        nullable: false
+        default: null
+      - name: 業務取引日付
+        nullable: false
+        default: get_business_date()
+      - name: 処理日時
+        nullable: false
+        default: current_timestamp
+      - name: 得意先ID
+        nullable: false
+        default: null
+      - name: 変動金額
+        nullable: false
+        default: "0.00"
+      - name: 売掛変動種類
+        nullable: false
+        default: null
+      - name: 取引管理No
+        nullable: false
+        default: null
+      - name: 請求番号
+        nullable: true
+        default: null
+      - name: 入金番号
+        nullable: true
+        default: null
+    constraint:
+      primary_key:
+        - 売掛変動No
+      uniques: []
+      foreign_keys:
+        - name: receivable_histories_foreignKey_1
+          reference_table: 得意先
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 得意先ID
+              ref: 得意先ID
+        - name: receivable_histories_foreignKey_2
+          reference_table: 請求
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 請求番号
+              ref: 請求番号
+        - name: receivable_histories_foreignKey_3
+          reference_table: 入金
+          delete_option: null
+          update_option: null
+          fields:
+            - this: 入金番号
+              ref: 入金番号
+    indexes: []
