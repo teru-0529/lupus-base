@@ -1,3 +1,8 @@
+DROP FUNCTION IF EXISTS inventories.receiving_details_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.selling_price_for_receivings() CASCADE;
+DROP FUNCTION IF EXISTS inventories.receivings_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.costomer_id_for_receivings() CASCADE;
+
 DROP FUNCTION IF EXISTS inventories.upsert_accounts_receivables() CASCADE;
 DROP FUNCTION IF EXISTS inventories.receivable_histories_pre_process() CASCADE;
 ALTER TABLE inventories.receivable_histories DROP CONSTRAINT IF EXISTS receivable_histories_receivable_type_check;

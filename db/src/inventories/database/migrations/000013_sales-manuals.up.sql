@@ -469,3 +469,87 @@ CREATE TRIGGER post_process
   ON inventories.receivable_histories
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.upsert_accounts_receivables();
+
+
+-- 受注得意先取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.costomer_id_for_receivings(i_receiving_id text) RETURNS text AS $$
+BEGIN
+  RETURN(SELECT costomer_id FROM inventories.receivings WHERE receiving_id = i_receiving_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 受注:登録「前」処理
+--  導出属性の算出:登録時のみ(受注ID)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.receivings_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  -- 導出属性の算出:登録時のみ(受注ID)
+  IF (TG_OP = 'INSERT') THEN
+    NEW.receiving_id:='RO-'||to_char(nextval('inventories.receiving_no_seed'),'FM0000000');
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.receivings
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.receivings_pre_process();
+
+
+-- 受注時売価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.selling_price_for_receivings(i_receiving_id text, i_product_id text) RETURNS numeric AS $$
+BEGIN
+  RETURN(SELECT selling_price FROM inventories.receiving_details WHERE receiving_id = i_receiving_id AND product_id = i_product_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 発注明細:登録「前」処理
+--  登録時初期化(出庫数量/キャンセル数量)
+--  導出属性の算出:登録時のみ(売価/想定原価/想定利益率)
+--  導出属性の算出(残数量)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.receiving_details_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  t_order_date date;
+  t_days_to_arrive integer;
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    --  登録時初期化(出庫数量/キャンセル数量)
+    NEW.shipping_quantity:=0;
+    NEW.cancel_quantity:=0;
+
+--  導出属性の算出:登録時のみ(売価)
+    IF NEW.selling_price IS NULL THEN
+      NEW.selling_price = inventories.selling_price_for_products(NEW.product_id);
+    ELSE
+      NEW.selling_price = ROUND(NEW.selling_price, 2);
+    END IF;
+
+--  導出属性の算出:登録時のみ(想定原価/想定利益率)
+    NEW.estimate_cost_price = inventories.cost_price_for_inventory(NEW.product_id);
+    NEW.estimate_profit_rate = inventories.calc_profit_rate(NEW.selling_price, NEW.estimate_cost_price);
+  END IF;
+
+  --  導出属性の算出(残数量)
+  NEW.remaining_quantity:=NEW.receiving_quantity - NEW.shipping_quantity - NEW.cancel_quantity;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.receiving_details
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.receiving_details_pre_process();

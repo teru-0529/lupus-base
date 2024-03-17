@@ -2,7 +2,11 @@
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.calc_profit_rate(i_selling_price numeric, i_cost_price numeric) RETURNS numeric AS $$
 BEGIN
-  RETURN ROUND((i_selling_price - i_cost_price) / i_selling_price, 2);
+  IF (i_selling_price = 0 OR i_selling_price < i_cost_price) THEN
+    RETURN 0.00;
+  ELSE
+    RETURN ROUND((i_selling_price - i_cost_price) / i_selling_price, 2);
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -123,6 +127,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- 商品売価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.selling_price_for_products(i_product_id text) RETURNS numeric AS $$
+BEGIN
+  RETURN(SELECT selling_price FROM inventories.products WHERE product_id = i_product_id);
+END;
+$$ LANGUAGE plpgsql;
 
 -- 想定利益率計算(by原価指定)
 -- Create Function
