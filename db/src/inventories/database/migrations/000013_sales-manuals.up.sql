@@ -553,3 +553,129 @@ CREATE TRIGGER pre_process
   ON inventories.receiving_details
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.receiving_details_pre_process();
+
+
+-- 出荷得意先取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.costomer_id_for_shippings(i_sipping_id text) RETURNS text AS $$
+BEGIN
+  RETURN(SELECT costomer_id FROM inventories.shippings WHERE sipping_id = i_sipping_id);
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 出荷:チェック制約
+--  テーブル相関チェック制約(請求(締日付/入金期限日付)の金額未確定チェック)
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.is_before_freeze_deposit_amounts(i_costomer_id text, i_cut_off_date date, i_deposit_limit_date date, operation_timestamp timestamp) RETURNS boolean AS $$
+BEGIN
+  -- 入金金額確定日時よりも処理日時が前である場合にTrue
+  RETURN(SELECT freeze_changed_timestamp > operation_timestamp FROM inventories.bills
+    WHERE  costomer_id = i_costomer_id AND cut_off_date = i_cut_off_date AND deposit_limit_date = i_deposit_limit_date);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Constraint
+ALTER TABLE inventories.shippings DROP CONSTRAINT IF EXISTS shippings_billing_id_check;
+ALTER TABLE inventories.shippings ADD CONSTRAINT shippings_billing_id_check CHECK (
+  inventories.is_before_freeze_deposit_amounts(costomer_id, cut_off_date,deposit_limit_date, operation_timestamp)
+);
+
+
+-- 出荷:登録「前」処理
+--  導出属性の算出:登録時のみ(出荷ID/締日付/入金期限日付/請求番号)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.shippings_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    -- 導出属性の算出:登録時のみ(出荷ID)
+    NEW.sipping_id:='SP-'||to_char(nextval('inventories.shipping_no_seed'),'FM0000000');
+
+    -- 導出属性の算出:登録時のみ(締日付/入金期限日付)
+    -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+    IF NEW.cut_off_date IS NULL AND NEW.deposit_limit_date IS NULL THEN
+      rec = inventories.calc_deposit_deadline(NEW.costomer_id, NEW.sipping_date);
+      NEW.cut_off_date = rec.cut_off_date;
+      NEW.deposit_limit_date = rec.deposit_date;
+    END IF;
+
+    -- 導出属性の算出:登録時のみ(請求番号)
+    NEW.billing_id = inventories.upsert_bills_for_cutoff_date(NEW.costomer_id, NEW.cut_off_date, NEW.deposit_limit_date, 0, NEW.created_by);
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.shippings
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.shippings_pre_process();
+
+
+-- 出荷時売価/原価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.prices_for_shipping(
+  i_sipping_id text,
+  i_receiving_id text,
+  i_product_id text,
+  OUT selling_price numeric,
+  OUT cost_price numeric
+) AS $$
+DECLARE
+  rec record;
+BEGIN
+  SELECT * INTO rec FROM inventories.shipping_details WHERE sipping_id = i_sipping_id AND receiving_id = i_receiving_id AND product_id = i_product_id;
+  selling_price = rec.selling_price;
+  cost_price = rec.cost_price;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 出荷明細:チェック制約
+--  属性相関チェック制約(出荷数量/返品数量)
+
+-- Create Constraint
+ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_return_quantity_check;
+ALTER TABLE inventories.shipping_details ADD CONSTRAINT shipping_details_return_quantity_check CHECK (
+  return_quantity <= shipping_quantity
+);
+
+
+-- 出荷明細:登録「前」処理
+--  登録時初期化(返品数量)
+--  導出属性の算出:登録時のみ(売価/原価/利益率)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.shipping_details_pre_process() RETURNS TRIGGER AS $$
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    --  登録時初期化(返品数量)
+    NEW.return_quantity:=0;
+
+--  導出属性の算出:登録時のみ(売価)
+    IF NEW.selling_price IS NULL THEN
+      NEW.selling_price = inventories.selling_price_for_receivings(NEW.receiving_id, NEW.product_id);
+    ELSE
+      NEW.selling_price = ROUND(NEW.selling_price, 2);
+    END IF;
+
+--  導出属性の算出:登録時のみ(原価/利益率)
+    NEW.cost_price = inventories.cost_price_for_inventory(NEW.product_id);
+    NEW.profit_rate = inventories.calc_profit_rate(NEW.selling_price, NEW.cost_price);
+
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT OR UPDATE
+  ON inventories.shipping_details
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.shipping_details_pre_process();

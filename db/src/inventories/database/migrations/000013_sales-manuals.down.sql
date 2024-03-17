@@ -1,3 +1,10 @@
+DROP FUNCTION IF EXISTS inventories.shipping_details_pre_process() CASCADE;
+ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_return_quantity_check;
+DROP FUNCTION IF EXISTS inventories.prices_for_shipping() CASCADE;
+DROP FUNCTION IF EXISTS inventories.shippings_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.is_before_freeze_deposit_amounts() CASCADE;
+DROP FUNCTION IF EXISTS inventories.costomer_id_for_shippings() CASCADE;
+
 DROP FUNCTION IF EXISTS inventories.receiving_details_pre_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.selling_price_for_receivings() CASCADE;
 DROP FUNCTION IF EXISTS inventories.receivings_pre_process() CASCADE;
