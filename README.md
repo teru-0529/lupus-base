@@ -84,148 +84,258 @@ INSERT INTO inventories.inventory_histories VALUES (default,'2024-02-01',default
 INSERT INTO inventories.inventory_histories VALUES (default,'2024-03-01',default,'AAA002001E','ALOCATABLE',-6, -18000, 'SELES',888,default,default,'101011-P0673822','101011-P0673822');
 ```
 
-## サンプルデータ登録SQL(transactions)
+## サンプルデータ登録SQL(transactions・項目毎)
 
 ``` SQL
--- ◆◆◆発注◆◆◆
--- ORDERINGS-1
+-- *** ORDERINGS ***
+-- ORDERING-1
 UPDATE business_date SET present_date = '2024-02-26' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.orderings VALUES (default,default,default,'P0673822','E00101',NULL,default,default,'100101-P0673822','100101-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000001','AAA002001E',5,0,0,0,default,default,default,default,default,default,'100101-P0673822','100101-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000001','AAA002002S',7,0,0,0,10500,default,default,default,default,default,'100101-P0673822','100101-P0673822');
 
--- ORDERINGS-1 納期変更
+-- ORDERING-1(CHANGE ARRIVAL DATE)
 UPDATE business_date SET present_date = '2024-02-28' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.order_arrival_change_instructions VALUES (default,default,default,'P0673822','仕入先都合','PO-0000001','AAA002001E','2024-03-15',default,default,'100102-P0673822','100102-P0673822');
 
--- ORDERINGS-1 キャンセル
+-- ORDERING-1(CANCEL)
 UPDATE business_date SET present_date = '2024-03-01' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.order_cancel_instructions VALUES (default,default,default,'P0673822','オーダーミス','PO-0000001','AAA002002S',3,default,default,'100103-P0673822','100103-P0673822');
 
--- ORDERINGS-2
+-- ORDERING-2
 UPDATE business_date SET present_date = '2024-03-05' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.orderings VALUES (default,default,default,'P0673822','E00101',NULL,default,default,'100104-P0673822','100104-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000002','AAA002001E',3,0,0,0,5800,default,default,default,default,default,'100104-P0673822','100104-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000002','AAA002025S',4,0,0,0,default,default,default,default,default,default,'100104-P0673822','100104-P0673822');
 
--- ORDERINGS-3
+-- ORDERING-3
 UPDATE business_date SET present_date = '2024-03-15' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.orderings VALUES (default,default,default,'P0673822','E00101',NULL,default,default,'100105-P0673822','100105-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000003','AAA002001E',2,0,0,0,default,default,default,default,default,default,'100105-P0673822','100105-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000003','AAA002002S',2,0,0,0,default,default,default,default,default,default,'100105-P0673822','100105-P0673822');
 
--- ORDERINGS-4
+-- ORDERING-4
 UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.orderings VALUES (default,default,default,'P0673822','E00101',NULL,default,default,'100106-P0673822','100106-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000004','AAA002001E',3,0,0,0,default,default,default,default,default,default,'100106-P0673822','100106-P0673822');
 
--- ORDERINGS-5
+-- ORDERING-5
 UPDATE business_date SET present_date = '2024-03-27' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.orderings VALUES (default,default,default,'P0673822','E00101',NULL,default,default,'100107-P0673822','100107-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000005','AAA002002S',4,0,0,0,default,default,default,default,default,default,'100107-P0673822','100107-P0673822');
 
--- ORDERINGS-6
+-- ORDERING-6
 UPDATE business_date SET present_date = '2024-04-03' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.orderings VALUES (default,default,default,'P0673822','E00102',NULL,default,default,'100108-P0673822','100108-P0673822');
 INSERT INTO inventories.ordering_details VALUES ('PO-0000006','BBB054792F',10,0,0,0,default,default,default,default,default,default,'100108-P0673822','100108-P0673822');
 
 
--- ◆◆◆入荷◆◆◆
--- WAREHOUSINGS-1 発注1の一部入荷
+-- *** WAREHOUSINGS ***
+-- WAREHOUSING-1(ORDERING-1:PART-OF)
 UPDATE business_date SET present_date = '2024-03-05' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100201-P0673822','100201-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000001','PO-0000001','AAA002002S',4,0,default,default,'INSPECTION',default,default,default,'100201-P0673822','100201-P0673822');
 
--- WAREHOUSINGS-2 発注1の残り＋発注2のほぼすべて（一部未納）
+-- WAREHOUSING-2(ORDERING-1:COMPLETE/ORDERING-2:PART-OF)
 UPDATE business_date SET present_date = '2024-03-15' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100202-P0673822','100202-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000002','PO-0000001','AAA002001E',5,0,5000,default,'INSPECTION',default,default,default,'100202-P0673822','100202-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000002','PO-0000002','AAA002001E',1,0,default,default,'INSPECTION',default,default,default,'100202-P0673822','100202-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000002','PO-0000002','AAA002025S',4,0,default,default,'INSPECTION',default,default,default,'100202-P0673822','100202-P0673822');
 
--- WAREHOUSINGS-3 発注2の未納分すべて（登録忘れ締日後に過去日付で登録・金額確定前なのでOK）
+-- WAREHOUSING-3(ORDERING-2:COMPLETE) *INPUT PAST DATA AFTER CUT OFF DATE AND BEFORE AMOUNT COMFIRMED DATE.
 UPDATE business_date SET present_date = '2024-03-22' WHERE business_date_type = 'BASE';
-INSERT INTO inventories.warehousings VALUES (default,'2024-03-20',default,'P0673822','E00101',default,default,default,NULL,default,default,'100203-P0673822','100203-P0673822');
+INSERT INTO inventories.warehousings VALUES (default,'2024-03-20',default,'P0673822','E00101',default,default,default,'登録忘れ',default,default,'100203-P0673822','100203-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000003','PO-0000002','AAA002001E',2,0,5500,default,'INSPECTION',default,default,default,'100203-P0673822','100203-P0673822');
 
--- WAREHOUSINGS-4 発注3の入荷（締日後のため別の支払）
+-- WAREHOUSING-4(ORDERING-3:PART-OF) *ANOTHER PAYMENT BECAUSE AFTER CUT OFF DATE.
 UPDATE business_date SET present_date = '2024-03-23' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100205-P0673822','100205-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000004','PO-0000003','AAA002002S',2,0,12000,default,'INSPECTION',default,default,default,'100205-P0673822','100205-P0673822');
 
--- 支払1 金額確定
+-- PAYMENT-1(AMOUNT COMFIRMED)
 UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.payment_confirm_instructions VALUES (default,default,default,'P0673822',NULL,'PM-0000001',default,default,'100204-P0673822','100204-P0673822');
 
--- WAREHOUSINGS-5 発注3の入荷
+-- WAREHOUSING-5(ORDERING-3:COMPLETE)
 UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100206-P0673822','100206-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000005','PO-0000003','AAA002001E',2,0,default,default,'INSPECTION',default,default,default,'100206-P0673822','100206-P0673822');
 
--- WAREHOUSINGS-6 発注4発注5の入荷
+-- WAREHOUSING-6(ORDERING-4:COMPLETE/ORDERING-5:COMPLETE)
 UPDATE business_date SET present_date = '2024-04-04' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100207-P0673822','100207-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000006','PO-0000004','AAA002001E',3,0,5700,default,'INSPECTION',default,default,default,'100207-P0673822','100207-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000006','PO-0000005','AAA002002S',4,0,default,default,'INSPECTION',default,default,default,'100207-P0673822','100207-P0673822');
 
--- WAREHOUSINGS-7 発注6の入荷(一部)
+-- WAREHOUSING-7(ORDERING-6:PART-OF)
 UPDATE business_date SET present_date = '2024-04-08' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousings VALUES (default,default,default,'P0673822','E00102',default,default,default,NULL,default,default,'100208-P0673822','100208-P0673822');
 INSERT INTO inventories.warehousing_details VALUES ('WH-0000007','PO-0000006','BBB054792F',6,0,default,default,'INSPECTION',default,default,default,'100208-P0673822','100208-P0673822');
 
--- 買掛修正★★★
+-- PAYABLE-CORRECT *REDUCE AMOUNT.
 UPDATE business_date SET present_date = '2024-04-10' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.correct_payable_instructions VALUES (default,default,default,'P0673822','瑕疵理由による支払減額','E00101',-20000,default,default,default,default,default,'100209-P0673822','100209-P0673822');
 
--- 支払3 金額確定
+-- PAYMENT-3(AMOUNT COMFIRMED)
 UPDATE business_date SET present_date = '2024-04-12' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.payment_confirm_instructions VALUES (default,default,default,'P0673822',NULL,'PM-0000003',default,default,'100210-P0673822','100210-P0673822');
 
--- 支払1 支払
+-- PAYMENT-1(AMOUNT COMPLETE)
 UPDATE business_date SET present_date = '2024-04-20' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.payment_instructions VALUES (default,default,default,'P0673822',NULL,'PM-0000001',default,default,'100211-P0673822','100211-P0673822');
 
 
--- ◆◆◆在庫◆◆◆
--- 検品1 入荷1の検品
+-- *** INVENTORIES ***
+-- MOVE-FOR-INSPECTION-1(WAREHOUSING-1)
 UPDATE business_date SET present_date = '2024-03-06' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002002S',4,default,default,'100301-P0673822','100301-P0673822');
 
--- 検品2 入荷2/入荷3の検品(一部不良)
+-- MOVE-FOR-INSPECTION-2(WAREHOUSING-2/WAREHOUSING-3) *DEFECTIVE PRODUCT.
 UPDATE business_date SET present_date = '2024-03-22' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002001E',7,default,default,'100302-P0673822','100302-P0673822');
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品不良品','INSPECTION','DAMAGED','AAA002001E',1,default,default,'100303-P0673822','100303-P0673822');
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002025S',4,default,default,'100304-P0673822','100304-P0673822');
 
--- 検品3 入荷4の検品
+-- MOVE-FOR-INSPECTION-3(WAREHOUSING-4)
 UPDATE business_date SET present_date = '2024-03-24' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002002S',2,default,default,'100305-P0673822','100305-P0673822');
 
--- 入荷2の返品（不良品）/瑕疵分の損失計上
+-- WAREHOUSING-2(RETURN) *DEFECTIVE PRODUCT.
+-- INVENTORY-CORRECT *REDUCE AMOUNT.
 UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousing_return_instructions VALUES (default,default,default,'P0673822','不良品の返品','WH-0000002','PO-0000002','AAA002001E','DAMAGED',1,3000,default,default,'PM-0000001',default,default,'100306-P0673822','100306-P0673822');
-
 INSERT INTO inventories.correct_inventory_instructions VALUES (default,default,default,'P0673822','当社瑕疵分損失計上','DAMAGED','AAA002001E',0,-2000,default,default,'100307-P0673822','100307-P0673822');
 
--- 検品4 入荷5の検品
+-- MOVE-FOR-INSPECTION-4(WAREHOUSING-5)
 UPDATE business_date SET present_date = '2024-03-26' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002001E',2,default,default,'100308-P0673822','100308-P0673822');
 
--- 検品5 入荷6の検品
+-- MOVE-FOR-INSPECTION-5(WAREHOUSING-6)
 UPDATE business_date SET present_date = '2024-04-05' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002001E',3,default,default,'100309-P0673822','100309-P0673822');
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','AAA002002S',4,default,default,'100310-P0673822','100310-P0673822');
 
--- その他処理
+-- INVENTORY-CORRECT *INCREASE AMOUNT.
 UPDATE business_date SET present_date = '2024-04-06' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.correct_inventory_instructions VALUES (default,default,default,'P0673822','譲与による入荷','ALOCATABLE','AAA002001E',1, 5100,default,default,'100311-P0673822','100311-P0673822');
 
--- 検品6 入荷7の検品
+-- MOVE-FOR-INSPECTION-6(WAREHOUSING-7) *DEFECTIVE PRODUCT.
 UPDATE business_date SET present_date = '2024-04-09' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品完了','INSPECTION','ALOCATABLE','BBB054792F',4,default,default,'100312-P0673822','100312-P0673822');
 INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P0673822','検品不良品','INSPECTION','DAMAGED','BBB054792F',2,default,default,'100313-P0673822','100313-P0673822');
 
--- 入荷7の返品(不良品)
+-- WAREHOUSING-7(RETURN) *DEFECTIVE PRODUCT.
 UPDATE business_date SET present_date = '2024-04-13' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.warehousing_return_instructions VALUES (default,default,default,'P0673822','不良品の返品','WH-0000007','PO-0000006','BBB054792F','DAMAGED',2,default,default,default,'PM-0000003',default,default,'100314-P0673822','100314-P0673822');
+
+
+-- *** RECEIVINGS ***
+-- RECEIVING-1
+UPDATE business_date SET present_date = '2024-03-06' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','S00201',default,NULL,default,default,'100401-P0673822','100401-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000001','AAA002002S',6,0,0,0,15000,default,default,default,default,'100401-P0673822','100401-P0673822');
+
+-- ******************************
+-- RECEIVING-1(CANCEL)
+UPDATE business_date SET present_date = '2024-03-07' WHERE business_date_type = 'BASE';
+UPDATE inventories.receiving_details SET cancel_quantity = 2, updated_by = '100402-P0673822' WHERE receiving_id = 'RO-0000001' AND product_id = 'AAA002002S';
+
+-- RECEIVING-2
+UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','S00201',default,NULL,default,default,'100403-P0673822','100403-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000002','AAA002001E',3,0,0,0,default,default,default,default,default,'100403-P0673822','100403-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000002','AAA002002S',2,0,0,0,default,default,default,default,default,'100403-P0673822','100403-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000002','AAA002025S',4,0,0,0,default,default,default,default,default,'100403-P0673822','100403-P0673822');
+
+-- RECEIVING-3
+UPDATE business_date SET present_date = '2024-03-31' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','S00201',default,NULL,default,default,'100404-P0673822','100404-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000003','AAA002001E',2,0,0,0,default,default,default,default,default,'100404-P0673822','100404-P0673822');
+
+-- RECEIVING-4(HIGH PRIORITY)
+UPDATE business_date SET present_date = '2024-04-01' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','S00201',10,'優先出荷対象',default,default,'100405-P0673822','100405-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000004','AAA002001E',2,0,0,0,default,default,default,default,default,'100405-P0673822','100405-P0673822');
+
+-- RECEIVING-5
+UPDATE business_date SET present_date = '2024-04-02' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','E00101',default,NULL,default,default,'100406-P0673822','100406-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000005','AAA002001E',1,0,0,0,default,default,default,default,default,'100406-P0673822','100406-P0673822');
+
+-- RECEIVING-6
+UPDATE business_date SET present_date = '2024-04-03' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','E00101',default,NULL,default,default,'100407-P0673822','100407-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000006','AAA002002S',2,0,0,0,default,default,default,default,default,'100407-P0673822','100407-P0673822');
+
+-- RECEIVING-7
+UPDATE business_date SET present_date = '2024-04-03' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','S00201',default,NULL,default,default,'100408-P0673822','100408-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000007','AAA002001E',4,0,0,0,default,default,default,default,default,'100408-P0673822','100408-P0673822');
+INSERT INTO inventories.receiving_details VALUES ('RO-0000007','BBB054792F',4,0,0,0,default,default,default,default,default,'100408-P0673822','100408-P0673822');
+
+-- *** SHIPPINGS ***
+-- SHIPPING-1(RECEIVING-1:PART-OF)
+UPDATE business_date SET present_date = '2024-03-10' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S00201',default,default,default,NULL,default,default,'100501-P0673822','100501-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000001','RO-0000001','AAA002002S',3,0,default,default,default,'ALOCATABLE',default,default,default,'100501-P0673822','100501-P0673822');
+
+-- SHIPPING-2(RECEIVING-1:COMPLETE/RECEIVING-2:COMPLETE)
+UPDATE business_date SET present_date = '2024-03-28' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S00201',default,default,default,'納期遅れのため値引き',default,default,'100502-P0673822','100502-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000002','RO-0000001','AAA002002S',1,0,13500,default,default,'ALOCATABLE',default,default,default,'100502-P0673822','100502-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000002','RO-0000002','AAA002001E',3,0,default,default,default,'ALOCATABLE',default,default,default,'100502-P0673822','100502-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000002','RO-0000002','AAA002002S',2,0,default,default,default,'ALOCATABLE',default,default,default,'100502-P0673822','100502-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000002','RO-0000002','AAA002025S',4,0,default,default,default,'ALOCATABLE',default,default,default,'100502-P0673822','100502-P0673822');
+
+-- SHIPPING-3(RECEIVING-4:COMPLETE/HIGH PRIORITY)
+UPDATE business_date SET present_date = '2024-04-01' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S00201',default,default,default,NULL,default,default,'100503-P0673822','100503-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000003','RO-0000004','AAA002001E',2,0,default,default,default,'ALOCATABLE',default,default,default,'100503-P0673822','100503-P0673822');
+
+-- DEPOSIT-1(ADVANCED PAYMENT)
+UPDATE business_date SET present_date = '2024-04-02' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.deposits VALUES (default,default,default,'P0673822','S00201',50000,0,0,default,default,default,'100504-P0673822','100504-P0673822');
+
+-- SHIPPING-4(RECEIVING-3:COMPLETE)
+UPDATE business_date SET present_date = '2024-04-03' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S00201',default,default,default,NULL,default,default,'100505-P0673822','100505-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000004','RO-0000003','AAA002001E',2,0,default,default,default,'ALOCATABLE',default,default,default,'100505-P0673822','100505-P0673822');
+
+-- SHIPPING-5(RECEIVING-5:COMPLETE)
+UPDATE business_date SET present_date = '2024-04-04' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100506-P0673822','100506-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000005','RO-0000005','AAA002001E',1,0,default,default,default,'ALOCATABLE',default,default,default,'100506-P0673822','100506-P0673822');
+
+-- SHIPPING-6(RECEIVING-6:COMPLETE)
+UPDATE business_date SET present_date = '2024-04-05' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100507-P0673822','100507-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000006','RO-0000006','AAA002002S',2,0,default,default,default,'ALOCATABLE',default,default,default,'100507-P0673822','100507-P0673822');
+
+-- ******************************
+-- BILLS-1(AMOUNT COMFIRMED)
+-- BILLS-3(AMOUNT COMFIRMED)
+UPDATE business_date SET present_date = '2024-04-06' WHERE business_date_type = 'BASE';
+UPDATE inventories.bills SET amount_confirmed_date = '2024-04-06', updated_by = '100508-P0673822' WHERE billing_id = 'BL-0000001';
+UPDATE inventories.bills SET amount_confirmed_date = '2024-04-06', updated_by = '100508-P0673822' WHERE billing_id = 'BL-0000003';
+
+-- ******************************
+-- SHIPPING-2(RETURN) *INIT DEFECTIVE PRODUCT.
+UPDATE business_date SET present_date = '2024-04-08' WHERE business_date_type = 'BASE';
+UPDATE inventories.shipping_details SET return_quantity = '2', updated_by = '100509-P0673822' WHERE sipping_id = 'SP-0000002' AND receiving_id = 'RO-0000002' AND product_id = 'AAA002025S';
+
+-- SHIPPING-7(RECEIVING-7:COMPLETE)
+UPDATE business_date SET present_date = '2024-04-10' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S00201',default,default,default,NULL,default,default,'100510-P0673822','100510-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000007','RO-0000007','AAA002001E',4,0,default,default,default,'ALOCATABLE',default,default,default,'100510-P0673822','100510-P0673822');
+INSERT INTO inventories.shipping_details VALUES ('SP-0000007','RO-0000007','BBB054792F',4,0,default,default,default,'ALOCATABLE',default,default,default,'100510-P0673822','100510-P0673822');
+
+-- DEPOSIT-2(APPLY FOR BILL-1)
+UPDATE business_date SET present_date = '2024-04-15' WHERE business_date_type = 'BASE';
+INSERT INTO inventories.deposits VALUES (default,default,default,'P0673822','S00201',100000,0,0,default,default,default,'100511-P0673822','100511-P0673822');
+
+-- ******************************
+-- RECEIVABLE-CORRECT *LATE PAYMENT FEE.
+UPDATE business_date SET present_date = '2024-04-18' WHERE business_date_type = 'BASE';
+-- INSERT INTO inventories.deposits VALUES (default,default,default,'P0673822','E00101',100000,0,0,default,default,default,'100511-P0673822','100511-P0673822');
 ```
