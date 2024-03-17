@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-17T17:32:27+09:00
+create_at: 2024-03-17T22:52:36+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -821,6 +821,10 @@ delive_elements:
     name_jp: 出荷明細No
     name_en: shippingDetailNo
     description: 出荷明細単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 売掛修正指示No
+    name_en: receivableCorrectInstructionNo
+    description: 売掛修正指示No
 segments:
   - key: 取引状況
     value: READY

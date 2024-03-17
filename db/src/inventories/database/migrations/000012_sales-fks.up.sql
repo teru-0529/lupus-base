@@ -133,3 +133,23 @@ ALTER TABLE inventories.shipping_details ADD CONSTRAINT shipping_details_foreign
 ) REFERENCES inventories.inventory_sites (
   site_id
 );
+
+-- 38.受注キャンセル指示(receiving_cancel_instructions)
+
+-- Set FK Constraint
+ALTER TABLE inventories.receiving_cancel_instructions DROP CONSTRAINT IF EXISTS receiving_cancel_instructions_foreignKey_1;
+ALTER TABLE inventories.receiving_cancel_instructions ADD CONSTRAINT receiving_cancel_instructions_foreignKey_1 FOREIGN KEY (
+  receiving_id
+) REFERENCES inventories.receivings (
+  receiving_id
+);
+
+-- 39.請求金額確定指示(billing_confirm_instructions)
+
+-- Set FK Constraint
+ALTER TABLE inventories.billing_confirm_instructions DROP CONSTRAINT IF EXISTS billing_confirm_instructions_foreignKey_1;
+ALTER TABLE inventories.billing_confirm_instructions ADD CONSTRAINT billing_confirm_instructions_foreignKey_1 FOREIGN KEY (
+  billing_id
+) REFERENCES inventories.bills (
+  billing_id
+);

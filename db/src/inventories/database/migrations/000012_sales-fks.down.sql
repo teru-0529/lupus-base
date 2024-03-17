@@ -1,3 +1,6 @@
+ALTER TABLE inventories.billing_confirm_instructions DROP CONSTRAINT IF EXISTS billing_confirm_instructions_foreignKey_1;
+ALTER TABLE inventories.receiving_cancel_instructions DROP CONSTRAINT IF EXISTS receiving_cancel_instructions_foreignKey_1;
+
 ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_foreignKey_1;
 ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_foreignKey_2;
 ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_foreignKey_3;

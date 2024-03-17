@@ -1,3 +1,9 @@
+DROP TABLE IF EXISTS inventories.billing_confirm_instructions CASCADE;
+DROP TABLE IF EXISTS inventories.receiving_cancel_instructions CASCADE;
+
+DROP FUNCTION IF EXISTS inventories.billing_confirm_instructions_audit();
+DROP FUNCTION IF EXISTS inventories.receiving_cancel_instructions_audit();
+
 DROP TABLE IF EXISTS inventories.shipping_details CASCADE;
 DROP TABLE IF EXISTS inventories.shippings CASCADE;
 DROP TABLE IF EXISTS inventories.receiving_details CASCADE;
