@@ -90,3 +90,46 @@ ALTER TABLE inventories.receiving_details ADD CONSTRAINT receiving_details_forei
 ) REFERENCES inventories.products (
   product_id
 );
+
+-- 36.出荷(shippings)
+
+-- Set FK Constraint
+ALTER TABLE inventories.shippings DROP CONSTRAINT IF EXISTS shippings_foreignKey_1;
+ALTER TABLE inventories.shippings ADD CONSTRAINT shippings_foreignKey_1 FOREIGN KEY (
+  costomer_id
+) REFERENCES inventories.costomers (
+  costomer_id
+);
+
+ALTER TABLE inventories.shippings DROP CONSTRAINT IF EXISTS shippings_foreignKey_2;
+ALTER TABLE inventories.shippings ADD CONSTRAINT shippings_foreignKey_2 FOREIGN KEY (
+  billing_id
+) REFERENCES inventories.bills (
+  billing_id
+);
+
+-- 37.出荷明細(shipping_details)
+
+-- Set FK Constraint
+ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_foreignKey_1;
+ALTER TABLE inventories.shipping_details ADD CONSTRAINT shipping_details_foreignKey_1 FOREIGN KEY (
+  sipping_id
+) REFERENCES inventories.shippings (
+  sipping_id
+) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_foreignKey_2;
+ALTER TABLE inventories.shipping_details ADD CONSTRAINT shipping_details_foreignKey_2 FOREIGN KEY (
+  receiving_id,
+  product_id
+) REFERENCES inventories.receiving_details (
+  receiving_id,
+  product_id
+);
+
+ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_foreignKey_3;
+ALTER TABLE inventories.shipping_details ADD CONSTRAINT shipping_details_foreignKey_3 FOREIGN KEY (
+  site_id
+) REFERENCES inventories.inventory_sites (
+  site_id
+);
