@@ -110,7 +110,7 @@ EXECUTE PROCEDURE inventories.bills_pre_process();
 CREATE OR REPLACE FUNCTION inventories.apply_deposit_from_bill() RETURNS TRIGGER AS $$
 BEGIN
   IF (OLD.amount_confirmed_date IS NULL AND NEW.amount_confirmed_date IS NOT NULL) THEN
-    CALL inventories.apply_deposit(NEW.costomer_id);
+    CALL inventories.apply_deposit(NEW.costomer_id);-- FIXME:
   END IF;
 
   RETURN NEW;
@@ -224,11 +224,32 @@ EXECUTE PROCEDURE inventories.deposits_pre_process();
 
 
 -- 入金:登録「後」処理
---  別テーブルの作成(入金充当)
+--  別テーブルの作成(入金充当/売掛変動履歴)
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.apply_deposit_from_deposit() RETURNS TRIGGER AS $$
 BEGIN
-  CALL inventories.apply_deposit(NEW.costomer_id);
+  --  1.入金充当 INFO:
+  CALL inventories.apply_deposit(NEW.costomer_id);-- FIXME:
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  2.売掛変動履歴 INFO:
+  INSERT INTO inventories.receivable_histories
+  VALUES (
+    default,
+    NEW.deposit_date,
+    NEW.operation_timestamp,
+    NEW.costomer_id,
+    - NEW.deposit_amount,
+    'DEPOSIT',
+    NEW.deposit_instruction_no,
+    NULL,
+    NEW.deposit_id,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
