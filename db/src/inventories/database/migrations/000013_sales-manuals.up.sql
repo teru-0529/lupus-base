@@ -679,3 +679,83 @@ CREATE TRIGGER pre_process
   ON inventories.shipping_details
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.shipping_details_pre_process();
+
+
+-- 出荷明細:登録「後」処理
+--  別テーブル登録/更新(受注明細/請求/売掛変動履歴/在庫変動履歴)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.shipping_post_process() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  SELECT * INTO rec FROM inventories.shippings WHERE sipping_id = NEW.sipping_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  1.受注明細 INFO:
+  UPDATE inventories.receiving_details
+  SET shipping_quantity = shipping_quantity + NEW.shipping_quantity,
+      updated_by = NEW.created_by
+  WHERE receiving_id = NEW.receiving_id AND product_id = NEW.product_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  2.請求 INFO:
+  UPDATE inventories.bills
+  SET billing_amount = billing_amount + NEW.shipping_quantity * NEW.selling_price,
+      updated_by = NEW.created_by
+  WHERE billing_id = rec.billing_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  3.売掛変動履歴 INFO:
+  INSERT INTO inventories.receivable_histories
+  VALUES (
+    default,
+    rec.sipping_date,
+    rec.operation_timestamp,
+    rec.costomer_id,
+    NEW.shipping_quantity * NEW.selling_price,
+    'SELLING',
+    NEW.shipping_detail_no,
+    rec.billing_id,
+    NULL,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  4.在庫変動履歴 INFO:
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    rec.sipping_date,
+    rec.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id,
+    - NEW.shipping_quantity,
+    - NEW.shipping_quantity * NEW.cost_price,
+    'SELES',
+    NEW.shipping_detail_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.shipping_details
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.shipping_post_process();
