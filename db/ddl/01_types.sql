@@ -23,7 +23,7 @@ CREATE TYPE inventory_type AS enum (
   'SALES_RETURN',
   'MOVE_SHIPPMENT',
   'SELES',
-  'ORDER_RETURN',
+  'PURCHASE_RETURN',
   'OTHER'
 );
 
@@ -31,7 +31,7 @@ CREATE TYPE inventory_type AS enum (
 DROP TYPE IF EXISTS payable_type;
 CREATE TYPE payable_type AS enum (
   'PURCHASE',
-  'ORDER_RETURN',
+  'PURCHASE_RETURN',
   'PAYMENT',
   'OTHER'
 );
@@ -47,7 +47,7 @@ CREATE TYPE payment_status AS enum (
 -- 売掛変動種類
 DROP TYPE IF EXISTS receivable_type;
 CREATE TYPE receivable_type AS enum (
-  'SELLING',
+  'SELES',
   'SALES_RETURN',
   'DEPOSIT',
   'OTHER'

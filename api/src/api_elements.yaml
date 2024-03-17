@@ -239,10 +239,10 @@ inventoryType:
     - SALES_RETURN
     - MOVE_SHIPPMENT
     - SELES
-    - ORDER_RETURN
+    - PURCHASE_RETURN
     - OTHER
   description: 在庫変動の種類
-  example: SELLING
+  example: SELES
 
 # 取引管理No
 tranzactionNo:
@@ -268,7 +268,7 @@ payableType:
   type: string
   enum:
     - PURCHASE
-    - ORDER_RETURN
+    - PURCHASE_RETURN
     - PAYMENT
     - OTHER
   description: 買掛変動の種類
@@ -339,12 +339,12 @@ depositId:
 receivableType:
   type: string
   enum:
-    - SELLING
+    - SELES
     - SALES_RETURN
     - DEPOSIT
     - OTHER
   description: 売掛変動の種類
-  example: SELLING
+  example: SELES
 
 # 請求状況
 billingStatus:

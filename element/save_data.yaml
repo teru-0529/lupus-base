@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-16T22:40:27+09:00
+create_at: 2024-03-17T17:32:27+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -320,7 +320,7 @@ elements:
     max_digits: null
     min_value: null
     max_value: null
-    example: SELLING
+    example: SELES
     description: 在庫変動の種類
   - name_jp: 取引管理No
     name_en: tranzactionNo
@@ -440,7 +440,7 @@ elements:
     max_digits: null
     min_value: null
     max_value: null
-    example: SELLING
+    example: SELES
     description: 売掛変動の種類
   - name_jp: 請求状況
     name_en: billingStatus
@@ -863,7 +863,7 @@ segments:
     name: 売上出庫
     description: 売上
   - key: 在庫変動種類
-    value: ORDER_RETURN
+    value: PURCHASE_RETURN
     name: 仕入返品出庫
     description: 仕入返品
   - key: 在庫変動種類
@@ -875,7 +875,7 @@ segments:
     name: 仕入購入
     description: 仕入購入
   - key: 買掛変動種類
-    value: ORDER_RETURN
+    value: PURCHASE_RETURN
     name: 仕入返品
     description: 仕入返品
   - key: 買掛変動種類
@@ -899,7 +899,7 @@ segments:
     name: 支払完了
     description: 支払完了
   - key: 売掛変動種類
-    value: SELLING
+    value: SELES
     name: 販売売上
     description: 販売売上
   - key: 売掛変動種類

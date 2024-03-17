@@ -68,7 +68,7 @@ INSERT INTO inventories.moving_instructions VALUES (default,default,default,'P06
 -- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', 1, 0, 'MOVE_WAREHOUSEMENT',999,default,default,'101003-P0673822','101003-P0673822');
 -- 4/5
 UPDATE business_date SET present_date = '2024-04-05' WHERE business_date_type = 'BASE';
-INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', -1, -3000, 'ORDER_RETURN',999,default,default,'101004-P0673822','101004-P0673822');
+INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', -1, -3000, 'PURCHASE_RETURN',999,default,default,'101004-P0673822','101004-P0673822');
 correct_inventory_instructions-- INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','DAMAGED', 0, -100, 'OTHER',999,default,default,'101004-P0673822','101004-P0673822');
 INSERT INTO inventories.inventory_histories VALUES (default,default,default,'AAA002001E','ALOCATABLE', -3, -9000, 'SELES',999,default,default,'101005-P0673822','101005-P0673822');
 -- 4/6

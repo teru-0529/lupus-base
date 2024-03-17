@@ -297,20 +297,20 @@ ALTER TABLE inventories.receivable_histories DROP CONSTRAINT IF EXISTS receivabl
 ALTER TABLE inventories.receivable_histories ADD CONSTRAINT receivable_histories_receivable_type_check CHECK (
   CASE
     -- 売掛変動種類が「販売売上」の場合、変動金額が0より大きい値であること
-    WHEN receivable_type = 'SELLING' AND variable_amount <= 0.00 THEN FALSE
+    WHEN receivable_type = 'SELES' AND variable_amount <= 0.00 THEN FALSE
     -- 売掛変動種類が「売上返品」「入金」の場合、変動金額が0より小さい値であること
     WHEN receivable_type = 'SALES_RETURN' AND variable_amount >= 0.00 THEN FALSE
     WHEN receivable_type = 'DEPOSIT' AND variable_amount >= 0.00 THEN FALSE
     -- 売掛変動種類が「入金」の場合、請求番号がNULLであること
     WHEN receivable_type = 'DEPOSIT' AND billing_id IS NOT NULL THEN FALSE
     -- 売掛変動種類が「販売売上」「売上返品」「その他取引」の場合、請求番号がNULLではないこと
-    WHEN receivable_type = 'SELLING' AND billing_id IS NULL THEN FALSE
+    WHEN receivable_type = 'SELES' AND billing_id IS NULL THEN FALSE
     WHEN receivable_type = 'SALES_RETURN' AND billing_id IS NULL THEN FALSE
     WHEN receivable_type = 'OTHER' AND billing_id IS NULL THEN FALSE
     -- 売掛変動種類が「入金」の場合、入金番号がNULLではないこと
     WHEN receivable_type = 'DEPOSIT' AND deposit_id IS NULL THEN FALSE
     -- 売掛変動種類が「販売売上」「売上返品」「その他取引」の場合、入金番号がNULLであること
-    WHEN receivable_type = 'SELLING' AND deposit_id IS NOT NULL THEN FALSE
+    WHEN receivable_type = 'SELES' AND deposit_id IS NOT NULL THEN FALSE
     WHEN receivable_type = 'SALES_RETURN' AND deposit_id IS NOT NULL THEN FALSE
     WHEN receivable_type = 'OTHER' AND deposit_id IS NOT NULL THEN FALSE
     ELSE TRUE
@@ -387,7 +387,7 @@ BEGIN
   END IF;
 
   -- 1.3.取引数量の計上(売掛変動種類により判断)
-  IF NEW.receivable_type='SELLING' OR NEW.receivable_type='SALES_RETURN' THEN
+  IF NEW.receivable_type='SELES' OR NEW.receivable_type='SALES_RETURN' THEN
     t_sales_amount:=t_sales_amount + NEW.variable_amount;
   ELSIF NEW.receivable_type='DEPOSIT' THEN
     t_deposit_amount:=t_deposit_amount - NEW.variable_amount;
@@ -717,7 +717,7 @@ BEGIN
     rec.operation_timestamp,
     rec.costomer_id,
     NEW.shipping_quantity * NEW.selling_price,
-    'SELLING',
+    'SELES',
     NEW.shipping_detail_no,
     rec.billing_id,
     NULL,

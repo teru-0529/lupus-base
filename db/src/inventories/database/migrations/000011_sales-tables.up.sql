@@ -3,7 +3,7 @@
 -- 売掛変動種類
 DROP TYPE IF EXISTS receivable_type;
 CREATE TYPE receivable_type AS enum (
-  'SELLING',
+  'SELES',
   'SALES_RETURN',
   'DEPOSIT',
   'OTHER'

@@ -175,7 +175,7 @@ ALTER TABLE inventories.payable_histories ADD CONSTRAINT payable_histories_payab
     -- 買掛変動種類が「仕入購入」の場合、変動金額が0より大きい値であること
     WHEN payable_type = 'PURCHASE' AND variable_amount <= 0.00 THEN FALSE
     -- 買掛変動種類が「仕入返品」「支払」の場合、変動金額が0より小さい値であること
-    WHEN payable_type = 'ORDER_RETURN' AND variable_amount >= 0.00 THEN FALSE
+    WHEN payable_type = 'PURCHASE_RETURN' AND variable_amount >= 0.00 THEN FALSE
     WHEN payable_type = 'PAYMENT' AND variable_amount >= 0.00 THEN FALSE
     ELSE TRUE
   END
@@ -251,7 +251,7 @@ BEGIN
   END IF;
 
   -- 1.3.取引数量の計上(買掛変動種類により判断)
-  IF NEW.payable_type='PURCHASE' OR NEW.payable_type='ORDER_RETURN' THEN
+  IF NEW.payable_type='PURCHASE' OR NEW.payable_type='PURCHASE_RETURN' THEN
     t_purchase_amount:=t_purchase_amount + NEW.variable_amount;
   ELSIF NEW.payable_type='PAYMENT' THEN
     t_payment_amount:=t_payment_amount - NEW.variable_amount;
@@ -830,7 +830,7 @@ BEGIN
     NEW.operation_timestamp,
     i_supplier_id,
     - NEW.quantity * NEW.unit_price,
-    'ORDER_RETURN',
+    'PURCHASE_RETURN',
     NEW.return_instruction_no,
     NEW.payment_id,
     default,
@@ -851,7 +851,7 @@ BEGIN
     NEW.site_id,
     - NEW.quantity,
     - NEW.quantity * NEW.unit_price,
-    'ORDER_RETURN',
+    'PURCHASE_RETURN',
     NEW.return_instruction_no,
     default,
     default,
