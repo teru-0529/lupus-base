@@ -1,3 +1,6 @@
+DROP FUNCTION IF EXISTS inventories.update_billing_comfirm_date() CASCADE;
+DROP FUNCTION IF EXISTS inventories.update_receiving_cancel_quantity() CASCADE;
+
 DROP FUNCTION IF EXISTS inventories.shipping_post_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.shipping_details_pre_process() CASCADE;
 ALTER TABLE inventories.shipping_details DROP CONSTRAINT IF EXISTS shipping_details_return_quantity_check;

@@ -780,3 +780,48 @@ CREATE TRIGGER post_process
   ON inventories.shipping_details
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.shipping_post_process();
+
+
+-- 受注キャンセル指示:登録「後」処理
+--  別テーブル変更(受注明細)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.update_receiving_cancel_quantity() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE inventories.receiving_details
+  SET cancel_quantity = cancel_quantity + NEW.quantity,
+      updated_by = NEW.created_by
+  WHERE receiving_id = NEW.receiving_id AND product_id = NEW.product_id;
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.receiving_cancel_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.update_receiving_cancel_quantity();
+
+
+-- 請求金額確定指示:登録「後」処理
+--  別テーブル変更(請求)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.update_billing_comfirm_date() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE inventories.bills
+  SET billing_status = 'CONFIRMED',
+      amount_confirmed_date = NEW.business_date,
+      updated_by = NEW.created_by
+  WHERE billing_id = NEW.billing_id;
+
+  return NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  BEFORE INSERT
+  ON inventories.billing_confirm_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.update_billing_comfirm_date();

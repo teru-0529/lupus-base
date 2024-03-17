@@ -236,10 +236,9 @@ UPDATE business_date SET present_date = '2024-03-06' WHERE business_date_type = 
 INSERT INTO inventories.receivings VALUES (default,default,default,'P0673822','S00201',default,NULL,default,default,'100401-P0673822','100401-P0673822');
 INSERT INTO inventories.receiving_details VALUES ('RO-0000001','AAA002002S',6,0,0,0,15000,default,default,default,default,'100401-P0673822','100401-P0673822');
 
--- ******************************
 -- RECEIVING-1(CANCEL)
 UPDATE business_date SET present_date = '2024-03-07' WHERE business_date_type = 'BASE';
-UPDATE inventories.receiving_details SET cancel_quantity = 2, updated_by = '100402-P0673822' WHERE receiving_id = 'RO-0000001' AND product_id = 'AAA002002S';
+INSERT INTO inventories.receiving_cancel_instructions VALUES (default,default,default,'P0673822','お客様都合','RO-0000001','AAA002002S',2,default,default,'100402-P0673822','100402-P0673822');
 
 -- RECEIVING-2
 UPDATE business_date SET present_date = '2024-03-25' WHERE business_date_type = 'BASE';
@@ -312,12 +311,11 @@ UPDATE business_date SET present_date = '2024-04-05' WHERE business_date_type = 
 INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100507-P0673822','100507-P0673822');
 INSERT INTO inventories.shipping_details VALUES ('SP-0000006','RO-0000006','AAA002002S',2,0,default,default,default,'ALOCATABLE',default,default,default,'100507-P0673822','100507-P0673822');
 
--- ******************************
 -- BILLS-1(AMOUNT COMFIRMED)
 -- BILLS-3(AMOUNT COMFIRMED)
 UPDATE business_date SET present_date = '2024-04-06' WHERE business_date_type = 'BASE';
-UPDATE inventories.bills SET amount_confirmed_date = '2024-04-06', updated_by = '100508-P0673822' WHERE billing_id = 'BL-0000001';
-UPDATE inventories.bills SET amount_confirmed_date = '2024-04-06', updated_by = '100508-P0673822' WHERE billing_id = 'BL-0000003';
+INSERT INTO inventories.billing_confirm_instructions VALUES (default,default,default,'P0673822',NULL,'BL-0000001',default,default,'100508-P0673822','100508-P0673822');
+INSERT INTO inventories.billing_confirm_instructions VALUES (default,default,default,'P0673822',NULL,'BL-0000003',default,default,'100508-P0673822','100508-P0673822');
 
 -- ******************************
 -- SHIPPING-2(RETURN) *INIT DEFECTIVE PRODUCT.
