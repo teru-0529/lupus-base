@@ -1,3 +1,7 @@
+DROP FUNCTION IF EXISTS inventories.correct_payable_instructions_post_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.correct_payable_instructions_pre_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.shipping_return_instructions_post_process() CASCADE;
+DROP FUNCTION IF EXISTS inventories.shipping_return_instructions_pre_process() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_billing_comfirm_date() CASCADE;
 DROP FUNCTION IF EXISTS inventories.update_receiving_cancel_quantity() CASCADE;
 

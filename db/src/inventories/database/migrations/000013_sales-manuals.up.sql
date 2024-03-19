@@ -80,16 +80,9 @@ BEGIN
   NEW.remaining_amount = ROUND(NEW.billing_amount - NEW.applied_amount, 2);
 
   -- 導出属性の算出(変更凍結日時/請求状況)
-  IF NEW.remaining_amount = 0 THEN
-    NEW.billing_status = 'COMPLETED';
-
-  ELSIF NEW.applied_amount > 0 THEN
-    NEW.billing_status = 'PART_OF_DEPOSITED';
-
-  ELSIF (OLD.amount_confirmed_date IS NULL AND NEW.amount_confirmed_date IS NOT NULL) THEN
+  IF (OLD.amount_confirmed_date IS NULL AND NEW.amount_confirmed_date IS NOT NULL) THEN
     NEW.freeze_changed_timestamp:=current_timestamp;
     NEW.billing_status = 'CONFIRMED';
-
   END IF;
 
   RETURN NEW;
@@ -106,11 +99,21 @@ EXECUTE PROCEDURE inventories.bills_pre_process();
 
 -- 請求:登録「後」処理
 --  別テーブルの作成(入金充当)
+--  導出属性の算出(請求状況)
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.apply_deposit_from_bill() RETURNS TRIGGER AS $$
 BEGIN
   IF (OLD.amount_confirmed_date IS NULL AND NEW.amount_confirmed_date IS NOT NULL) THEN
     CALL inventories.apply_deposit(NEW.costomer_id);-- FIXME:
+  END IF;
+
+  -- 導出属性の算出(請求状況)
+  IF NEW.remaining_amount = 0 THEN
+    NEW.billing_status = 'COMPLETED';
+
+  ELSIF NEW.applied_amount > 0 THEN
+    NEW.billing_status = 'PART_OF_DEPOSITED';
+
   END IF;
 
   RETURN NEW;
@@ -825,3 +828,209 @@ CREATE TRIGGER post_process
   ON inventories.billing_confirm_instructions
   FOR EACH ROW
 EXECUTE PROCEDURE inventories.update_billing_comfirm_date();
+
+
+-- 出荷返品指示:登録「前」処理
+--  導出属性の算出(売価/原価/締日付/入金期限日付/請求番号)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.shipping_return_instructions_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  i_costomer_id text;
+  rec RECORD;
+BEGIN
+
+  --  導出属性の算出(売価/原価)
+  rec = inventories.prices_for_shipping(NEW.sipping_id, NEW.receiving_id, NEW.product_id);
+  IF NEW.selling_price IS NULL THEN
+    NEW.selling_price = rec.selling_price;
+  ELSE
+    NEW.selling_price = ROUND(NEW.selling_price, 2);
+  END IF;
+  IF NEW.cost_price IS NULL THEN
+    NEW.cost_price = rec.cost_price;
+  ELSE
+    NEW.cost_price = ROUND(NEW.cost_price, 2);
+  END IF;
+
+  -- 導出属性の算出(締日付/入金期限日付)
+  -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+  IF NEW.cut_off_date IS NULL AND NEW.deposit_limit_date IS NULL THEN
+    SELECT costomer_id INTO i_costomer_id FROM inventories.shippings WHERE sipping_id = NEW.sipping_id;
+
+    rec = inventories.calc_deposit_deadline(i_costomer_id, NEW.business_date);
+    NEW.cut_off_date = rec.cut_off_date;
+    NEW.deposit_limit_date = rec.deposit_date;
+  END IF;
+
+  -- 導出属性の算出(請求番号)
+  NEW.billing_id = inventories.upsert_bills_for_cutoff_date(
+    i_costomer_id,
+    NEW.cut_off_date,
+    NEW.deposit_limit_date,
+    - NEW.quantity * NEW.selling_price,
+    NEW.created_by
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT
+  ON inventories.shipping_return_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.shipping_return_instructions_pre_process();
+
+
+-- 出荷返品指示:登録「後」処理
+--  別テーブル登録(出荷明細/売掛変動履歴/在庫変動履歴)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.shipping_return_instructions_post_process() RETURNS TRIGGER AS $$
+DECLARE
+  i_costomer_id text;
+BEGIN
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  1.出荷明細 INFO:
+  UPDATE inventories.shipping_details
+  SET return_quantity = return_quantity + NEW.quantity,
+      updated_by = NEW.created_by
+  WHERE sipping_id = NEW.sipping_id AND receiving_id = NEW.receiving_id AND product_id = NEW.product_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  2.売掛変動履歴 INFO:
+  SELECT costomer_id INTO i_costomer_id FROM inventories.shippings WHERE sipping_id = NEW.sipping_id;
+  INSERT INTO inventories.receivable_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    i_costomer_id,
+    - NEW.quantity * NEW.selling_price,
+    'SALES_RETURN',
+    NEW.return_instruction_no,
+    NEW.billing_id,
+    default,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  -- 3.在庫変動履歴 INFO:
+  INSERT INTO inventories.inventory_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    NEW.product_id,
+    NEW.site_id,
+    NEW.quantity,
+    NEW.quantity * NEW.cost_price,
+    'SALES_RETURN',
+    NEW.return_instruction_no,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.shipping_return_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.shipping_return_instructions_post_process();
+
+
+-- 売掛金修正指示:登録「前」処理
+--  有効桁数調整(変動金額)
+--  導出属性の算出(締日付/入金期限日付/請求番号)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.correct_receivable_instructions_pre_process() RETURNS TRIGGER AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  --  有効桁数調整(変動金額)
+  NEW.variable_amount = ROUND(NEW.variable_amount, 2);
+
+
+  -- 導出属性の算出(締日付/入金期限日付)
+  -- 両項目の設定がいずれも設定がない場合に算出される。(片方だけ設定がある場合はNULL制約エラー)
+  IF NEW.cut_off_date IS NULL AND NEW.deposit_limit_date IS NULL THEN
+    rec = inventories.calc_deposit_deadline(NEW.costomer_id, NEW.business_date);
+    NEW.cut_off_date = rec.cut_off_date;
+    NEW.deposit_limit_date = rec.deposit_date;
+  END IF;
+
+  -- 導出属性の算出(請求番号)
+  NEW.billing_id = inventories.upsert_bills_for_cutoff_date(
+    NEW.costomer_id,
+    NEW.cut_off_date,
+    NEW.deposit_limit_date,
+    NEW.variable_amount,
+    NEW.created_by
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER pre_process
+  BEFORE INSERT
+  ON inventories.correct_receivable_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.correct_receivable_instructions_pre_process();
+
+
+-- 売掛金修正指示:登録「後」処理
+--  別テーブル登録(売掛変動履歴)
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.correct_receivable_instructions_post_process() RETURNS TRIGGER AS $$
+BEGIN
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  1.売掛変動履歴 INFO:
+  INSERT INTO inventories.receivable_histories
+  VALUES (
+    default,
+    NEW.business_date,
+    NEW.operation_timestamp,
+    NEW.costomer_id,
+    NEW.variable_amount,
+    'OTHER',
+    NEW.receivable_correct_instruction_no,
+    NEW.billing_id,
+    default,
+    default,
+    default,
+    NEW.created_by,
+    NEW.created_by
+  );
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER post_process
+  AFTER INSERT
+  ON inventories.correct_receivable_instructions
+  FOR EACH ROW
+EXECUTE PROCEDURE inventories.correct_receivable_instructions_post_process();

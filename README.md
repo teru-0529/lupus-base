@@ -292,6 +292,7 @@ UPDATE business_date SET present_date = '2024-04-01' WHERE business_date_type = 
 INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S00201',default,default,default,NULL,default,default,'100503-P0673822','100503-P0673822');
 INSERT INTO inventories.shipping_details VALUES ('SP-0000003','RO-0000004','AAA002001E',2,0,default,default,default,'ALOCATABLE',default,default,default,'100503-P0673822','100503-P0673822');
 
+-- ***********************************************
 -- DEPOSIT-1(ADVANCED PAYMENT)
 UPDATE business_date SET present_date = '2024-04-02' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.deposits VALUES (default,default,default,'P0673822','S00201',50000,0,0,default,default,default,'100504-P0673822','100504-P0673822');
@@ -311,16 +312,16 @@ UPDATE business_date SET present_date = '2024-04-05' WHERE business_date_type = 
 INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','E00101',default,default,default,NULL,default,default,'100507-P0673822','100507-P0673822');
 INSERT INTO inventories.shipping_details VALUES ('SP-0000006','RO-0000006','AAA002002S',2,0,default,default,default,'ALOCATABLE',default,default,default,'100507-P0673822','100507-P0673822');
 
+-- ***********************************************
 -- BILLS-1(AMOUNT COMFIRMED)
 -- BILLS-3(AMOUNT COMFIRMED)
 UPDATE business_date SET present_date = '2024-04-06' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.billing_confirm_instructions VALUES (default,default,default,'P0673822',NULL,'BL-0000001',default,default,'100508-P0673822','100508-P0673822');
 INSERT INTO inventories.billing_confirm_instructions VALUES (default,default,default,'P0673822',NULL,'BL-0000003',default,default,'100508-P0673822','100508-P0673822');
 
--- ******************************
 -- SHIPPING-2(RETURN) *INIT DEFECTIVE PRODUCT.
 UPDATE business_date SET present_date = '2024-04-08' WHERE business_date_type = 'BASE';
-UPDATE inventories.shipping_details SET return_quantity = '2', updated_by = '100509-P0673822' WHERE sipping_id = 'SP-0000002' AND receiving_id = 'RO-0000002' AND product_id = 'AAA002025S';
+INSERT INTO inventories.shipping_return_instructions VALUES (default,default,default,'P0673822','お客様都合','SP-0000002','RO-0000002','AAA002025S','INSPECTION',2,default,default,default,default,default,default,default,'100509-P0673822','100509-P0673822');
 
 -- SHIPPING-7(RECEIVING-7:COMPLETE)
 UPDATE business_date SET present_date = '2024-04-10' WHERE business_date_type = 'BASE';
@@ -328,12 +329,12 @@ INSERT INTO inventories.shippings VALUES (default,default,default,'P0673822','S0
 INSERT INTO inventories.shipping_details VALUES ('SP-0000007','RO-0000007','AAA002001E',4,0,default,default,default,'ALOCATABLE',default,default,default,'100510-P0673822','100510-P0673822');
 INSERT INTO inventories.shipping_details VALUES ('SP-0000007','RO-0000007','BBB054792F',4,0,default,default,default,'ALOCATABLE',default,default,default,'100510-P0673822','100510-P0673822');
 
+-- ***********************************************
 -- DEPOSIT-2(APPLY FOR BILL-1)
 UPDATE business_date SET present_date = '2024-04-15' WHERE business_date_type = 'BASE';
 INSERT INTO inventories.deposits VALUES (default,default,default,'P0673822','S00201',100000,0,0,default,default,default,'100511-P0673822','100511-P0673822');
 
--- ******************************
 -- RECEIVABLE-CORRECT *LATE PAYMENT FEE.
 UPDATE business_date SET present_date = '2024-04-18' WHERE business_date_type = 'BASE';
--- INSERT INTO inventories.deposits VALUES (default,default,default,'P0673822','E00101',100000,0,0,default,default,default,'100511-P0673822','100511-P0673822');
+INSERT INTO inventories.correct_receivable_instructions VALUES (default,default,default,'P0673822','遅延損害金','E00101',300000,default,default,default,default,default,'100512-P0673822','100512-P0673822');
 ```

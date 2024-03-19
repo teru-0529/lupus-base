@@ -812,7 +812,7 @@ EXECUTE PROCEDURE inventories.warehousing_return_instructions_pre_process();
 
 
 -- 入荷返品指示:登録「後」処理
---  別テーブル登録(買掛変動履歴/在庫変動履歴)
+--  別テーブル登録(入荷明細/買掛変動履歴/在庫変動履歴)
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.warehousing_return_instructions_post_process() RETURNS TRIGGER AS $$
 DECLARE
@@ -821,7 +821,15 @@ BEGIN
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
-  --  1.買掛変動履歴 INFO:
+  --  1.入荷明細 INFO:
+  UPDATE inventories.warehousing_details
+  SET return_quantity = return_quantity + NEW.quantity,
+      updated_by = NEW.created_by
+  WHERE warehousing_id = NEW.warehousing_id AND ordering_id = NEW.ordering_id AND product_id = NEW.product_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  2.買掛変動履歴 INFO:
   SELECT supplier_id INTO i_supplier_id FROM inventories.warehousings WHERE warehousing_id = NEW.warehousing_id;
   INSERT INTO inventories.payable_histories
   VALUES (
@@ -841,7 +849,7 @@ BEGIN
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
-  -- 2.在庫変動履歴 INFO:
+  -- 3.在庫変動履歴 INFO:
   INSERT INTO inventories.inventory_histories
   VALUES (
     default,
