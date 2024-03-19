@@ -1,3 +1,6 @@
+ALTER TABLE inventories.deposit_appropriations DROP CONSTRAINT IF EXISTS deposit_appropriations_foreignKey_1;
+ALTER TABLE inventories.deposit_appropriations DROP CONSTRAINT IF EXISTS deposit_appropriations_foreignKey_2;
+
 ALTER TABLE inventories.correct_receivable_instructions DROP CONSTRAINT IF EXISTS correct_receivable_instructions_foreignKey_1;
 ALTER TABLE inventories.correct_receivable_instructions DROP CONSTRAINT IF EXISTS correct_receivable_instructions_foreignKey_2;
 ALTER TABLE inventories.shipping_return_instructions DROP CONSTRAINT IF EXISTS shipping_return_instructions_foreignKey_1;

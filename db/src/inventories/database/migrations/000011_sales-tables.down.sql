@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS inventories.deposit_appropriations CASCADE;
+
+DROP FUNCTION IF EXISTS inventories.deposit_appropriations_audit();
+
 DROP TABLE IF EXISTS inventories.correct_receivable_instructions CASCADE;
 DROP TABLE IF EXISTS inventories.shipping_return_instructions CASCADE;
 DROP TABLE IF EXISTS inventories.billing_confirm_instructions CASCADE;
