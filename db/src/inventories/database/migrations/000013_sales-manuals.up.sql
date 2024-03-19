@@ -13,48 +13,50 @@ CREATE SEQUENCE inventories.shipping_no_seed START 1;
 
 -- 入金充当
 -- Create Function
-CREATE OR REPLACE PROCEDURE inventories.apply_deposit(i_costomer_id text) AS $$
--- FIXME:
--- FIXME:
--- FIXME:
--- DECLARE
---   rec RECORD;
---   r_billing_id text;
+CREATE OR REPLACE PROCEDURE inventories.apply_deposit(i_costomer_id text, i_created_by text) AS $$
+DECLARE
+  deposit RECORD;
+  billing RECORD;
+  t_applied_amount numeric;
+  t_billing_status billing_status;
 BEGIN
-  -- SELECT * INTO rec FROM inventories.bills
-  --   WHERE  costomer_id = i_costomer_id AND cut_off_date = i_cut_off_date AND deposit_limit_date = i_deposit_limit_date
-  --   FOR UPDATE;
+  -- 残額のある入金データでループ
+  FOR deposit IN SELECT * FROM inventories.deposits
+  WHERE costomer_id = i_costomer_id AND remaining_amount > 0 LOOP
 
-  -- IF rec IS NULL THEN
-  --   INSERT INTO inventories.bills VALUES (
-  --     default,
-  --     i_costomer_id,
-  --     i_cut_off_date,
-  --     i_deposit_limit_date,
-  --     i_variable_amount,
-  --     default,
-  --     default,
-  --     default,
-  --     NULL,
-  --     NULL,
-  --     default,
-  --     default,
-  --     i_create_by,
-  --     i_create_by
-  --   ) RETURNING billing_id INTO r_billing_id;
-  --   RETURN r_billing_id;
+    -- 金額確定済みの残額のある請求データでループ
+    FOR billing IN SELECT * FROM inventories.bills
+    WHERE costomer_id = i_costomer_id AND remaining_amount > 0 AND freeze_changed_timestamp IS NOT NULL
+    ORDER BY deposit_limit_date LOOP
 
-  -- ELSE
-  --   UPDATE inventories.bills
-  --   SET billing_amount = rec.billing_amount + i_variable_amount,
-  --       updated_by = i_create_by
-  --   WHERE  billing_id = rec.billing_id;
-  --   RETURN rec.billing_id;
-  -- END IF;
+      -- 充当金額/請求状況の算出(請求残/入金残の小さい方)
+      IF billing.remaining_amount > deposit.remaining_amount THEN
+        t_applied_amount = deposit.remaining_amount;
+        t_billing_status = 'PART_OF_DEPOSITED';
+      ELSE
+        t_applied_amount = billing.remaining_amount;
+        t_billing_status = 'COMPLETED';
+      END IF;
 
--- FIXME:
--- FIXME:
--- FIXME:
+      INSERT INTO inventories.deposit_appropriations VALUES (
+        billing.billing_id,
+        deposit.deposit_id,
+        t_applied_amount,
+        default,
+        default,
+        i_created_by,
+        i_created_by
+      );
+
+      UPDATE inventories.deposits
+      SET applied_amount = applied_amount + t_applied_amount, updated_by = i_created_by
+      WHERE deposit_id = deposit.deposit_id;
+
+      UPDATE inventories.bills
+      SET applied_amount = applied_amount + t_applied_amount, billing_status = t_billing_status, updated_by = i_created_by
+      WHERE billing_id = billing.billing_id;
+    END LOOP;
+  END LOOP;
   RETURN;
 END;
 $$ LANGUAGE plpgsql;
@@ -104,7 +106,7 @@ EXECUTE PROCEDURE inventories.bills_pre_process();
 CREATE OR REPLACE FUNCTION inventories.apply_deposit_from_bill() RETURNS TRIGGER AS $$
 BEGIN
   IF (OLD.amount_confirmed_date IS NULL AND NEW.amount_confirmed_date IS NOT NULL) THEN
-    CALL inventories.apply_deposit(NEW.costomer_id);-- FIXME:
+    CALL inventories.apply_deposit(NEW.costomer_id, NEW.updated_by);-- FIXME:
   END IF;
 
   -- 導出属性の算出(請求状況)
@@ -232,7 +234,7 @@ EXECUTE PROCEDURE inventories.deposits_pre_process();
 CREATE OR REPLACE FUNCTION inventories.apply_deposit_from_deposit() RETURNS TRIGGER AS $$
 BEGIN
   --  1.入金充当 INFO:
-  CALL inventories.apply_deposit(NEW.costomer_id);-- FIXME:
+  CALL inventories.apply_deposit(NEW.costomer_id, NEW.updated_by);-- FIXME:
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
