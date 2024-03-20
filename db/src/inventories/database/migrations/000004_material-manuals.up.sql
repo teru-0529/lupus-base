@@ -45,11 +45,11 @@ EXECUTE PROCEDURE inventories.products_pre_process();
 -- Create Constraint
 ALTER TABLE inventories.suppliers DROP CONSTRAINT IF EXISTS suppliers_order_policy_check;
 ALTER TABLE inventories.suppliers ADD CONSTRAINT suppliers_order_policy_check CHECK (
-  -- 発注方法が「定期発注」の場合、発注曜日が「必須」
+  -- 発注方法が「定期発注(週次)」の場合、発注曜日が「必須」
   -- 発注方法が「随時発注」の場合、発注曜日が存在してはいけない
   CASE
-    WHEN order_policy='PERIODICALLY' AND order_week_num IS NULL THEN FALSE
-    WHEN order_policy='AS_NEEDED' AND order_week_num IS NOT NULL THEN FALSE
+    WHEN order_policy='WEEKLY' AND order_week IS NULL THEN FALSE
+    WHEN order_policy='AS_NEEDED' AND order_week IS NOT NULL THEN FALSE
     ELSE TRUE
   END
 );
@@ -290,6 +290,67 @@ BEGIN
   ELSE
     deposit_date = DATE(first_date + deposit_day_interval);
   END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.getWeekNum(i_week week) RETURNS integer AS $$
+DECLARE
+  t_week week;
+  i integer;
+BEGIN
+  i = 0;
+  FOR t_week IN SELECT UNNEST(ENUM_RANGE(NULL::week)) LOOP
+    IF t_week = i_week THEN RETURN i; END IF;
+
+    i=i+1;
+  END LOOP;
+  RETURN -1;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 発注予定日、入荷予定日の計算INFO:
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.calc_planed_order_date(
+  i_product_id text,
+  i_supplier_id text,
+  operation_date date,
+  OUT ordering_date date,
+  OUT warehousing_date date
+  ) AS $$
+DECLARE
+  t_supplier_id text;
+  rec record;
+  t_days_to_arrive integer;
+  t_week_num integer;
+  t_days_to_ordering integer;
+BEGIN
+  -- 1.仕入先ID/標準入荷日数の特定
+  IF i_product_id IS NULL AND i_supplier_id IS NULL THEN
+    RETURN;
+  ELSIF i_product_id IS NOT NULL THEN
+    SELECT supplier_id INTO t_supplier_id FROM inventories.products WHERE product_id = i_product_id;
+    t_days_to_arrive = inventories.calc_days_to_arriva(i_product_id);
+  ELSE
+    t_supplier_id = i_supplier_id;
+    SELECT days_to_arrive INTO t_days_to_arrive FROM inventories.suppliers WHERE supplier_id = i_supplier_id;
+  END IF;
+
+  -- 2.発注予定日の特定
+  SELECT * INTO rec FROM inventories.suppliers WHERE supplier_id = t_supplier_id;
+  IF rec.order_policy = 'AS_NEEDED' THEN
+    ordering_date = operation_date;
+  ELSE
+    t_week_num = 7 + inventories.getWeekNum(rec.order_week) - date_part('dow', operation_date);
+    t_days_to_ordering = t_week_num % 7;
+    ordering_date = DATE(operation_date + CAST(t_days_to_ordering || ' Day' AS interval));
+  END IF;
+
+  -- 3.入荷予定日の特定
+  warehousing_date = DATE(ordering_date + CAST(t_days_to_arrive || ' Day' AS interval));
 
 END;
 $$ LANGUAGE plpgsql;

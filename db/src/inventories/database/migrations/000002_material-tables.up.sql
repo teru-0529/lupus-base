@@ -11,7 +11,7 @@ CREATE TYPE dealing_status AS enum (
 -- 発注方針
 DROP TYPE IF EXISTS order_policy;
 CREATE TYPE order_policy AS enum (
-  'PERIODICALLY',
+  'WEEKLY',
   'AS_NEEDED'
 );
 
@@ -25,6 +25,14 @@ CREATE TYPE week AS enum (
   'THU',
   'FRI',
   'SAT'
+);
+
+-- 倉庫種別
+DROP TYPE IF EXISTS site_type;
+CREATE TYPE site_type AS enum (
+  'ALLOWABLE',
+  'INSPECT',
+  'KEEP'
 );
 
 -- Tables DDL
@@ -253,7 +261,7 @@ CREATE TABLE inventories.suppliers (
   purchase_pic varchar(8) check (purchase_pic ~* '^P[0-9]{7}$'),
   contact_person varchar(20),
   order_policy order_policy NOT NULL,
-  order_week_num integer check (1 <= order_week_num AND order_week_num <= 7),
+  order_week week,
   days_to_arrive integer NOT NULL check (days_to_arrive >= 1),
   note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -274,7 +282,7 @@ COMMENT ON COLUMN inventories.suppliers.payment_day IS '支払期限日';
 COMMENT ON COLUMN inventories.suppliers.purchase_pic IS '仕入担当者ID';
 COMMENT ON COLUMN inventories.suppliers.contact_person IS '相手先担当者';
 COMMENT ON COLUMN inventories.suppliers.order_policy IS '発注方針';
-COMMENT ON COLUMN inventories.suppliers.order_week_num IS '発注曜日';
+COMMENT ON COLUMN inventories.suppliers.order_week IS '発注曜日';
 COMMENT ON COLUMN inventories.suppliers.days_to_arrive IS '標準入荷日数';
 COMMENT ON COLUMN inventories.suppliers.note IS '備考';
 COMMENT ON COLUMN inventories.suppliers.created_at IS '作成日時';
@@ -481,8 +489,9 @@ EXECUTE PROCEDURE inventories.products_audit();
 DROP TABLE IF EXISTS inventories.inventory_sites CASCADE;
 CREATE TABLE inventories.inventory_sites (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
-  manage_pic varchar(8) check (manage_pic ~* '^P[0-9]{7}$'),
-  allocatable boolean NOT NULL DEFAULT True,
+  manage_pic varchar(8) NOT NULL check (manage_pic ~* '^P[0-9]{7}$'),
+  site_type site_type NOT NULL,
+  note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -495,7 +504,8 @@ COMMENT ON TABLE inventories.inventory_sites IS '倉庫';
 -- Set Column Comment
 COMMENT ON COLUMN inventories.inventory_sites.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.inventory_sites.manage_pic IS '管理担当者ID';
-COMMENT ON COLUMN inventories.inventory_sites.allocatable IS '引当可能';
+COMMENT ON COLUMN inventories.inventory_sites.site_type IS '倉庫種別';
+COMMENT ON COLUMN inventories.inventory_sites.note IS '備考';
 COMMENT ON COLUMN inventories.inventory_sites.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.inventory_sites.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.inventory_sites.created_by IS '作成者';

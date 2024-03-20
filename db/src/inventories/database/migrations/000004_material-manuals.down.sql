@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS inventories.calc_planed_order_date() CASCADE;
 DROP FUNCTION IF EXISTS inventories.calc_deposit_deadline() CASCADE;
 DROP FUNCTION IF EXISTS inventories.calc_payment_deadline() CASCADE;
 DROP FUNCTION IF EXISTS inventories.calc_days_to_arriva() CASCADE;

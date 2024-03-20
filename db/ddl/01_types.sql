@@ -11,7 +11,7 @@ CREATE TYPE dealing_status AS enum (
 -- 発注方針
 DROP TYPE IF EXISTS order_policy;
 CREATE TYPE order_policy AS enum (
-  'PERIODICALLY',
+  'WEEKLY',
   'AS_NEEDED'
 );
 
@@ -81,5 +81,13 @@ CREATE TYPE product_shipping_situation AS enum (
   'ON_INSPECT',
   'ORDERING',
   'ORDER_PREPARING'
+);
+
+-- 倉庫種別
+DROP TYPE IF EXISTS site_type;
+CREATE TYPE site_type AS enum (
+  'ALLOWABLE',
+  'INSPECT',
+  'KEEP'
 );
 

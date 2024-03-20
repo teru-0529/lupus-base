@@ -517,11 +517,12 @@ EXECUTE PROCEDURE inventories.insert_correct_inventory_history();
 
 -- SAMPLE DATA
 -- 倉庫
-INSERT INTO inventories.inventory_sites VALUES ('ALOCATABLE', 'P0673822', True,default,default,'100001-P0673822','100001-P0673822');
-INSERT INTO inventories.inventory_sites VALUES ('KEEP', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
-INSERT INTO inventories.inventory_sites VALUES ('INSPECTION', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
-INSERT INTO inventories.inventory_sites VALUES ('DAMAGED', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
-INSERT INTO inventories.inventory_sites VALUES ('PRIVATE_ORDER', 'P0673822', False,default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('USUALLY','P0673822','ALLOWABLE',NULL,default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('ON_INSPECT','P0673822','INSPECT',NULL,default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('DEFECTIVE_INSPECTION','P0673822','KEEP','検品不良品(一時待機用)',default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('SHIPPING_RETURN','P0673822','KEEP','出荷返品(一時待機用)',default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('PRIVATE_ORDER','P0673822','KEEP','個別発注品',default,default,'100001-P0673822','100001-P0673822');
+INSERT INTO inventories.inventory_sites VALUES ('OTHER_KEEP','P0673822','KEEP','その他確保用',default,default,'100001-P0673822','100001-P0673822');
 
 -- 企業
 INSERT INTO inventories.companies VALUES ('E00101','織田物産','171-0022','東京都豊島区南池袋１丁目',null,null,null,default,default,'100002-P0673822','100002-P0673822');
@@ -536,7 +537,7 @@ INSERT INTO inventories.dealing_banks VALUES ('S00201','0009','三井住友銀�
 
 -- 仕入先
 INSERT INTO inventories.suppliers VALUES ('E00101','ACTIVE',20,1,99,'P0673822','織田信長','AS_NEEDED',null,10,null,default,default,'100005-P0673822','100005-P0673822');
-INSERT INTO inventories.suppliers VALUES ('E00102','ACTIVE',10,1,15,'P0673822','豊臣秀吉','PERIODICALLY',3,5,null,default,default,'100005-P0673822','100005-P0673822');
+INSERT INTO inventories.suppliers VALUES ('E00102','ACTIVE',10,1,15,'P0673822','豊臣秀吉','WEEKLY','WED',5,null,default,default,'100005-P0673822','100005-P0673822');
 
 -- 得意先
 INSERT INTO inventories.costomers VALUES ('E00101','ACTIVE',5,1,99,'P0673822','織田信雄',null,default,default,'100004-P0673822','100004-P0673822');
