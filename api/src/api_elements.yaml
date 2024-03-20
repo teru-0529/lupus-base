@@ -113,18 +113,10 @@ contactPerson:
 orderPolicy:
   type: string
   enum:
-    - PERIODICALLY
+    - WEEKLY
     - AS_NEEDED
   description: 発注方針（定期/随時）
-  example: PERIODICALLY
-
-# 発注曜日
-orderWeekNum:
-  type: integer
-  minimum: 1
-  maximum: 7
-  description: 発注曜日（日曜が0）
-  example: 4
+  example: WEEKLY
 
 # 標準入荷日数
 daysToArrive:
@@ -412,6 +404,16 @@ productShippingSituation:
     - ON_INSPECT
     - ORDERING
     - ORDER_PREPARING
-  description: ""
-  example: ""
+  description: 在庫
+  example: IN_STOCK
+
+# 倉庫種別
+siteType:
+  type: string
+  enum:
+    - ALLOWABLE
+    - INSPECT
+    - KEEP
+  description: 検品中
+  example: INSPECT
 

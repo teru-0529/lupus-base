@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-17T22:52:36+09:00
+create_at: 2024-03-20T11:17:57+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -150,18 +150,8 @@ elements:
     max_digits: null
     min_value: null
     max_value: null
-    example: PERIODICALLY
+    example: WEEKLY
     description: 発注方針（定期/随時）
-  - name_jp: 発注曜日
-    name_en: orderWeekNum
-    domain: 整数
-    reg_ex: null
-    min_digits: null
-    max_digits: null
-    min_value: 1
-    max_value: 7
-    example: 4
-    description: 発注曜日（日曜が0）
   - name_jp: 標準入荷日数
     name_en: daysToArrive
     domain: 整数
@@ -510,8 +500,18 @@ elements:
     max_digits: null
     min_value: null
     max_value: null
-    example: ""
-    description: ""
+    example: IN_STOCK
+    description: 在庫
+  - name_jp: 倉庫種別
+    name_en: siteType
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: INSPECT
+    description: 検品中
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -825,6 +825,10 @@ delive_elements:
     name_jp: 売掛修正指示No
     name_en: receivableCorrectInstructionNo
     description: 売掛修正指示No
+  - origin: 曜日
+    name_jp: 発注曜日
+    name_en: orderWeek
+    description: 発注曜日
 segments:
   - key: 取引状況
     value: READY
@@ -839,8 +843,8 @@ segments:
     name: 取引中止
     description: 取引を中断している状態
   - key: 発注方針
-    value: PERIODICALLY
-    name: 定期発注
+    value: WEEKLY
+    name: 定期発注(週次)
     description: 曜日を指定して定期的に発注する
   - key: 発注方針
     value: AS_NEEDED
@@ -978,3 +982,15 @@ segments:
     value: ORDER_PREPARING
     name: 未発注
     description: これから発注
+  - key: 倉庫種別
+    value: ALLOWABLE
+    name: 引当可
+    description: 引当可
+  - key: 倉庫種別
+    value: INSPECT
+    name: 検品用
+    description: 検品用
+  - key: 倉庫種別
+    value: KEEP
+    name: 確保
+    description: 確保

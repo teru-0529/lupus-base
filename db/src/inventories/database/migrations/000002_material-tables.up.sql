@@ -27,6 +27,14 @@ CREATE TYPE week AS enum (
   'SAT'
 );
 
+-- 倉庫種別
+DROP TYPE IF EXISTS site_type;
+CREATE TYPE site_type AS enum (
+  'ALLOWABLE',
+  'INSPECT',
+  'KEEP'
+);
+
 -- Tables DDL
 
 -- 1.企業(companies)
@@ -481,8 +489,9 @@ EXECUTE PROCEDURE inventories.products_audit();
 DROP TABLE IF EXISTS inventories.inventory_sites CASCADE;
 CREATE TABLE inventories.inventory_sites (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
-  manage_pic varchar(8) check (manage_pic ~* '^P[0-9]{7}$'),
-  allocatable boolean NOT NULL DEFAULT True,
+  manage_pic varchar(8) NOT NULL check (manage_pic ~* '^P[0-9]{7}$'),
+  site_type site_type NOT NULL,
+  note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   created_by varchar(58),
@@ -495,7 +504,8 @@ COMMENT ON TABLE inventories.inventory_sites IS '倉庫';
 -- Set Column Comment
 COMMENT ON COLUMN inventories.inventory_sites.site_id IS '倉庫ID';
 COMMENT ON COLUMN inventories.inventory_sites.manage_pic IS '管理担当者ID';
-COMMENT ON COLUMN inventories.inventory_sites.allocatable IS '引当可能';
+COMMENT ON COLUMN inventories.inventory_sites.site_type IS '倉庫種別';
+COMMENT ON COLUMN inventories.inventory_sites.note IS '備考';
 COMMENT ON COLUMN inventories.inventory_sites.created_at IS '作成日時';
 COMMENT ON COLUMN inventories.inventory_sites.updated_at IS '更新日時';
 COMMENT ON COLUMN inventories.inventory_sites.created_by IS '作成者';
