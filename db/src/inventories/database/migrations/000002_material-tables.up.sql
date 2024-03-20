@@ -11,7 +11,7 @@ CREATE TYPE dealing_status AS enum (
 -- 発注方針
 DROP TYPE IF EXISTS order_policy;
 CREATE TYPE order_policy AS enum (
-  'PERIODICALLY',
+  'WEEKLY',
   'AS_NEEDED'
 );
 
@@ -253,7 +253,7 @@ CREATE TABLE inventories.suppliers (
   purchase_pic varchar(8) check (purchase_pic ~* '^P[0-9]{7}$'),
   contact_person varchar(20),
   order_policy order_policy NOT NULL,
-  order_week_num integer check (1 <= order_week_num AND order_week_num <= 7),
+  order_week week,
   days_to_arrive integer NOT NULL check (days_to_arrive >= 1),
   note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -274,7 +274,7 @@ COMMENT ON COLUMN inventories.suppliers.payment_day IS '支払期限日';
 COMMENT ON COLUMN inventories.suppliers.purchase_pic IS '仕入担当者ID';
 COMMENT ON COLUMN inventories.suppliers.contact_person IS '相手先担当者';
 COMMENT ON COLUMN inventories.suppliers.order_policy IS '発注方針';
-COMMENT ON COLUMN inventories.suppliers.order_week_num IS '発注曜日';
+COMMENT ON COLUMN inventories.suppliers.order_week IS '発注曜日';
 COMMENT ON COLUMN inventories.suppliers.days_to_arrive IS '標準入荷日数';
 COMMENT ON COLUMN inventories.suppliers.note IS '備考';
 COMMENT ON COLUMN inventories.suppliers.created_at IS '作成日時';
