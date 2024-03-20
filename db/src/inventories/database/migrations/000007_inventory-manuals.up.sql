@@ -53,6 +53,25 @@ CREATE TRIGGER pre_process
 EXECUTE PROCEDURE inventories.month_summaries_pre_process();
 
 
+-- 在庫原価取得
+-- Create Function
+CREATE OR REPLACE FUNCTION inventories.cost_price_for_inventory(i_product_id text) RETURNS numeric AS $$
+DECLARE
+  rec RECORD;
+
+BEGIN
+  SELECT * INTO rec FROM inventories.current_inventory_summaries WHERE product_id = i_product_id;
+  IF rec IS NOT NULL AND rec.present_quantity > 0 THEN
+    RETURN rec.cost_price;
+  ELSE
+    -- 現在在庫サマリが存在しない/数量0の場合は、商品の原価を返す
+    RETURN(SELECT cost_price FROM inventories.products WHERE product_id = i_product_id);
+  END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 現在在庫サマリ:登録「前」処理
 --  導出属性の算出(原価/想定利益率)
 --  有効桁数調整(在庫金額)
@@ -96,7 +115,7 @@ ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_i
     -- 在庫変動種類が「倉庫間移動出庫」「売上出庫」「仕入返品出庫」の場合、変動数量が-1以下であること
     WHEN inventory_type = 'MOVE_SHIPPMENT' AND variable_quantity >= 0 THEN FALSE
     WHEN inventory_type = 'SELES' AND variable_quantity >= 0 THEN FALSE
-    WHEN inventory_type = 'ORDER_RETURN' AND variable_quantity >= 0 THEN FALSE
+    WHEN inventory_type = 'PURCHASE_RETURN' AND variable_quantity >= 0 THEN FALSE
     -- 在庫変動種類が「倉庫間移動入庫」「倉庫間移動出庫」の場合、変動金額が0であること
     WHEN inventory_type = 'MOVE_WAREHOUSEMENT' AND variable_amount != 0.00 THEN FALSE
     WHEN inventory_type = 'MOVE_SHIPPMENT' AND variable_amount != 0.00 THEN FALSE
@@ -105,7 +124,7 @@ ALTER TABLE inventories.inventory_histories ADD CONSTRAINT inventory_histories_i
     WHEN inventory_type = 'SALES_RETURN' AND variable_amount <= 0.00 THEN FALSE
     -- 在庫変動種類が「売上出庫」「仕入返品出庫」の場合、変動金額が0より小さい値であること
     WHEN inventory_type = 'SELES' AND variable_amount >= 0.00 THEN FALSE
-    WHEN inventory_type = 'ORDER_RETURN' AND variable_amount >= 0.00 THEN FALSE
+    WHEN inventory_type = 'PURCHASE_RETURN' AND variable_amount >= 0.00 THEN FALSE
     ELSE TRUE
   END
 );

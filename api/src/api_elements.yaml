@@ -239,10 +239,10 @@ inventoryType:
     - SALES_RETURN
     - MOVE_SHIPPMENT
     - SELES
-    - ORDER_RETURN
+    - PURCHASE_RETURN
     - OTHER
   description: 在庫変動の種類
-  example: SELLING
+  example: SELES
 
 # 取引管理No
 tranzactionNo:
@@ -268,7 +268,7 @@ payableType:
   type: string
   enum:
     - PURCHASE
-    - ORDER_RETURN
+    - PURCHASE_RETURN
     - PAYMENT
     - OTHER
   description: 買掛変動の種類
@@ -310,4 +310,108 @@ warehousingId:
   maxLength: 10
   description: 入荷を一意に特定するID
   example: WH-0000011
+
+# 売掛変動No
+receivableNo:
+  type: integer
+  description: 売掛変動履歴のサロゲートキー
+  example: 6
+
+# 請求番号
+billingId:
+  type: string
+  pattern: ^BL-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 請求を一意に特定するID
+  example: BL-0000034
+
+# 入金番号
+depositId:
+  type: string
+  pattern: ^DP-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 入金を一意に特定するID
+  example: DP-0000002
+
+# 売掛変動種類
+receivableType:
+  type: string
+  enum:
+    - SELES
+    - SALES_RETURN
+    - DEPOSIT
+    - OTHER
+  description: 売掛変動の種類
+  example: SELES
+
+# 請求状況
+billingStatus:
+  type: string
+  enum:
+    - TO_BE_DETERMINED
+    - CONFIRMED
+    - PART_OF_DEPOSITED
+    - COMPLETED
+  description: 請求・入金状況の種類
+  example: TO_BE_DETERMINED
+
+# 曜日
+week:
+  type: string
+  enum:
+    - SUN
+    - MON
+    - TUE
+    - WED
+    - THU
+    - FRI
+    - SAT
+  description: 曜日
+  example: TUE
+
+# 受注番号
+receivingId:
+  type: string
+  pattern: ^RO-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 受注を一意に特定するID
+  example: RO-0000006
+
+# 出荷優先度数
+sippingPriority:
+  type: integer
+  minimum: 0
+  maximum: 100
+  description: 出荷時の優先度(数値が小さいほうが優先)
+  example: 50
+
+# 出荷番号
+sippingId:
+  type: string
+  pattern: ^SP-[0-9]{7}$
+  minLength: 10
+  maxLength: 10
+  description: 出荷を一意に特定するID
+  example: SP-0000021
+
+# 優先順位
+priority:
+  type: integer
+  minimum: 1
+  description: 優先順位（連番）
+  example: 2
+
+# 商品入荷状況
+productShippingSituation:
+  type: string
+  enum:
+    - IN_STOCK
+    - ON_INSPECT
+    - ORDERING
+    - ORDER_PREPARING
+  description: ""
+  example: ""
 

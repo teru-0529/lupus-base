@@ -4,7 +4,7 @@
 DROP TYPE IF EXISTS payable_type;
 CREATE TYPE payable_type AS enum (
   'PURCHASE',
-  'ORDER_RETURN',
+  'PURCHASE_RETURN',
   'PAYMENT',
   'OTHER'
 );

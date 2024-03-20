@@ -8,7 +8,7 @@ CREATE TYPE inventory_type AS enum (
   'SALES_RETURN',
   'MOVE_SHIPPMENT',
   'SELES',
-  'ORDER_RETURN',
+  'PURCHASE_RETURN',
   'OTHER'
 );
 

@@ -175,7 +175,7 @@ ALTER TABLE inventories.payable_histories ADD CONSTRAINT payable_histories_payab
     -- 買掛変動種類が「仕入購入」の場合、変動金額が0より大きい値であること
     WHEN payable_type = 'PURCHASE' AND variable_amount <= 0.00 THEN FALSE
     -- 買掛変動種類が「仕入返品」「支払」の場合、変動金額が0より小さい値であること
-    WHEN payable_type = 'ORDER_RETURN' AND variable_amount >= 0.00 THEN FALSE
+    WHEN payable_type = 'PURCHASE_RETURN' AND variable_amount >= 0.00 THEN FALSE
     WHEN payable_type = 'PAYMENT' AND variable_amount >= 0.00 THEN FALSE
     ELSE TRUE
   END
@@ -251,7 +251,7 @@ BEGIN
   END IF;
 
   -- 1.3.取引数量の計上(買掛変動種類により判断)
-  IF NEW.payable_type='PURCHASE' OR NEW.payable_type='ORDER_RETURN' THEN
+  IF NEW.payable_type='PURCHASE' OR NEW.payable_type='PURCHASE_RETURN' THEN
     t_purchase_amount:=t_purchase_amount + NEW.variable_amount;
   ELSIF NEW.payable_type='PAYMENT' THEN
     t_payment_amount:=t_payment_amount - NEW.variable_amount;
@@ -812,7 +812,7 @@ EXECUTE PROCEDURE inventories.warehousing_return_instructions_pre_process();
 
 
 -- 入荷返品指示:登録「後」処理
---  別テーブル登録(買掛変動履歴/在庫変動履歴)
+--  別テーブル登録(入荷明細/買掛変動履歴/在庫変動履歴)
 -- Create Function
 CREATE OR REPLACE FUNCTION inventories.warehousing_return_instructions_post_process() RETURNS TRIGGER AS $$
 DECLARE
@@ -821,7 +821,15 @@ BEGIN
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
-  --  1.買掛変動履歴 INFO:
+  --  1.入荷明細 INFO:
+  UPDATE inventories.warehousing_details
+  SET return_quantity = return_quantity + NEW.quantity,
+      updated_by = NEW.created_by
+  WHERE warehousing_id = NEW.warehousing_id AND ordering_id = NEW.ordering_id AND product_id = NEW.product_id;
+
+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+
+  --  2.買掛変動履歴 INFO:
   SELECT supplier_id INTO i_supplier_id FROM inventories.warehousings WHERE warehousing_id = NEW.warehousing_id;
   INSERT INTO inventories.payable_histories
   VALUES (
@@ -830,7 +838,7 @@ BEGIN
     NEW.operation_timestamp,
     i_supplier_id,
     - NEW.quantity * NEW.unit_price,
-    'ORDER_RETURN',
+    'PURCHASE_RETURN',
     NEW.return_instruction_no,
     NEW.payment_id,
     default,
@@ -841,7 +849,7 @@ BEGIN
 
 ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 
-  -- 2.在庫変動履歴 INFO:
+  -- 3.在庫変動履歴 INFO:
   INSERT INTO inventories.inventory_histories
   VALUES (
     default,
@@ -851,7 +859,7 @@ BEGIN
     NEW.site_id,
     - NEW.quantity,
     - NEW.quantity * NEW.unit_price,
-    'ORDER_RETURN',
+    'PURCHASE_RETURN',
     NEW.return_instruction_no,
     default,
     default,

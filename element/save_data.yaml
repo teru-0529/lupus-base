@@ -1,6 +1,6 @@
 data_type: define_elements
 version: 3.0.22
-create_at: 2024-03-15T16:22:25+09:00
+create_at: 2024-03-17T22:52:36+09:00
 elements:
   - name_jp: アカウントID
     name_en: accountId
@@ -320,7 +320,7 @@ elements:
     max_digits: null
     min_value: null
     max_value: null
-    example: SELLING
+    example: SELES
     description: 在庫変動の種類
   - name_jp: 取引管理No
     name_en: tranzactionNo
@@ -402,6 +402,116 @@ elements:
     max_value: null
     example: WH-0000011
     description: 入荷を一意に特定するID
+  - name_jp: 売掛変動No
+    name_en: receivableNo
+    domain: ID
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: 6
+    description: 売掛変動履歴のサロゲートキー
+  - name_jp: 請求番号
+    name_en: billingId
+    domain: NOKEY
+    reg_ex: ^BL-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: BL-0000034
+    description: 請求を一意に特定するID
+  - name_jp: 入金番号
+    name_en: depositId
+    domain: NOKEY
+    reg_ex: ^DP-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: DP-0000002
+    description: 入金を一意に特定するID
+  - name_jp: 売掛変動種類
+    name_en: receivableType
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: SELES
+    description: 売掛変動の種類
+  - name_jp: 請求状況
+    name_en: billingStatus
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: TO_BE_DETERMINED
+    description: 請求・入金状況の種類
+  - name_jp: 曜日
+    name_en: week
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: TUE
+    description: 曜日
+  - name_jp: 受注番号
+    name_en: receivingId
+    domain: NOKEY
+    reg_ex: ^RO-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: RO-0000006
+    description: 受注を一意に特定するID
+  - name_jp: 出荷優先度数
+    name_en: sippingPriority
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 0
+    max_value: 100
+    example: 50
+    description: 出荷時の優先度(数値が小さいほうが優先)
+  - name_jp: 出荷番号
+    name_en: sippingId
+    domain: NOKEY
+    reg_ex: ^SP-[0-9]{7}$
+    min_digits: 10
+    max_digits: 10
+    min_value: null
+    max_value: null
+    example: SP-0000021
+    description: 出荷を一意に特定するID
+  - name_jp: 優先順位
+    name_en: priority
+    domain: 整数
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: 1
+    max_value: null
+    example: 2
+    description: 優先順位（連番）
+  - name_jp: 商品入荷状況
+    name_en: productShippingSituation
+    domain: 区分値
+    reg_ex: null
+    min_digits: null
+    max_digits: null
+    min_value: null
+    max_value: null
+    example: ""
+    description: ""
 delive_elements:
   - origin: 名称
     name_jp: 企業名称
@@ -647,6 +757,74 @@ delive_elements:
     name_jp: 変更後納期日付
     name_en: changedArrivalDate
     description: 変更後の納期日付
+  - origin: 変動金額
+    name_jp: 請求金額
+    name_en: billingAmount
+    description: 請求金額
+  - origin: 変動金額
+    name_jp: 入金金額
+    name_en: depositAmount
+    description: 入金金額
+  - origin: 変動金額
+    name_jp: 残額
+    name_en: remainingAmount
+    description: 残額
+  - origin: 変動金額
+    name_jp: 未充当金額
+    name_en: notAppliedAmount
+    description: 未充当金額
+  - origin: 数量
+    name_jp: 受注数量
+    name_en: receivingQuantity
+    description: 受注数量
+  - origin: 価格
+    name_jp: 想定原価
+    name_en: estimateCostPrice
+    description: 想定原価
+  - origin: 日付
+    name_jp: 入金期限日付
+    name_en: depositLimitDate
+    description: 入金期限日付
+  - origin: 日付
+    name_jp: 出荷日付
+    name_en: sippingDate
+    description: 出荷日付
+  - origin: 日付
+    name_jp: 入金日付
+    name_en: depositDate
+    description: 入金日付
+  - origin: 日付
+    name_jp: 出荷見込日付
+    name_en: availableShipmentDate
+    description: 出荷見込日付
+  - origin: 日付
+    name_jp: 最短発注日付
+    name_en: fastestOrderDate
+    description: 最短発注日付
+  - origin: 変動金額
+    name_jp: 充当済金額
+    name_en: appliedAmount
+    description: 充当金額
+  - origin: 取引管理No
+    name_jp: 入金指示No
+    name_en: depositInstructionNo
+    description: 入金指示単位で採番する取引管理No
+  - origin: 変動金額
+    name_jp: 売上金額
+    name_en: salesAmount
+    description: 売上金額
+  - origin: 日付
+    name_jp: 受注日付
+    name_en: receivingDate
+    description: 受注日付
+  - origin: 取引管理No
+    name_jp: 出荷明細No
+    name_en: shippingDetailNo
+    description: 出荷明細単位で採番する取引管理No
+  - origin: 取引管理No
+    name_jp: 売掛修正指示No
+    name_en: receivableCorrectInstructionNo
+    description: 売掛修正指示No
 segments:
   - key: 取引状況
     value: READY
@@ -689,7 +867,7 @@ segments:
     name: 売上出庫
     description: 売上
   - key: 在庫変動種類
-    value: ORDER_RETURN
+    value: PURCHASE_RETURN
     name: 仕入返品出庫
     description: 仕入返品
   - key: 在庫変動種類
@@ -701,7 +879,7 @@ segments:
     name: 仕入購入
     description: 仕入購入
   - key: 買掛変動種類
-    value: ORDER_RETURN
+    value: PURCHASE_RETURN
     name: 仕入返品
     description: 仕入返品
   - key: 買掛変動種類
@@ -724,3 +902,79 @@ segments:
     value: COMPLETED
     name: 支払完了
     description: 支払完了
+  - key: 売掛変動種類
+    value: SELES
+    name: 販売売上
+    description: 販売売上
+  - key: 売掛変動種類
+    value: SALES_RETURN
+    name: 売上返品
+    description: 売上返品
+  - key: 売掛変動種類
+    value: DEPOSIT
+    name: 入金
+    description: 入金
+  - key: 売掛変動種類
+    value: OTHER
+    name: その他取引
+    description: その他取引
+  - key: 請求状況
+    value: TO_BE_DETERMINED
+    name: 金額確定前
+    description: 金額確定前
+  - key: 請求状況
+    value: CONFIRMED
+    name: 金額確定
+    description: 金額確定
+  - key: 請求状況
+    value: PART_OF_DEPOSITED
+    name: 一部充当
+    description: 一部充当
+  - key: 請求状況
+    value: COMPLETED
+    name: 入金確認完了
+    description: 入金確認完了
+  - key: 曜日
+    value: SUN
+    name: 日曜日
+    description: 日曜日
+  - key: 曜日
+    value: MON
+    name: 月曜日
+    description: 月曜日
+  - key: 曜日
+    value: TUE
+    name: 火曜日
+    description: 火曜日
+  - key: 曜日
+    value: WED
+    name: 水曜日
+    description: 水曜日
+  - key: 曜日
+    value: THU
+    name: 木曜日
+    description: 木曜日
+  - key: 曜日
+    value: FRI
+    name: 金曜日
+    description: 金曜日
+  - key: 曜日
+    value: SAT
+    name: 土曜日
+    description: 土曜日
+  - key: 商品入荷状況
+    value: IN_STOCK
+    name: 在庫
+    description: 在庫あり
+  - key: 商品入荷状況
+    value: ON_INSPECT
+    name: 検品中
+    description: 検品中
+  - key: 商品入荷状況
+    value: ORDERING
+    name: 既発注
+    description: 発注済み
+  - key: 商品入荷状況
+    value: ORDER_PREPARING
+    name: 未発注
+    description: これから発注
