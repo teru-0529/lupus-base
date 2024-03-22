@@ -6,14 +6,14 @@
 DROP TABLE IF EXISTS inventories.suppliers CASCADE;
 CREATE TABLE inventories.suppliers (
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
-  dealing_status dealing_status NOT NULL DEFAULT 'READY',
+  dealing_status inventories.dealing_status NOT NULL DEFAULT 'READY',
   cut_off_day integer NOT NULL DEFAULT 99 check (1 <= cut_off_day AND cut_off_day <= 99),
   month_of_payment_term integer NOT NULL DEFAULT 1 check (month_of_payment_term >= 1),
   payment_day integer NOT NULL DEFAULT 99 check (1 <= payment_day AND payment_day <= 99),
   purchase_pic varchar(8) check (purchase_pic ~* '^P[0-9]{7}$'),
   contact_person varchar(20),
-  order_policy order_policy NOT NULL,
-  order_week week NOT NULL,
+  order_policy inventories.order_policy NOT NULL,
+  order_week inventories.week,
   days_to_arrive integer NOT NULL check (days_to_arrive >= 1),
   note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,

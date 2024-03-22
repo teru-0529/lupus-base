@@ -1,23 +1,23 @@
 -- Enum Type DDL
 
 -- 取引状況
-DROP TYPE IF EXISTS dealing_status;
-CREATE TYPE dealing_status AS enum (
+DROP TYPE IF EXISTS inventories.dealing_status;
+CREATE TYPE inventories.dealing_status AS enum (
   'READY',
   'ACTIVE',
   'STOP_DEALING'
 );
 
 -- 発注方針
-DROP TYPE IF EXISTS order_policy;
-CREATE TYPE order_policy AS enum (
+DROP TYPE IF EXISTS inventories.order_policy;
+CREATE TYPE inventories.order_policy AS enum (
   'WEEKLY',
   'AS_NEEDED'
 );
 
 -- 在庫変動種類
-DROP TYPE IF EXISTS inventory_type;
-CREATE TYPE inventory_type AS enum (
+DROP TYPE IF EXISTS inventories.inventory_type;
+CREATE TYPE inventories.inventory_type AS enum (
   'MOVE_WAREHOUSEMENT',
   'PURCHASE',
   'SALES_RETURN',
@@ -28,8 +28,8 @@ CREATE TYPE inventory_type AS enum (
 );
 
 -- 買掛変動種類
-DROP TYPE IF EXISTS payable_type;
-CREATE TYPE payable_type AS enum (
+DROP TYPE IF EXISTS inventories.payable_type;
+CREATE TYPE inventories.payable_type AS enum (
   'PURCHASE',
   'PURCHASE_RETURN',
   'PAYMENT',
@@ -37,16 +37,16 @@ CREATE TYPE payable_type AS enum (
 );
 
 -- 支払状況
-DROP TYPE IF EXISTS payment_status;
-CREATE TYPE payment_status AS enum (
+DROP TYPE IF EXISTS inventories.payment_status;
+CREATE TYPE inventories.payment_status AS enum (
   'TO_BE_DETERMINED',
   'CONFIRMED',
   'COMPLETED'
 );
 
 -- 売掛変動種類
-DROP TYPE IF EXISTS receivable_type;
-CREATE TYPE receivable_type AS enum (
+DROP TYPE IF EXISTS inventories.receivable_type;
+CREATE TYPE inventories.receivable_type AS enum (
   'SELES',
   'SALES_RETURN',
   'DEPOSIT',
@@ -54,8 +54,8 @@ CREATE TYPE receivable_type AS enum (
 );
 
 -- 請求状況
-DROP TYPE IF EXISTS billing_status;
-CREATE TYPE billing_status AS enum (
+DROP TYPE IF EXISTS inventories.billing_status;
+CREATE TYPE inventories.billing_status AS enum (
   'TO_BE_DETERMINED',
   'CONFIRMED',
   'PART_OF_DEPOSITED',
@@ -63,8 +63,8 @@ CREATE TYPE billing_status AS enum (
 );
 
 -- 曜日
-DROP TYPE IF EXISTS week;
-CREATE TYPE week AS enum (
+DROP TYPE IF EXISTS inventories.week;
+CREATE TYPE inventories.week AS enum (
   'SUN',
   'MON',
   'TUE',
@@ -75,8 +75,8 @@ CREATE TYPE week AS enum (
 );
 
 -- 商品入荷状況
-DROP TYPE IF EXISTS product_shipping_situation;
-CREATE TYPE product_shipping_situation AS enum (
+DROP TYPE IF EXISTS inventories.product_shipping_situation;
+CREATE TYPE inventories.product_shipping_situation AS enum (
   'IN_STOCK',
   'ON_INSPECT',
   'ORDERING',
@@ -84,8 +84,8 @@ CREATE TYPE product_shipping_situation AS enum (
 );
 
 -- 倉庫種別
-DROP TYPE IF EXISTS site_type;
-CREATE TYPE site_type AS enum (
+DROP TYPE IF EXISTS inventories.site_type;
+CREATE TYPE inventories.site_type AS enum (
   'ALLOWABLE',
   'INSPECT',
   'KEEP'

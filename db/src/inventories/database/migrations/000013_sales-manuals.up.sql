@@ -18,7 +18,7 @@ DECLARE
   deposit RECORD;
   billing RECORD;
   t_applied_amount numeric;
-  t_billing_status billing_status;
+  t_billing_status inventories.billing_status;
 BEGIN
   -- 残額のある入金データでループ
   FOR deposit IN SELECT * FROM inventories.deposits

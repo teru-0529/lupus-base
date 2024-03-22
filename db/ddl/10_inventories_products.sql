@@ -9,7 +9,7 @@ CREATE TABLE inventories.products (
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   product_code varchar(30) NOT NULL,
   product_name varchar(30) NOT NULL,
-  dealing_status dealing_status NOT NULL DEFAULT 'READY',
+  dealing_status inventories.dealing_status NOT NULL DEFAULT 'READY',
   selling_price numeric NOT NULL DEFAULT 0.00 check (selling_price >= 0),
   cost_price numeric NOT NULL DEFAULT 0.00 check (cost_price >= 0),
   standard_profit_rate numeric check (standard_profit_rate >= 0),

@@ -296,13 +296,13 @@ $$ LANGUAGE plpgsql;
 
 
 -- Create Function
-CREATE OR REPLACE FUNCTION inventories.getWeekNum(i_week week) RETURNS integer AS $$
+CREATE OR REPLACE FUNCTION inventories.getWeekNum(i_week inventories.week) RETURNS integer AS $$
 DECLARE
-  t_week week;
+  t_week inventories.week;
   i integer;
 BEGIN
   i = 0;
-  FOR t_week IN SELECT UNNEST(ENUM_RANGE(NULL::week)) LOOP
+  FOR t_week IN SELECT UNNEST(ENUM_RANGE(NULL::inventories.week)) LOOP
     IF t_week = i_week THEN RETURN i; END IF;
 
     i=i+1;

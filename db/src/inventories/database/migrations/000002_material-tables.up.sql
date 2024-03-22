@@ -1,23 +1,23 @@
 -- Enum Type DDL
 
 -- 取引状況
-DROP TYPE IF EXISTS dealing_status;
-CREATE TYPE dealing_status AS enum (
+DROP TYPE IF EXISTS inventories.dealing_status;
+CREATE TYPE inventories.dealing_status AS enum (
   'READY',
   'ACTIVE',
   'STOP_DEALING'
 );
 
 -- 発注方針
-DROP TYPE IF EXISTS order_policy;
-CREATE TYPE order_policy AS enum (
+DROP TYPE IF EXISTS inventories.order_policy;
+CREATE TYPE inventories.order_policy AS enum (
   'WEEKLY',
   'AS_NEEDED'
 );
 
 -- 曜日
-DROP TYPE IF EXISTS week;
-CREATE TYPE week AS enum (
+DROP TYPE IF EXISTS inventories.week;
+CREATE TYPE inventories.week AS enum (
   'SUN',
   'MON',
   'TUE',
@@ -28,8 +28,8 @@ CREATE TYPE week AS enum (
 );
 
 -- 倉庫種別
-DROP TYPE IF EXISTS site_type;
-CREATE TYPE site_type AS enum (
+DROP TYPE IF EXISTS inventories.site_type;
+CREATE TYPE inventories.site_type AS enum (
   'ALLOWABLE',
   'INSPECT',
   'KEEP'
@@ -181,7 +181,7 @@ EXECUTE PROCEDURE inventories.dealing_banks_audit();
 DROP TABLE IF EXISTS inventories.costomers CASCADE;
 CREATE TABLE inventories.costomers (
   costomer_id varchar(6) NOT NULL check (LENGTH(costomer_id) = 6),
-  dealing_status dealing_status NOT NULL DEFAULT 'READY',
+  dealing_status inventories.dealing_status NOT NULL DEFAULT 'READY',
   cut_off_day integer NOT NULL DEFAULT 99 check (1 <= cut_off_day AND cut_off_day <= 99),
   month_of_deposit_term integer NOT NULL DEFAULT 1 check (month_of_deposit_term >= 1),
   deposit_day integer NOT NULL DEFAULT 99 check (1 <= deposit_day AND deposit_day <= 99),
@@ -254,14 +254,14 @@ EXECUTE PROCEDURE inventories.costomers_audit();
 DROP TABLE IF EXISTS inventories.suppliers CASCADE;
 CREATE TABLE inventories.suppliers (
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
-  dealing_status dealing_status NOT NULL DEFAULT 'READY',
+  dealing_status inventories.dealing_status NOT NULL DEFAULT 'READY',
   cut_off_day integer NOT NULL DEFAULT 99 check (1 <= cut_off_day AND cut_off_day <= 99),
   month_of_payment_term integer NOT NULL DEFAULT 1 check (month_of_payment_term >= 1),
   payment_day integer NOT NULL DEFAULT 99 check (1 <= payment_day AND payment_day <= 99),
   purchase_pic varchar(8) check (purchase_pic ~* '^P[0-9]{7}$'),
   contact_person varchar(20),
-  order_policy order_policy NOT NULL,
-  order_week week,
+  order_policy inventories.order_policy NOT NULL,
+  order_week inventories.week,
   days_to_arrive integer NOT NULL check (days_to_arrive >= 1),
   note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -411,7 +411,7 @@ CREATE TABLE inventories.products (
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   product_code varchar(30) NOT NULL,
   product_name varchar(30) NOT NULL,
-  dealing_status dealing_status NOT NULL DEFAULT 'READY',
+  dealing_status inventories.dealing_status NOT NULL DEFAULT 'READY',
   selling_price numeric NOT NULL DEFAULT 0.00 check (selling_price >= 0),
   cost_price numeric NOT NULL DEFAULT 0.00 check (cost_price >= 0),
   standard_profit_rate numeric check (standard_profit_rate >= 0),
@@ -490,7 +490,7 @@ DROP TABLE IF EXISTS inventories.inventory_sites CASCADE;
 CREATE TABLE inventories.inventory_sites (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   manage_pic varchar(8) NOT NULL check (manage_pic ~* '^P[0-9]{7}$'),
-  site_type site_type NOT NULL,
+  site_type inventories.site_type NOT NULL,
   note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
