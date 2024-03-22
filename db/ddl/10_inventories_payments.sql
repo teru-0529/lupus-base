@@ -10,7 +10,7 @@ CREATE TABLE inventories.payments (
   cut_off_date date NOT NULL DEFAULT get_business_date(),
   payment_limit_date date NOT NULL DEFAULT get_business_date(),
   payment_amount numeric NOT NULL DEFAULT 0.00,
-  payment_status payment_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
+  payment_status inventories.payment_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
   amount_confirmed_date date,
   payment_date date,
   freeze_changed_timestamp timestamp,

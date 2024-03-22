@@ -1,6 +1,6 @@
 data_type: define_tables
-version: 3.2.6
-create_at: 2024-03-20T11:11:46+09:00
+version: 3.2.7
+create_at: 2024-03-22T21:18:29+09:00
 schema:
   name_jp: 在庫管理
   name_en: inventories
@@ -138,7 +138,7 @@ tables:
         nullable: false
         default: null
       - name: 発注曜日
-        nullable: false
+        nullable: true
         default: null
       - name: 標準入荷日数
         nullable: false

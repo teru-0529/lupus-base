@@ -6,7 +6,7 @@
 DROP TABLE IF EXISTS inventories.costomers CASCADE;
 CREATE TABLE inventories.costomers (
   costomer_id varchar(6) NOT NULL check (LENGTH(costomer_id) = 6),
-  dealing_status dealing_status NOT NULL DEFAULT 'READY',
+  dealing_status inventories.dealing_status NOT NULL DEFAULT 'READY',
   cut_off_day integer NOT NULL DEFAULT 99 check (1 <= cut_off_day AND cut_off_day <= 99),
   month_of_deposit_term integer NOT NULL DEFAULT 1 check (month_of_deposit_term >= 1),
   deposit_day integer NOT NULL DEFAULT 99 check (1 <= deposit_day AND deposit_day <= 99),

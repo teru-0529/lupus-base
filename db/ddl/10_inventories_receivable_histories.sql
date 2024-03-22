@@ -10,7 +10,7 @@ CREATE TABLE inventories.receivable_histories (
   operation_timestamp timestamp NOT NULL DEFAULT current_timestamp,
   costomer_id varchar(6) NOT NULL check (LENGTH(costomer_id) = 6),
   variable_amount numeric NOT NULL DEFAULT 0.00,
-  receivable_type receivable_type NOT NULL,
+  receivable_type inventories.receivable_type NOT NULL,
   tranzaction_no serial NOT NULL,
   billing_id varchar(10) check (billing_id ~* '^BL-[0-9]{7}$'),
   deposit_id varchar(10) check (deposit_id ~* '^DP-[0-9]{7}$'),

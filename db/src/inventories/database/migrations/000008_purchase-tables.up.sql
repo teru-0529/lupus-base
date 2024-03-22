@@ -1,8 +1,8 @@
 -- Enum Type DDL
 
 -- 買掛変動種類
-DROP TYPE IF EXISTS payable_type;
-CREATE TYPE payable_type AS enum (
+DROP TYPE IF EXISTS inventories.payable_type;
+CREATE TYPE inventories.payable_type AS enum (
   'PURCHASE',
   'PURCHASE_RETURN',
   'PAYMENT',
@@ -10,8 +10,8 @@ CREATE TYPE payable_type AS enum (
 );
 
 -- 支払状況
-DROP TYPE IF EXISTS payment_status;
-CREATE TYPE payment_status AS enum (
+DROP TYPE IF EXISTS inventories.payment_status;
+CREATE TYPE inventories.payment_status AS enum (
   'TO_BE_DETERMINED',
   'CONFIRMED',
   'COMPLETED'
@@ -29,7 +29,7 @@ CREATE TABLE inventories.payments (
   cut_off_date date NOT NULL DEFAULT get_business_date(),
   payment_limit_date date NOT NULL DEFAULT get_business_date(),
   payment_amount numeric NOT NULL DEFAULT 0.00,
-  payment_status payment_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
+  payment_status inventories.payment_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
   amount_confirmed_date date,
   payment_date date,
   freeze_changed_timestamp timestamp,
@@ -244,7 +244,7 @@ CREATE TABLE inventories.payable_histories (
   operation_timestamp timestamp NOT NULL DEFAULT current_timestamp,
   supplier_id varchar(6) NOT NULL check (LENGTH(supplier_id) = 6),
   variable_amount numeric NOT NULL DEFAULT 0.00,
-  payable_type payable_type NOT NULL,
+  payable_type inventories.payable_type NOT NULL,
   tranzaction_no serial NOT NULL,
   payment_id varchar(10) NOT NULL check (payment_id ~* '^PM-[0-9]{7}$'),
   created_at timestamp NOT NULL DEFAULT current_timestamp,

@@ -1,8 +1,8 @@
 -- Enum Type DDL
 
 -- 売掛変動種類
-DROP TYPE IF EXISTS receivable_type;
-CREATE TYPE receivable_type AS enum (
+DROP TYPE IF EXISTS inventories.receivable_type;
+CREATE TYPE inventories.receivable_type AS enum (
   'SELES',
   'SALES_RETURN',
   'DEPOSIT',
@@ -10,21 +10,12 @@ CREATE TYPE receivable_type AS enum (
 );
 
 -- 請求状況
-DROP TYPE IF EXISTS billing_status;
-CREATE TYPE billing_status AS enum (
+DROP TYPE IF EXISTS inventories.billing_status;
+CREATE TYPE inventories.billing_status AS enum (
   'TO_BE_DETERMINED',
   'CONFIRMED',
   'PART_OF_DEPOSITED',
   'COMPLETED'
-);
-
--- 商品入荷状況
-DROP TYPE IF EXISTS product_shipping_situation;
-CREATE TYPE product_shipping_situation AS enum (
-  'IN_STOCK',
-  'ON_INSPECT',
-  'ORDERING',
-  'ORDER_PREPARING'
 );
 
 -- Tables DDL
@@ -41,7 +32,7 @@ CREATE TABLE inventories.bills (
   billing_amount numeric NOT NULL DEFAULT 0.00,
   applied_amount numeric NOT NULL DEFAULT 0.00,
   remaining_amount numeric NOT NULL DEFAULT 0.00,
-  billing_status billing_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
+  billing_status inventories.billing_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
   amount_confirmed_date date,
   freeze_changed_timestamp timestamp,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -331,7 +322,7 @@ CREATE TABLE inventories.receivable_histories (
   operation_timestamp timestamp NOT NULL DEFAULT current_timestamp,
   costomer_id varchar(6) NOT NULL check (LENGTH(costomer_id) = 6),
   variable_amount numeric NOT NULL DEFAULT 0.00,
-  receivable_type receivable_type NOT NULL,
+  receivable_type inventories.receivable_type NOT NULL,
   tranzaction_no serial NOT NULL,
   billing_id varchar(10) check (billing_id ~* '^BL-[0-9]{7}$'),
   deposit_id varchar(10) check (deposit_id ~* '^DP-[0-9]{7}$'),

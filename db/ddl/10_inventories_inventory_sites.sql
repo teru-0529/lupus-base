@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS inventories.inventory_sites CASCADE;
 CREATE TABLE inventories.inventory_sites (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   manage_pic varchar(8) NOT NULL check (manage_pic ~* '^P[0-9]{7}$'),
-  site_type site_type NOT NULL,
+  site_type inventories.site_type NOT NULL,
   note text,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,

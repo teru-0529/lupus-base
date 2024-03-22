@@ -1,8 +1,8 @@
 -- Enum Type DDL
 
 -- 在庫変動種類
-DROP TYPE IF EXISTS inventory_type;
-CREATE TYPE inventory_type AS enum (
+DROP TYPE IF EXISTS inventories.inventory_type;
+CREATE TYPE inventories.inventory_type AS enum (
   'MOVE_WAREHOUSEMENT',
   'PURCHASE',
   'SALES_RETURN',
@@ -319,7 +319,7 @@ CREATE TABLE inventories.inventory_histories (
   site_id varchar(30) NOT NULL check (LENGTH(site_id) >= 1),
   variable_quantity integer NOT NULL,
   variable_amount numeric NOT NULL,
-  inventory_type inventory_type NOT NULL,
+  inventory_type inventories.inventory_type NOT NULL,
   tranzaction_no serial NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,

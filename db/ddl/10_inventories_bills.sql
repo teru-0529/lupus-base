@@ -12,7 +12,7 @@ CREATE TABLE inventories.bills (
   billing_amount numeric NOT NULL DEFAULT 0.00,
   applied_amount numeric NOT NULL DEFAULT 0.00,
   remaining_amount numeric NOT NULL DEFAULT 0.00,
-  billing_status billing_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
+  billing_status inventories.billing_status NOT NULL DEFAULT 'TO_BE_DETERMINED',
   amount_confirmed_date date,
   freeze_changed_timestamp timestamp,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
